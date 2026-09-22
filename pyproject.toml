@@ -1,0 +1,77 @@
+[project]
+name = "cyclic-peptide"
+version = "0.1.0"
+description = "Pipeline that turns cyclic-peptide patents (e.g. WO2025162428) into a structured SMILES + bioactivity dataset."
+requires-python = ">=3.11,<3.14"
+authors = [{ name = "cyclic-peptide contributors" }]
+keywords = ["cheminformatics", "patents", "cyclic-peptides", "ras-inhibitors", "occr"]
+
+# Slim core: data models + CLI. Heavy stacks live in extras below.
+dependencies = [
+    "pydantic>=2.5",
+    "click>=8.1",
+    "rich>=13.7",
+    "httpx>=0.28.1",
+    "bs4>=0.0.2",
+]
+
+[project.optional-dependencies]
+# OCR / cheminformatics
+chem = [
+    "rdkit>=2024.3.1",
+    "pillow>=10.0",
+]
+ocr = [
+    "decimer>=2.0",
+    "opencv-python>=4.9",
+]
+# Document scraping / extraction
+pdf = [
+    "pymupdf>=1.24",
+    "camelot-py[base]>=0.11",
+]
+scrape = [
+    "httpx>=0.27",
+    "beautifulsoup4>=4.12",
+    "playwright>=1.42",
+]
+# LLM-assisted Markush / table parsing
+llm = [
+    "langchain>=0.1",
+    "langchain-openai>=0.0.5",
+]
+
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "ruff>=0.3",
+    "mypy>=1.8",
+]
+all = ["cyclic-peptide[chem,ocr,pdf,scrape,llm]"]
+
+[project.scripts]
+cpd = "cpd.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cpd"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"
+pythonpath = ["src"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = false
+ignore_missing_imports = true
