@@ -27,7 +27,7 @@ def test_parse_extracts_title_applicants_abstract() -> None:
     assert doc.publication_date is not None
     assert doc.publication_date.isoformat() == "2025-08-14"
     assert doc.pdf_url is not None
-    assert doc.pdf_url.startswith("https:")
+    assert str(doc.pdf_url).startswith("https:")
 
 
 def test_parse_handles_missing_fields_gracefully() -> None:
