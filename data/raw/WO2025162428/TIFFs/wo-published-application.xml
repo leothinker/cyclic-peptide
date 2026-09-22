@@ -1,0 +1,1711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wo-published-application date-produced="20250807" dtd-version="1.7" file="wo-published-application.xml" lang="en" produced-by="IB">
+<wo-bibliographic-data lang="en" produced-by="IB">
+<publication-reference>
+<document-id lang="en">
+<country>WO</country>
+<doc-number>2025/162428</doc-number>
+<kind>A1</kind>
+<date>20250807</date>
+</document-id>
+</publication-reference>
+<wo-publication-info>
+<pct-pub-info>
+<wo-published-text>
+<wo-text-letter-code>x</wo-text-letter-code>
+<wo-text-letter-code>c</wo-text-letter-code>
+</wo-published-text>
+</pct-pub-info>
+<wo-pubnum>32/2025</wo-pubnum>
+</wo-publication-info>
+<application-reference appl-type="international">
+<document-id lang="en">
+<country>CN</country>
+<doc-number>CN2025/075389</doc-number>
+<date>20250127</date>
+</document-id>
+</application-reference>
+<invention-title lang="en">CYCLIC PEPTIDE COMPOUNDS AND COMPOSITIONS AS RAS INHIBITORS</invention-title>
+<invention-title lang="fr">COMPOSÉS PEPTIDIQUES CYCLIQUES ET COMPOSITIONS UTILISÉS EN TANT QU'INHIBITEURS DE RAS</invention-title>
+<parties>
+<applicants>
+<applicant app-type="applicant" designation="all" sequence="1">
+<addressbook lang="en">
+<name>SYNERON TECHNOLOGY CO. LTD.</name>
+<address>
+<address-1>7208 Redtop Rd. Hummelstown</address-1>
+<address-2>Pennsylvania 17036</address-2>
+<postcode> 17036</postcode>
+<country>US</country>
+</address>
+</addressbook>
+<nationality>
+<country>US</country>
+</nationality>
+<residence>
+<country>US</country>
+</residence>
+</applicant>
+<applicant app-type="applicant-inventor" designation="as-indicated" sequence="2">
+<addressbook lang="en">
+<name>ZHOU, Caihong</name>
+<address>
+<address-1>No.160, Basheng Road, Simbay Park</address-1>
+<address-2>Pudong New Area, Shanghai 201208</address-2>
+<postcode> 201208</postcode>
+<country>CN</country>
+</address>
+</addressbook>
+<nationality>
+<country>CN</country>
+</nationality>
+<residence>
+<country>CN</country>
+</residence>
+<designated-states>
+<country>BW</country>
+</designated-states>
+</applicant>
+</applicants>
+<inventors>
+<inventor designation="all" sequence="1">
+<addressbook lang="en">
+<name>POSS, Michael A.</name>
+<address>
+<address-1>15 Valerie Lane, Lawrenceville</address-1>
+<address-2>New Jersey 08648-1433</address-2>
+<postcode> 08648-1433</postcode>
+<country>US</country>
+</address>
+</addressbook>
+</inventor>
+<inventor designation="all" sequence="2">
+<addressbook lang="en">
+<name>LU, Cheng</name>
+<address>
+<address-1>No.160, Basheng Road, Simbay Park</address-1>
+<address-2>Pudong New Area, Shanghai 201208</address-2>
+<postcode> 201208</postcode>
+<country>CN</country>
+</address>
+</addressbook>
+</inventor>
+<inventor designation="all" sequence="3">
+<addressbook lang="en">
+<name>WANG, Yu</name>
+<address>
+<address-1>11/F, Building 1, No. 3 Haidian Street</address-1>
+<address-2>Haidian District, Beijing 100080</address-2>
+<postcode> 100080</postcode>
+<country>CN</country>
+</address>
+</addressbook>
+</inventor>
+<inventor designation="all" sequence="4">
+<addressbook lang="en">
+<name>XIONG, Yuanpeng</name>
+<address>
+<address-1>11/F, Building 1, No. 3 Haidian Street</address-1>
+<address-2>Haidian District, Beijing 100080</address-2>
+<postcode> 100080</postcode>
+<country>CN</country>
+</address>
+</addressbook>
+</inventor>
+<inventor designation="all" sequence="5">
+<addressbook lang="en">
+<name>DEGENHARDT, Yan</name>
+<address>
+<address-1>300 Barwynne Rd. Wynnewood</address-1>
+<address-2>Pennsylvania 19096</address-2>
+<postcode> 19096</postcode>
+<country>US</country>
+</address>
+</addressbook>
+</inventor>
+</inventors>
+<agents>
+<agent rep-type="agent" sequence="1">
+<addressbook lang="en">
+<name>LIU , SHEN &amp; ASSOCIATES</name>
+<address>
+<address-1>10th Floor, Building 1, 10 Caihefang Road</address-1>
+<address-2>Haidian District, Beijing 100080</address-2>
+<postcode> 100080</postcode>
+<country>CN</country>
+</address>
+</addressbook>
+</agent>
+</agents>
+</parties>
+<designation-of-states>
+<designation-pct>
+<regional>
+<region>
+<country>EP</country>
+</region>
+<country>AL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>AT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>BE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>BG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>CH</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>CY</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>CZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>DE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>DK</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>EE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>ES</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>FI</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>FR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>GB</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>GR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>HR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>HU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IS</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>LT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>LU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>LV</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MC</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>ME</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MK</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>NL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>NO</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>PL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>PT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>RO</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>RS</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SI</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SK</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>TR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+</regional>
+<regional>
+<region>
+<country>OA</country>
+</region>
+<country>BF</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>BJ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CF</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CI</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GQ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>KM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>ML</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>MR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>NE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>SN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>TD</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>TG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+</regional>
+<regional>
+<region>
+<country>AP</country>
+</region>
+<country>BW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CV</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GH</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>KE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>LR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>LS</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>MW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>MZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>NA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>RW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>SC</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>SD</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>SL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>ST</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>SZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>TZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>UG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>ZM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>ZW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+</regional>
+<regional>
+<region>
+<country>EA</country>
+</region>
+<country>AM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>AZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>BY</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>KG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>KZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>RU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>TJ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>TM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+</regional>
+<national>
+<country>AE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>AG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model-certificate</kind-of-protection>
+</protection-request>
+<country>AL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>AM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>AO</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>AT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>AU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>AZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>BA</country>
+<protection-request>
+<kind-of-protection>consensual-patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>BB</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>BG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>BH</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>BN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>BR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>BW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model-certificate</kind-of-protection>
+</protection-request>
+<country>BY</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>BZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>CH</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>CL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CO</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CV</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>provisional-patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>CZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>DE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>DJ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>DK</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>DM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>DO</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>DZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>EC</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>EE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>EG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>ES</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>FI</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GB</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>GD</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>GE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GH</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-certificate</kind-of-protection>
+</protection-request>
+<country>GM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>GT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>HN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>HR</country>
+<protection-request>
+<kind-of-protection>consensual-patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>HU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>ID</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IQ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IS</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>IT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>JM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>JO</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>JP</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>KE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>KG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>KH</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>KN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-certificate</kind-of-protection>
+</protection-request>
+<country>KP</country>
+<protection-request>
+<kind-of-protection>inventor-certificate</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>petty-patent</kind-of-protection>
+</protection-request>
+<country>KR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>KW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>KZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>LA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>LC</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>LK</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>LR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>LS</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>LU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>LY</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MD</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MK</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>MW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>MX</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>MY</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-innovation</kind-of-protection>
+</protection-request>
+<country>MZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>NA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>NG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>NI</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>NO</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>NZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>OM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>PA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>PE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>PG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>PH</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>PL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>PT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>QA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>RO</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>RS</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>petty-patent</kind-of-protection>
+</protection-request>
+<country>RU</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>RW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>SA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SC</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SD</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SE</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SK</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>SL</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>ST</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>SV</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>SY</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>TH</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>petty-patent</kind-of-protection>
+</protection-request>
+<country>TJ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>petty-patent</kind-of-protection>
+</protection-request>
+<country>TM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>provisional-patent</kind-of-protection>
+</protection-request>
+<country>TN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>TR</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>TT</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-certificate</kind-of-protection>
+</protection-request>
+<country>TZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>UA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>UG</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-certificate</kind-of-protection>
+</protection-request>
+<country>US</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>UY</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>UZ</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>VC</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-certificate</kind-of-protection>
+</protection-request>
+<country>VN</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>patent-for-utility-solution</kind-of-protection>
+</protection-request>
+<country>WS</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>ZA</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<country>ZM</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+<protection-request>
+<kind-of-protection>utility-model</kind-of-protection>
+</protection-request>
+<country>ZW</country>
+<protection-request>
+<kind-of-protection>patent</kind-of-protection>
+</protection-request>
+</national>
+</designation-pct>
+</designation-of-states>
+<wo-priority-info>
+<priority-claim kind="national" sequence="1">
+<country>CN</country>
+<doc-number>PCT/CN2024/074452</doc-number>
+<date>20240129</date>
+</priority-claim>
+<priority-claim kind="national" sequence="2">
+<country>CN</country>
+<doc-number>PCT/CN2024/134816</doc-number>
+<date>20241127</date>
+</priority-claim>
+<priority-claim kind="national" sequence="3">
+<country>CN</country>
+<doc-number>PCT/CN2025/070357</doc-number>
+<date>20250103</date>
+</priority-claim>
+</wo-priority-info>
+<search-authority>
+<isa>
+<country>EP</country>
+</isa>
+</search-authority>
+<classifications-ipcr>
+<classification-ipcr>
+<ipc-version-indicator>
+<date>20060101</date>
+</ipc-version-indicator>
+<classification-level>A</classification-level>
+<section>C</section>
+<class>07</class>
+<subclass>K</subclass>
+<main-group>7</main-group>
+<subgroup>54</subgroup>
+<symbol-position>F</symbol-position>
+<classification-value>I</classification-value>
+<generating-office>
+<country>EP</country>
+</generating-office>
+<classification-status>B</classification-status>
+<classification-data-source>H</classification-data-source>
+</classification-ipcr>
+<classification-ipcr>
+<ipc-version-indicator>
+<date>20060101</date>
+</ipc-version-indicator>
+<classification-level>A</classification-level>
+<section>A</section>
+<class>61</class>
+<subclass>K</subclass>
+<main-group>38</main-group>
+<subgroup>12</subgroup>
+<symbol-position>L</symbol-position>
+<classification-value>I</classification-value>
+<generating-office>
+<country>EP</country>
+</generating-office>
+<classification-status>B</classification-status>
+<classification-data-source>H</classification-data-source>
+</classification-ipcr>
+</classifications-ipcr>
+<figure-to-publish>
+<fig-number>0</fig-number>
+</figure-to-publish>
+</wo-bibliographic-data>
+<abstract lang="en">
+<p num="0000">This disclosure provides cyclic peptide compounds of formula (A) or formula (II) as inhibitors of Ras kinase, and compositions and use of the same in treating diseases associated with Ras kinase.</p>
+</abstract>
+<abstract lang="fr">
+<p num="0000">La présente invention concerne des composés peptidiques cycliques de formule (A) ou de formule (II) utilisés en tant qu'inhibiteurs de la kinase Ras, ainsi que des compositions et leur utilisation dans le traitement de maladies associées à la kinase Ras.</p>
+</abstract>
+<abstract-figure orientation="L">
+<img file="CN2025075389_07082025_pf_fp.g4" he="87MM" img-content="drawing" img-format="tif" wi="256MM"/>
+</abstract-figure>
+<abstract-figure lang="en" orientation="L">
+<img file="CN2025075389_07082025_gz_en.g4" he="87MM" img-content="drawing" img-format="tif" wi="256MM"/>
+</abstract-figure>
+<abstract-figure lang="fr" orientation="L">
+<img file="CN2025075389_07082025_gz_fr.g4" he="87MM" img-content="drawing" img-format="tif" wi="256MM"/>
+</abstract-figure>
+<front-page>
+<doc-page file="000001.tif" he="3560" id="docp000001" type="tif" wi="2540"/>
+</front-page>
+<description>
+<doc-page file="000002.tif" he="3560" id="docp000002" type="tif" wi="2540"/>
+<doc-page file="000003.tif" he="3560" id="docp000003" type="tif" wi="2540"/>
+<doc-page file="000004.tif" he="3560" id="docp000004" type="tif" wi="2540"/>
+<doc-page file="000005.tif" he="3560" id="docp000005" type="tif" wi="2540"/>
+<doc-page file="000006.tif" he="3560" id="docp000006" type="tif" wi="2540"/>
+<doc-page file="000007.tif" he="3560" id="docp000007" type="tif" wi="2540"/>
+<doc-page file="000008.tif" he="3560" id="docp000008" type="tif" wi="2540"/>
+<doc-page file="000009.tif" he="3560" id="docp000009" type="tif" wi="2540"/>
+<doc-page file="000010.tif" he="3560" id="docp000010" type="tif" wi="2540"/>
+<doc-page file="000011.tif" he="3560" id="docp000011" type="tif" wi="2540"/>
+<doc-page file="000012.tif" he="3560" id="docp000012" type="tif" wi="2540"/>
+<doc-page file="000013.tif" he="3560" id="docp000013" type="tif" wi="2540"/>
+<doc-page file="000014.tif" he="3560" id="docp000014" type="tif" wi="2540"/>
+<doc-page file="000015.tif" he="3560" id="docp000015" type="tif" wi="2540"/>
+<doc-page file="000016.tif" he="3560" id="docp000016" type="tif" wi="2540"/>
+<doc-page file="000017.tif" he="3560" id="docp000017" type="tif" wi="2540"/>
+<doc-page file="000018.tif" he="3560" id="docp000018" type="tif" wi="2540"/>
+<doc-page file="000019.tif" he="3560" id="docp000019" type="tif" wi="2540"/>
+<doc-page file="000020.tif" he="3560" id="docp000020" type="tif" wi="2540"/>
+<doc-page file="000021.tif" he="3560" id="docp000021" type="tif" wi="2540"/>
+<doc-page file="000022.tif" he="3560" id="docp000022" type="tif" wi="2540"/>
+<doc-page file="000023.tif" he="3560" id="docp000023" type="tif" wi="2540"/>
+<doc-page file="000024.tif" he="3560" id="docp000024" type="tif" wi="2540"/>
+<doc-page file="000025.tif" he="3560" id="docp000025" type="tif" wi="2540"/>
+<doc-page file="000026.tif" he="3560" id="docp000026" type="tif" wi="2540"/>
+<doc-page file="000027.tif" he="3560" id="docp000027" type="tif" wi="2540"/>
+<doc-page file="000028.tif" he="3560" id="docp000028" type="tif" wi="2540"/>
+<doc-page file="000029.tif" he="3560" id="docp000029" type="tif" wi="2540"/>
+<doc-page file="000030.tif" he="3560" id="docp000030" type="tif" wi="2540"/>
+<doc-page file="000031.tif" he="3560" id="docp000031" type="tif" wi="2540"/>
+<doc-page file="000032.tif" he="3560" id="docp000032" type="tif" wi="2540"/>
+<doc-page file="000033.tif" he="3560" id="docp000033" type="tif" wi="2540"/>
+<doc-page file="000034.tif" he="3560" id="docp000034" type="tif" wi="2540"/>
+<doc-page file="000035.tif" he="3560" id="docp000035" type="tif" wi="2540"/>
+<doc-page file="000036.tif" he="3560" id="docp000036" type="tif" wi="2540"/>
+<doc-page file="000037.tif" he="3560" id="docp000037" type="tif" wi="2540"/>
+<doc-page file="000038.tif" he="3560" id="docp000038" type="tif" wi="2540"/>
+<doc-page file="000039.tif" he="3560" id="docp000039" type="tif" wi="2540"/>
+<doc-page file="000040.tif" he="3560" id="docp000040" type="tif" wi="2540"/>
+<doc-page file="000041.tif" he="3560" id="docp000041" type="tif" wi="2540"/>
+<doc-page file="000042.tif" he="3560" id="docp000042" type="tif" wi="2540"/>
+<doc-page file="000043.tif" he="3560" id="docp000043" type="tif" wi="2540"/>
+<doc-page file="000044.tif" he="3560" id="docp000044" type="tif" wi="2540"/>
+<doc-page file="000045.tif" he="3560" id="docp000045" type="tif" wi="2540"/>
+<doc-page file="000046.tif" he="3560" id="docp000046" type="tif" wi="2540"/>
+<doc-page file="000047.tif" he="3560" id="docp000047" type="tif" wi="2540"/>
+<doc-page file="000048.tif" he="3560" id="docp000048" type="tif" wi="2540"/>
+<doc-page file="000049.tif" he="3560" id="docp000049" type="tif" wi="2540"/>
+<doc-page file="000050.tif" he="3560" id="docp000050" type="tif" wi="2540"/>
+<doc-page file="000051.tif" he="3560" id="docp000051" type="tif" wi="2540"/>
+<doc-page file="000052.tif" he="3560" id="docp000052" type="tif" wi="2540"/>
+<doc-page file="000053.tif" he="3560" id="docp000053" type="tif" wi="2540"/>
+<doc-page file="000054.tif" he="3560" id="docp000054" type="tif" wi="2540"/>
+<doc-page file="000055.tif" he="3560" id="docp000055" type="tif" wi="2540"/>
+<doc-page file="000056.tif" he="3560" id="docp000056" type="tif" wi="2540"/>
+<doc-page file="000057.tif" he="3560" id="docp000057" type="tif" wi="2540"/>
+<doc-page file="000058.tif" he="3560" id="docp000058" type="tif" wi="2540"/>
+<doc-page file="000059.tif" he="3560" id="docp000059" type="tif" wi="2540"/>
+<doc-page file="000060.tif" he="3560" id="docp000060" type="tif" wi="2540"/>
+<doc-page file="000061.tif" he="3560" id="docp000061" type="tif" wi="2540"/>
+<doc-page file="000062.tif" he="3560" id="docp000062" type="tif" wi="2540"/>
+<doc-page file="000063.tif" he="3560" id="docp000063" type="tif" wi="2540"/>
+<doc-page file="000064.tif" he="3560" id="docp000064" type="tif" wi="2540"/>
+<doc-page file="000065.tif" he="3560" id="docp000065" type="tif" wi="2540"/>
+<doc-page file="000066.tif" he="3560" id="docp000066" type="tif" wi="2540"/>
+<doc-page file="000067.tif" he="3560" id="docp000067" type="tif" wi="2540"/>
+<doc-page file="000068.tif" he="3560" id="docp000068" type="tif" wi="2540"/>
+<doc-page file="000069.tif" he="3560" id="docp000069" type="tif" wi="2540"/>
+<doc-page file="000070.tif" he="3560" id="docp000070" type="tif" wi="2540"/>
+<doc-page file="000071.tif" he="3560" id="docp000071" type="tif" wi="2540"/>
+<doc-page file="000072.tif" he="3560" id="docp000072" type="tif" wi="2540"/>
+<doc-page file="000073.tif" he="3560" id="docp000073" type="tif" wi="2540"/>
+<doc-page file="000074.tif" he="3560" id="docp000074" type="tif" wi="2540"/>
+<doc-page file="000075.tif" he="3560" id="docp000075" type="tif" wi="2540"/>
+<doc-page file="000076.tif" he="3560" id="docp000076" type="tif" wi="2540"/>
+<doc-page file="000077.tif" he="3560" id="docp000077" type="tif" wi="2540"/>
+<doc-page file="000078.tif" he="3560" id="docp000078" type="tif" wi="2540"/>
+<doc-page file="000079.tif" he="3560" id="docp000079" type="tif" wi="2540"/>
+<doc-page file="000080.tif" he="3560" id="docp000080" type="tif" wi="2540"/>
+<doc-page file="000081.tif" he="3560" id="docp000081" type="tif" wi="2540"/>
+<doc-page file="000082.tif" he="3560" id="docp000082" type="tif" wi="2540"/>
+<doc-page file="000083.tif" he="3560" id="docp000083" type="tif" wi="2540"/>
+<doc-page file="000084.tif" he="3560" id="docp000084" type="tif" wi="2540"/>
+<doc-page file="000085.tif" he="3560" id="docp000085" type="tif" wi="2540"/>
+<doc-page file="000086.tif" he="3560" id="docp000086" type="tif" wi="2540"/>
+<doc-page file="000087.tif" he="3560" id="docp000087" type="tif" wi="2540"/>
+<doc-page file="000088.tif" he="3560" id="docp000088" type="tif" wi="2540"/>
+<doc-page file="000089.tif" he="3560" id="docp000089" type="tif" wi="2540"/>
+<doc-page file="000090.tif" he="3560" id="docp000090" type="tif" wi="2540"/>
+<doc-page file="000091.tif" he="3560" id="docp000091" type="tif" wi="2540"/>
+<doc-page file="000092.tif" he="3560" id="docp000092" type="tif" wi="2540"/>
+<doc-page file="000093.tif" he="3560" id="docp000093" type="tif" wi="2540"/>
+<doc-page file="000094.tif" he="3560" id="docp000094" type="tif" wi="2540"/>
+<doc-page file="000095.tif" he="3560" id="docp000095" type="tif" wi="2540"/>
+<doc-page file="000096.tif" he="3560" id="docp000096" type="tif" wi="2540"/>
+<doc-page file="000097.tif" he="3560" id="docp000097" type="tif" wi="2540"/>
+<doc-page file="000098.tif" he="3560" id="docp000098" type="tif" wi="2540"/>
+<doc-page file="000099.tif" he="3560" id="docp000099" type="tif" wi="2540"/>
+<doc-page file="000100.tif" he="3560" id="docp000100" type="tif" wi="2540"/>
+<doc-page file="000101.tif" he="3560" id="docp000101" type="tif" wi="2540"/>
+<doc-page file="000102.tif" he="3560" id="docp000102" type="tif" wi="2540"/>
+<doc-page file="000103.tif" he="3560" id="docp000103" type="tif" wi="2540"/>
+<doc-page file="000104.tif" he="3560" id="docp000104" type="tif" wi="2540"/>
+<doc-page file="000105.tif" he="3560" id="docp000105" type="tif" wi="2540"/>
+<doc-page file="000106.tif" he="3560" id="docp000106" type="tif" wi="2540"/>
+<doc-page file="000107.tif" he="3560" id="docp000107" type="tif" wi="2540"/>
+<doc-page file="000108.tif" he="3560" id="docp000108" type="tif" wi="2540"/>
+<doc-page file="000109.tif" he="3560" id="docp000109" type="tif" wi="2540"/>
+<doc-page file="000110.tif" he="3560" id="docp000110" type="tif" wi="2540"/>
+<doc-page file="000111.tif" he="3560" id="docp000111" type="tif" wi="2540"/>
+<doc-page file="000112.tif" he="3560" id="docp000112" type="tif" wi="2540"/>
+<doc-page file="000113.tif" he="3560" id="docp000113" type="tif" wi="2540"/>
+<doc-page file="000114.tif" he="3560" id="docp000114" type="tif" wi="2540"/>
+<doc-page file="000115.tif" he="3560" id="docp000115" type="tif" wi="2540"/>
+<doc-page file="000116.tif" he="3560" id="docp000116" type="tif" wi="2540"/>
+<doc-page file="000117.tif" he="3560" id="docp000117" type="tif" wi="2540"/>
+<doc-page file="000118.tif" he="3560" id="docp000118" type="tif" wi="2540"/>
+<doc-page file="000119.tif" he="3560" id="docp000119" type="tif" wi="2540"/>
+<doc-page file="000120.tif" he="3560" id="docp000120" type="tif" wi="2540"/>
+<doc-page file="000121.tif" he="3560" id="docp000121" type="tif" wi="2540"/>
+<doc-page file="000122.tif" he="3560" id="docp000122" type="tif" wi="2540"/>
+<doc-page file="000123.tif" he="3560" id="docp000123" type="tif" wi="2540"/>
+<doc-page file="000124.tif" he="3560" id="docp000124" type="tif" wi="2540"/>
+<doc-page file="000125.tif" he="3560" id="docp000125" type="tif" wi="2540"/>
+<doc-page file="000126.tif" he="3560" id="docp000126" type="tif" wi="2540"/>
+<doc-page file="000127.tif" he="3560" id="docp000127" type="tif" wi="2540"/>
+<doc-page file="000128.tif" he="3560" id="docp000128" type="tif" wi="2540"/>
+<doc-page file="000129.tif" he="3560" id="docp000129" type="tif" wi="2540"/>
+<doc-page file="000130.tif" he="3560" id="docp000130" type="tif" wi="2540"/>
+<doc-page file="000131.tif" he="3560" id="docp000131" type="tif" wi="2540"/>
+<doc-page file="000132.tif" he="3560" id="docp000132" type="tif" wi="2540"/>
+<doc-page file="000133.tif" he="3560" id="docp000133" type="tif" wi="2540"/>
+<doc-page file="000134.tif" he="3560" id="docp000134" type="tif" wi="2540"/>
+<doc-page file="000135.tif" he="3560" id="docp000135" type="tif" wi="2540"/>
+<doc-page file="000136.tif" he="3560" id="docp000136" type="tif" wi="2540"/>
+<doc-page file="000137.tif" he="3560" id="docp000137" type="tif" wi="2540"/>
+<doc-page file="000138.tif" he="3560" id="docp000138" type="tif" wi="2540"/>
+<doc-page file="000139.tif" he="3560" id="docp000139" type="tif" wi="2540"/>
+<doc-page file="000140.tif" he="3560" id="docp000140" type="tif" wi="2540"/>
+<doc-page file="000141.tif" he="3560" id="docp000141" type="tif" wi="2540"/>
+<doc-page file="000142.tif" he="3560" id="docp000142" type="tif" wi="2540"/>
+<doc-page file="000143.tif" he="3560" id="docp000143" type="tif" wi="2540"/>
+<doc-page file="000144.tif" he="3560" id="docp000144" type="tif" wi="2540"/>
+<doc-page file="000145.tif" he="3560" id="docp000145" type="tif" wi="2540"/>
+<doc-page file="000146.tif" he="3560" id="docp000146" type="tif" wi="2540"/>
+<doc-page file="000147.tif" he="3560" id="docp000147" type="tif" wi="2540"/>
+<doc-page file="000148.tif" he="3560" id="docp000148" type="tif" wi="2540"/>
+<doc-page file="000149.tif" he="3560" id="docp000149" type="tif" wi="2540"/>
+<doc-page file="000150.tif" he="3560" id="docp000150" type="tif" wi="2540"/>
+<doc-page file="000151.tif" he="3560" id="docp000151" type="tif" wi="2540"/>
+<doc-page file="000152.tif" he="3560" id="docp000152" type="tif" wi="2540"/>
+<doc-page file="000153.tif" he="3560" id="docp000153" type="tif" wi="2540"/>
+<doc-page file="000154.tif" he="3560" id="docp000154" type="tif" wi="2540"/>
+<doc-page file="000155.tif" he="3560" id="docp000155" type="tif" wi="2540"/>
+<doc-page file="000156.tif" he="3560" id="docp000156" type="tif" wi="2540"/>
+<doc-page file="000157.tif" he="3560" id="docp000157" type="tif" wi="2540"/>
+<doc-page file="000158.tif" he="3560" id="docp000158" type="tif" wi="2540"/>
+<doc-page file="000159.tif" he="3560" id="docp000159" type="tif" wi="2540"/>
+<doc-page file="000160.tif" he="3560" id="docp000160" type="tif" wi="2540"/>
+<doc-page file="000161.tif" he="3560" id="docp000161" type="tif" wi="2540"/>
+<doc-page file="000162.tif" he="3560" id="docp000162" type="tif" wi="2540"/>
+<doc-page file="000163.tif" he="3560" id="docp000163" type="tif" wi="2540"/>
+<doc-page file="000164.tif" he="3560" id="docp000164" type="tif" wi="2540"/>
+<doc-page file="000165.tif" he="3560" id="docp000165" type="tif" wi="2540"/>
+<doc-page file="000166.tif" he="3560" id="docp000166" type="tif" wi="2540"/>
+<doc-page file="000167.tif" he="3560" id="docp000167" type="tif" wi="2540"/>
+<doc-page file="000168.tif" he="3560" id="docp000168" type="tif" wi="2540"/>
+<doc-page file="000169.tif" he="3560" id="docp000169" type="tif" wi="2540"/>
+<doc-page file="000170.tif" he="3560" id="docp000170" type="tif" wi="2540"/>
+<doc-page file="000171.tif" he="3560" id="docp000171" type="tif" wi="2540"/>
+<doc-page file="000172.tif" he="3560" id="docp000172" type="tif" wi="2540"/>
+<doc-page file="000173.tif" he="3560" id="docp000173" type="tif" wi="2540"/>
+<doc-page file="000174.tif" he="3560" id="docp000174" type="tif" wi="2540"/>
+<doc-page file="000175.tif" he="3560" id="docp000175" type="tif" wi="2540"/>
+<doc-page file="000176.tif" he="3560" id="docp000176" type="tif" wi="2540"/>
+<doc-page file="000177.tif" he="3560" id="docp000177" type="tif" wi="2540"/>
+<doc-page file="000178.tif" he="3560" id="docp000178" type="tif" wi="2540"/>
+<doc-page file="000179.tif" he="3560" id="docp000179" type="tif" wi="2540"/>
+<doc-page file="000180.tif" he="3560" id="docp000180" type="tif" wi="2540"/>
+<doc-page file="000181.tif" he="3560" id="docp000181" type="tif" wi="2540"/>
+<doc-page file="000182.tif" he="3560" id="docp000182" type="tif" wi="2540"/>
+<doc-page file="000183.tif" he="3560" id="docp000183" type="tif" wi="2540"/>
+<doc-page file="000184.tif" he="3560" id="docp000184" type="tif" wi="2540"/>
+<doc-page file="000185.tif" he="3560" id="docp000185" type="tif" wi="2540"/>
+<doc-page file="000186.tif" he="3560" id="docp000186" type="tif" wi="2540"/>
+<doc-page file="000187.tif" he="3560" id="docp000187" type="tif" wi="2540"/>
+<doc-page file="000188.tif" he="3560" id="docp000188" type="tif" wi="2540"/>
+<doc-page file="000189.tif" he="3560" id="docp000189" type="tif" wi="2540"/>
+<doc-page file="000190.tif" he="3560" id="docp000190" type="tif" wi="2540"/>
+<doc-page file="000191.tif" he="3560" id="docp000191" type="tif" wi="2540"/>
+<doc-page file="000192.tif" he="3560" id="docp000192" type="tif" wi="2540"/>
+<doc-page file="000193.tif" he="3560" id="docp000193" type="tif" wi="2540"/>
+<doc-page file="000194.tif" he="3560" id="docp000194" type="tif" wi="2540"/>
+<doc-page file="000195.tif" he="3560" id="docp000195" type="tif" wi="2540"/>
+<doc-page file="000196.tif" he="3560" id="docp000196" type="tif" wi="2540"/>
+<doc-page file="000197.tif" he="3560" id="docp000197" type="tif" wi="2540"/>
+<doc-page file="000198.tif" he="3560" id="docp000198" type="tif" wi="2540"/>
+<doc-page file="000199.tif" he="3560" id="docp000199" type="tif" wi="2540"/>
+<doc-page file="000200.tif" he="3560" id="docp000200" type="tif" wi="2540"/>
+<doc-page file="000201.tif" he="3560" id="docp000201" type="tif" wi="2540"/>
+<doc-page file="000202.tif" he="3560" id="docp000202" type="tif" wi="2540"/>
+<doc-page file="000203.tif" he="3560" id="docp000203" type="tif" wi="2540"/>
+<doc-page file="000204.tif" he="3560" id="docp000204" type="tif" wi="2540"/>
+<doc-page file="000205.tif" he="3560" id="docp000205" type="tif" wi="2540"/>
+<doc-page file="000206.tif" he="3560" id="docp000206" type="tif" wi="2540"/>
+<doc-page file="000207.tif" he="3560" id="docp000207" type="tif" wi="2540"/>
+<doc-page file="000208.tif" he="3560" id="docp000208" type="tif" wi="2540"/>
+<doc-page file="000209.tif" he="3560" id="docp000209" type="tif" wi="2540"/>
+<doc-page file="000210.tif" he="3560" id="docp000210" type="tif" wi="2540"/>
+<doc-page file="000211.tif" he="3560" id="docp000211" type="tif" wi="2540"/>
+<doc-page file="000212.tif" he="3560" id="docp000212" type="tif" wi="2540"/>
+<doc-page file="000213.tif" he="3560" id="docp000213" type="tif" wi="2540"/>
+<doc-page file="000214.tif" he="3560" id="docp000214" type="tif" wi="2540"/>
+<doc-page file="000215.tif" he="3560" id="docp000215" type="tif" wi="2540"/>
+<doc-page file="000216.tif" he="3560" id="docp000216" type="tif" wi="2540"/>
+<doc-page file="000217.tif" he="3560" id="docp000217" type="tif" wi="2540"/>
+<doc-page file="000218.tif" he="3560" id="docp000218" type="tif" wi="2540"/>
+<doc-page file="000219.tif" he="3560" id="docp000219" type="tif" wi="2540"/>
+<doc-page file="000220.tif" he="3560" id="docp000220" type="tif" wi="2540"/>
+<doc-page file="000221.tif" he="3560" id="docp000221" type="tif" wi="2540"/>
+<doc-page file="000222.tif" he="3560" id="docp000222" type="tif" wi="2540"/>
+<doc-page file="000223.tif" he="3560" id="docp000223" type="tif" wi="2540"/>
+<doc-page file="000224.tif" he="3560" id="docp000224" type="tif" wi="2540"/>
+<doc-page file="000225.tif" he="3560" id="docp000225" type="tif" wi="2540"/>
+<doc-page file="000226.tif" he="3560" id="docp000226" type="tif" wi="2540"/>
+<doc-page file="000227.tif" he="3560" id="docp000227" type="tif" wi="2540"/>
+<doc-page file="000228.tif" he="3560" id="docp000228" type="tif" wi="2540"/>
+<doc-page file="000229.tif" he="3560" id="docp000229" type="tif" wi="2540"/>
+<doc-page file="000230.tif" he="3560" id="docp000230" type="tif" wi="2540"/>
+<doc-page file="000231.tif" he="3560" id="docp000231" type="tif" wi="2540"/>
+<doc-page file="000232.tif" he="3560" id="docp000232" type="tif" wi="2540"/>
+<doc-page file="000233.tif" he="3560" id="docp000233" type="tif" wi="2540"/>
+<doc-page file="000234.tif" he="3560" id="docp000234" type="tif" wi="2540"/>
+<doc-page file="000235.tif" he="3560" id="docp000235" type="tif" wi="2540"/>
+<doc-page file="000236.tif" he="3560" id="docp000236" type="tif" wi="2540"/>
+<doc-page file="000237.tif" he="3560" id="docp000237" type="tif" wi="2540"/>
+<doc-page file="000238.tif" he="3560" id="docp000238" type="tif" wi="2540"/>
+<doc-page file="000239.tif" he="3560" id="docp000239" type="tif" wi="2540"/>
+<doc-page file="000240.tif" he="3560" id="docp000240" type="tif" wi="2540"/>
+<doc-page file="000241.tif" he="3560" id="docp000241" type="tif" wi="2540"/>
+<doc-page file="000242.tif" he="3560" id="docp000242" type="tif" wi="2540"/>
+<doc-page file="000243.tif" he="3560" id="docp000243" type="tif" wi="2540"/>
+<doc-page file="000244.tif" he="3560" id="docp000244" type="tif" wi="2540"/>
+<doc-page file="000245.tif" he="3560" id="docp000245" type="tif" wi="2540"/>
+<doc-page file="000246.tif" he="3560" id="docp000246" type="tif" wi="2540"/>
+</description>
+<claims>
+<doc-page file="000247.tif" he="3560" id="docp000247" type="tif" wi="2540"/>
+<doc-page file="000248.tif" he="3560" id="docp000248" type="tif" wi="2540"/>
+<doc-page file="000249.tif" he="3560" id="docp000249" type="tif" wi="2540"/>
+<doc-page file="000250.tif" he="3560" id="docp000250" type="tif" wi="2540"/>
+<doc-page file="000251.tif" he="3560" id="docp000251" type="tif" wi="2540"/>
+<doc-page file="000252.tif" he="3560" id="docp000252" type="tif" wi="2540"/>
+<doc-page file="000253.tif" he="3560" id="docp000253" type="tif" wi="2540"/>
+<doc-page file="000254.tif" he="3560" id="docp000254" type="tif" wi="2540"/>
+<doc-page file="000255.tif" he="3560" id="docp000255" type="tif" wi="2540"/>
+<doc-page file="000256.tif" he="3560" id="docp000256" type="tif" wi="2540"/>
+<doc-page file="000257.tif" he="3560" id="docp000257" type="tif" wi="2540"/>
+<doc-page file="000258.tif" he="3560" id="docp000258" type="tif" wi="2540"/>
+<doc-page file="000259.tif" he="3560" id="docp000259" type="tif" wi="2540"/>
+<doc-page file="000260.tif" he="3560" id="docp000260" type="tif" wi="2540"/>
+<doc-page file="000261.tif" he="3560" id="docp000261" type="tif" wi="2540"/>
+<doc-page file="000262.tif" he="3560" id="docp000262" type="tif" wi="2540"/>
+<doc-page file="000263.tif" he="3560" id="docp000263" type="tif" wi="2540"/>
+<doc-page file="000264.tif" he="3560" id="docp000264" type="tif" wi="2540"/>
+</claims>
+<wo-search-report>
+<doc-page file="000265.tif" he="3560" id="docp000265" type="tif" wi="2540"/>
+<doc-page file="000266.tif" he="3560" id="docp000266" type="tif" wi="2540"/>
+<doc-page file="000267.tif" he="3560" id="docp000267" type="tif" wi="2540"/>
+<doc-page file="000268.tif" he="3560" id="docp000268" type="tif" wi="2540"/>
+<doc-page file="000269.tif" he="3560" id="docp000269" type="tif" wi="2540"/>
+<doc-page file="000270.tif" he="3560" id="docp000270" type="tif" wi="2540"/>
+</wo-search-report>
+</wo-published-application>

@@ -3,8 +3,6 @@ name = "cyclic-peptide"
 version = "0.1.0"
 description = "Pipeline that turns cyclic-peptide patents (e.g. WO2025162428) into a structured SMILES + bioactivity dataset."
 requires-python = ">=3.11,<3.14"
-authors = [{ name = "cyclic-peptide contributors" }]
-keywords = ["cheminformatics", "patents", "cyclic-peptides", "ras-inhibitors", "occr"]
 
 # Slim core: data models + CLI. Heavy stacks live in extras below.
 dependencies = [

@@ -1,4 +1,4 @@
-"""cpd CLI: fetch -> extract -> ocr pipeline."""
+"""cpd CLI: fetch -> extract -> crop -> ocr pipeline."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -9,6 +9,7 @@ from rich.table import Table
 
 from cpd import __version__
 from cpd.extractors.pdf import PyMuPdfExtractor
+from cpd.extractors.structure_cropper import StructureCropper, parse_pages
 from cpd.scrapers.wipo import WipoFetcher
 
 console = Console()
@@ -57,6 +58,60 @@ def extract(ctx: click.Context, pdf_path: str) -> None:
 
 
 @cli.command()
+@click.argument("pdf_path", type=click.Path(exists=True, dir_okay=False))
+@click.option("--patent-id", default=None,
+              help="Patent ID used in the output folder name. "
+                   "Defaults to the PDF file stem.")
+@click.option("--pages", default=None,
+              help="Page selection: '1-5', '1,2,93', or 'all'. "
+                   "Use this to iterate quickly on a few pages before "
+                   "running over the whole patent.")
+@click.option("--dpi", default=200, type=int, show_default=True,
+              help="Render resolution for the per-page pixmap.")
+@click.option("--out-dir", default="data/structures", type=click.Path(),
+              show_default=True,
+              help="Where to write the cropped single-structure PNGs.")
+@click.option("--padding", default=12, type=int, show_default=True,
+              help="Padding (pixels) around each crop, at the rendered DPI.")
+@click.pass_context
+def crop(
+    ctx: click.Context, pdf_path: str, patent_id: str | None,
+    pages: str | None, dpi: int, out_dir: str, padding: int,
+) -> None:
+    """Crop isolated structure figures from each page of a patent PDF.
+
+    Unlike `extract`, which dumps every embedded raster XRef, this renders
+    each page and locates structure drawings via vector strokes, dropping
+    barcodes / headers / footers / full-page tables.
+    """
+    import pymupdf  # lazy: gated by the [pdf] extra
+
+    pdf = Path(pdf_path)
+    pid = patent_id or pdf.stem
+    cropper = StructureCropper(
+        Path(out_dir), patent_id=pid, dpi=dpi, padding_px=padding,
+    )
+
+    doc = pymupdf.open(pdf)
+    try:
+        total = len(doc)
+    finally:
+        doc.close()
+    page_list = parse_pages(pages, total=total)
+
+    seen_pages: set[int] = set()
+    n_crops = 0
+    with console.status(f"[bold]Cropping[/bold] {len(page_list)} pages of {pdf.name}..."):
+        for region in cropper.crop_pages(pdf, page_list):
+            seen_pages.add(region.page)
+            n_crops += 1
+    console.print(
+        f"[bold green]OK[/bold green] {n_crops} crops across "
+        f"{len(seen_pages)}/{len(page_list)} pages -> {cropper.out_dir}"
+    )
+
+
+@cli.command()
 @click.pass_context
 def status(ctx: click.Context) -> None:
     """Show what's been downloaded / processed."""
@@ -74,6 +129,7 @@ def status(ctx: click.Context) -> None:
         ("Raw HTML", "raw/*.html"),
         ("Raw PDFs", "raw/*.pdf"),
         ("Cropped images", "images/*.png"),
+        ("Cropped structures", "structures/**/*.png"),
         ("Compounds (JSONL)", "processed/*.jsonl"),
         ("Compounds (CSV)", "processed/*.csv"),
     ):
