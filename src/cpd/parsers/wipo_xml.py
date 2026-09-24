@@ -20,6 +20,7 @@ WIPO body XML uses both ``Compound N`` (Title case, in figure legends) and
 ``compound N`` (lowercase, in the running text of synthesis paragraphs). All
 identifier regexes below are case-insensitive so both spellings match.
 """
+
 from __future__ import annotations
 
 import json
@@ -88,6 +89,7 @@ class ImageRecord:
 
 # ---------- public API ----------
 
+
 def parse_body_xml(xml_path: Path) -> list[ImageRecord]:
     """Walk body XML and emit one ImageRecord per ``<img>`` figure.
 
@@ -107,8 +109,11 @@ def parse_body_xml(xml_path: Path) -> list[ImageRecord]:
 
 
 def write_map_json(
-    records: list[ImageRecord], out_path: Path, *,
-    patent_id: str, source_xml: Path,
+    records: list[ImageRecord],
+    out_path: Path,
+    *,
+    patent_id: str,
+    source_xml: Path,
 ) -> None:
     """Persist the mapping as JSON for downstream consumption."""
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -149,8 +154,12 @@ def load_map_json(path: Path) -> list[ImageRecord]:
 
 # ---------- internals ----------
 
+
 def _build_record(
-    img: Tag, soup: BeautifulSoup, *, base_dir: Path,
+    img: Tag,
+    soup: BeautifulSoup,
+    *,
+    base_dir: Path,
 ) -> ImageRecord:
     parent_p = img.find_parent("p")
 
@@ -187,7 +196,10 @@ def _build_record(
 
 
 def _collect_sibling_texts(
-    parent_p: Tag | None, *, direction: str, limit: int,
+    parent_p: Tag | None,
+    *,
+    direction: str,
+    limit: int,
 ) -> list[str]:
     if parent_p is None:
         return []

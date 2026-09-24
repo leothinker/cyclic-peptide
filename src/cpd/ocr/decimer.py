@@ -24,6 +24,7 @@ Usage
 >>> if smiles is None:
 ...     print("DECIMER could not parse this figure")
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -44,7 +45,7 @@ class DecimerReader(StructureReader):
     def __init__(self, model_dir: Path | None = None) -> None:
         self._model_dir = model_dir
 
-    def read(self, image_path: Path) -> str | None:
+    def read(self, image_path: Path | str) -> str | None:
         """Return a canonical-looking SMILES string, or ``None`` on failure.
 
         Returns ``None`` when:

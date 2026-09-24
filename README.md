@@ -1,58 +1,56 @@
-# cyclic-peptide
+# Cyclic Peptide Dataset Pipeline
 
-Build a structured dataset of cyclic peptide compounds (e.g. KRAS inhibitors from
-patents like [WO2025162428](https://patentscope.wipo.int/search/en/WO2025162428))
-by extracting SMILES and bioactivity values (e.g. G12V-GDP `Kd` nM) from patent
-PDFs and tables.
+Automated extraction of cyclic-peptide chemical structures (SMILES) and RAS bioactivity data ($K_D$) from patent characterization tables (e.g. WO2025162428).
 
-## Quick start
+## Pipeline Workflow
 
-```bash
-# install uv (once): https://docs.astral.sh/uv/getting-started/installation/
-uv sync                       # base install: data models + CLI
-uv sync --extra chem          # add RDKit
-uv sync --extra ocr           # add DECIMER
-uv sync --extra pdf           # add PDF + table extraction
-uv sync --extra scrape        # add Playwright + httpx
-uv sync --all-extras          # everything (heavy)
+1. **Table Identification (`cpd.parsers.table_finder`)**:
+   Scans FullText patent images and classifies them into SMILES tables and bioactivity ($K_D$) tables based on image dimensions and aspect ratios.
+2. **Cell-Aligned OCR Extraction (`cpd.parsers.table_extractor`)**:
+   Detects table grid lines with OpenCV morphological operations, performs cell-level text recognition via RapidOCR, and extracts compound rows.
+3. **Chemical Validation & Auto-Repair (`cpd.chem`)**:
+   Auto-repairs common OCR wrapping artifacts (e.g. amide carbonyl bonds and unclosed chiral brackets) and validates cyclic peptide descriptors using RDKit.
+4. **Data Assembly (`main.py`)**:
+   Joins SMILES structures with quantitative $K_D$ values on `Cmpd #` and exports the final benchmark dataset.
+
+## Quick Start
+
+```powershell
+# 1. Install dependencies
+uv sync
+
+# 2. Run the full extraction pipeline
+uv run python main.py
+
+# 3. Run the test suite
+uv run pytest
 ```
 
-Run the CLI:
+## Key Outputs
 
-```bash
-uv run cpd --help
-uv run cpd fetch WO2025162428
-uv run cpd extract data/raw/WO2025162428.pdf
-uv run cpd ocr data/images/example.png
-```
+- `data/processed/cyclic_peptides_benchmark.csv`: Merged dataset containing compound IDs, canonical SMILES, molecular weights, heavy atom counts, and G12V GDP $K_D$ (nM) affinities.
 
-## Layout
+## Project Structure
 
-```
+```text
 cyclic-peptide/
-├── data/
-│   ├── raw/         # downloaded patent PDFs / HTML
-│   ├── images/      # cropped 2D structure figures
-│   └── processed/   # final CSV / JSON dataset
-├── notebooks/       # exploratory OCSR / LLM prompts
+├── pyproject.toml              # Project dependencies and configurations
+├── main.py                     # Single-entry pipeline execution script
 ├── src/cpd/
-│   ├── cli.py       # `cpd` entrypoint
-│   ├── models/      # Pydantic schemas: Compound, Bioactivity
-│   ├── scrapers/    # WIPO / SureChEMBL fetchers
-│   ├── extractors/  # PDF table + image crop
-│   └── ocr/         # DECIMER + LLM-based structure readers
-└── tests/
+│   ├── chem.py                 # RDKit validation and SMILES syntax repair
+│   ├── merge.py                # Dataset join and export utilities
+│   ├── parsers/
+│   │   ├── table_finder.py     # Table image classifier
+│   │   ├── table_extractor.py  # RapidOCR-backed table row extractor
+│   │   └── wipo_xml.py         # FullText body XML parser
+│   └── ocr/
+│       ├── base.py             # StructureReader interface
+│       └── decimer.py          # DECIMER backup engine (for structure-only patents)
+├── tests/                      # Core pytest test suite
+└── data/
+    ├── raw/                    # Raw patent images and documents
+    └── processed/              # Generated benchmark datasets
 ```
-
-## Pipeline (planned)
-
-1. **fetch** — pull patent PDF from WIPO / Google Patents.
-2. **extract** — split into per-page images and tables (PyMuPDF + Camelot).
-3. **ocr** — run DECIMER on cropped 2D structure images → SMILES.
-4. **parse** — read Markush / R-group tables via LLM into structured rows.
-5. **merge** — align SMILES with `Kd` / `IC50` rows into a CSV dataset.
-
-See `docs/` (TBD) for the full design notes.
 
 ### Package Installation
 

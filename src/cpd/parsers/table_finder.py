@@ -49,6 +49,7 @@ The whole module is stdlib + Pillow. No external OCR / VLM / ML deps. The
 :class:`TableKeywordDetector` is the only seam; the default implementation
 is a no-op, so the pipeline still works on locked-down machines.
 """
+
 from __future__ import annotations
 
 import json
@@ -93,11 +94,11 @@ class TableImage:
     width: int
     height: int
     size_bytes: int
-    aspect: float                      # width / height
+    aspect: float  # width / height
     table_type: str = TableType.UNKNOWN
-    confidence: float = 0.0            # 0..1
+    confidence: float = 0.0  # 0..1
     detected_keywords: list[str] = field(default_factory=list)
-    is_table_candidate: bool = False   # pre-clustering flag
+    is_table_candidate: bool = False  # pre-clustering flag
 
     def to_dict(self) -> dict:
         d = asdict(self)
@@ -182,7 +183,9 @@ class HeaderKeywordDetector:
 
     HEADER_FRAC = 0.18
 
-    def __init__(self, *, ocr_callable: Callable[[Image.Image], str] | None = None) -> None:
+    def __init__(
+        self, *, ocr_callable: Callable[[Image.Image], str] | None = None
+    ) -> None:
         self._ocr = ocr_callable
 
     def detect(self, image: Image.Image) -> Iterable[str]:
@@ -212,9 +215,9 @@ class HeaderKeywordDetector:
 
 
 # Size+aspect+width thresholds tuned on WO2025162428's FullText layout.
-STRUCTURE_MAX_BYTES = 80_000     # pure structure figures are sparse
-TABLE_MIN_ASPECT = 0.65          # letter/A4-ish landscape
-TABLE_MAX_ASPECT = 1.40          # not too wide -> not a panoramic banner
+STRUCTURE_MAX_BYTES = 80_000  # pure structure figures are sparse
+TABLE_MIN_ASPECT = 0.65  # letter/A4-ish landscape
+TABLE_MAX_ASPECT = 1.40  # not too wide -> not a panoramic banner
 
 # SMILES vs activity discrimination (WO2025162428 specific):
 #   activity pages render at width 1909-1924 px (no SMILES column) and
@@ -304,9 +307,15 @@ def scan_directory(
 
         # Refine table_type using keywords (if any).
         table_type = size_bucket
-        is_table_candidate = size_bucket in (
-            TableType.ACTIVITY, TableType.SMILES, TableType.OTHER,
-        ) and sz >= ACTIVITY_MIN_BYTES
+        is_table_candidate = (
+            size_bucket
+            in (
+                TableType.ACTIVITY,
+                TableType.SMILES,
+                TableType.OTHER,
+            )
+            and sz >= ACTIVITY_MIN_BYTES
+        )
         confidence = 0.6 if is_table_candidate else 0.3
         if "activity" in keywords and "smiles" in keywords:
             table_type = TableType.OTHER  # ambiguous
@@ -339,7 +348,8 @@ def scan_directory(
 
 
 def find_tables(
-    images: list[TableImage], *,
+    images: list[TableImage],
+    *,
     gap_tolerance: int = 2,
     table_types: Iterable[str] = (TableType.ACTIVITY, TableType.SMILES),
 ) -> list[TableBlock]:
@@ -391,7 +401,8 @@ def _close_block(table_type: str, lst: list[TableImage]) -> TableBlock:
 
 
 def find_by_type(
-    images: list[TableImage], *,
+    images: list[TableImage],
+    *,
     table_type: str,
 ) -> list[TableImage]:
     """Convenience filter: all TableImages of a given type."""
@@ -432,13 +443,15 @@ def load_findings_json(path: Path) -> tuple[list[TableImage], list[TableBlock]]:
     blocks: list[TableBlock] = []
     for b in data["blocks"]:
         imgs = [i for i in images if i.filename in b["filenames"]]
-        blocks.append(TableBlock(
-            table_type=b["table_type"],
-            start_id=int(b["start_id"]),
-            end_id=int(b["end_id"]),
-            images=tuple(imgs),
-            dominant_keywords=tuple(b.get("dominant_keywords") or []),
-        ))
+        blocks.append(
+            TableBlock(
+                table_type=b["table_type"],
+                start_id=int(b["start_id"]),
+                end_id=int(b["end_id"]),
+                images=tuple(imgs),
+                dominant_keywords=tuple(b.get("dominant_keywords") or []),
+            )
+        )
     return images, blocks
 
 
