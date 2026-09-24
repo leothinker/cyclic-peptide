@@ -53,3 +53,29 @@ cyclic-peptide/
 5. **merge** — align SMILES with `Kd` / `IC50` rows into a CSV dataset.
 
 See `docs/` (TBD) for the full design notes.
+
+### Package Installation
+
+**Recommended: Using uv (faster and more reliable)**
+
+```shell
+# Install uv if you haven't already
+pip install uv
+
+# Install the package with development dependencies
+uv sync --extra dev
+
+# Activate the virtual environment
+source .venv/bin/activate
+```
+
+**Alternative: Using pip**
+
+```shell
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+# Ensure you have a recent version of pip (required for editable installs with pyproject.toml)
+$ python3 -m pip install --upgrade pip
+# Install the package in editable mode
+$ pip install -e .
+```
