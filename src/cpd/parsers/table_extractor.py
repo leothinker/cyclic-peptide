@@ -1,32 +1,70 @@
-"""Extract structured rows from activity / SMILES table images.
+"""Unified table extractor producing compounds + assays from patent JPGs.
 
-Supported Backends:
-- RapidOcrTableExtractor: Local high-precision OpenCV line detection + RapidOCR.
-- RegexTableExtractor: Fast deterministic regex parser over OCR text (used in unit tests).
-- VisionLlmTableExtractor: Multi-modal LLM API integration.
-- StubTableExtractor: No-op fallback for offline pipeline testing.
+Three table layouts appear in WO2025162428's golden tables, and the
+extractor handles them all with one code path:
+
+  * 3-col SMILES table           (Cmpd # | Structure | SMILES)
+  * 7-col activity table         (Cmpd # | Structure | RT | MS | Method | Polarity | KD)
+  * 6-col dense activity table   (Compound # | RT | MS | Method | Polarity | KD)
+
+The pipeline for every image is:
+
+  1. OCR the top header band and map each detected header cell to a
+     canonical field name via :mod:`cpd.parsers.headers` (so ``Compound #``
+     and ``Cmpd #`` collapse to the same field).
+  2. Detect horizontal row boundaries with OpenCV morphology.
+  3. For each row, OCR every text cell; for the ``structure`` column,
+     crop the cell to a PNG under ``cells_dir``.
+
+Output is **two flat lists**, joined on ``cmpd_id`` by the caller:
+
+  * :class:`CompoundRecord` carries ``cmpd_id``, ``smiles``, RDKit
+    canonical form, descriptors, and the cropped structure-image path.
+  * :class:`AssayRecord`  carries ``cmpd_id``, ``kd_nm``, ``rt_min``,
+    ``ms_mz``, ``lcms_method``, ``ms_polarity``.
+
+Continuation pages without a header (``I100382``) reuse the previous
+image's column layout (passed via ``prev_columns``) so we never lose a
+row. Header-only images (``I100287``) emit zero records and are filtered
+out by the row count.
 """
 
 from __future__ import annotations
 
-import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Protocol
+from typing import Iterable, Sequence
 
 import cv2
 import numpy as np
 
-from cpd.chem import auto_repair_smiles, validate_and_enrich
+from cpd.parsers.headers import canonical_field
 
 
 # ---------- row schemas ----------
 
 
 @dataclass(frozen=True)
-class ActivityRow:
-    """One row of an activity table image."""
+class CompoundRecord:
+    """One cyclic peptide: SMILES, RDKit descriptors, cropped structure image."""
+
+    cmpd_id: str
+    smiles: str | None = None
+    canonical_smiles: str | None = None
+    molecular_weight: float | None = None
+    heavy_atom_count: int | None = None
+    is_valid: bool | None = None
+    structure_image: str | None = None  # path relative to cells_dir parent
+    source_image: str | None = None
+
+    def to_dict(self) -> dict:
+        return self.__dict__.copy()
+
+
+@dataclass(frozen=True)
+class AssayRecord:
+    """One activity measurement (KD + LCMS) for a cyclic peptide."""
 
     cmpd_id: str
     kd_nm: float | None = None
@@ -35,543 +73,390 @@ class ActivityRow:
     lcms_method: str | None = None
     ms_polarity: str | None = None
     source_image: str | None = None
-    notes: str | None = None
 
     def to_dict(self) -> dict:
-        return {
-            "cmpd_id": self.cmpd_id,
-            "kd_nm": self.kd_nm,
-            "rt_min": self.rt_min,
-            "ms_mz": self.ms_mz,
-            "lcms_method": self.lcms_method,
-            "ms_polarity": self.ms_polarity,
-            "source_image": self.source_image,
-            "notes": self.notes,
-        }
+        return self.__dict__.copy()
+
+
+# ---------- column geometry ----------
 
 
 @dataclass(frozen=True)
-class SmilesRow:
-    """One row of a SMILES table image."""
-
-    cmpd_id: str
-    smiles: str | None = None
-    canonical_smiles: str | None = None
-    molecular_weight: float | None = None
-    heavy_atom_count: int | None = None
-    is_valid: bool | None = None
-    source_image: str | None = None
-
-    def to_dict(self) -> dict:
-        return {
-            "cmpd_id": self.cmpd_id,
-            "smiles": self.smiles,
-            "canonical_smiles": self.canonical_smiles,
-            "molecular_weight": self.molecular_weight,
-            "heavy_atom_count": self.heavy_atom_count,
-            "is_valid": self.is_valid,
-            "source_image": self.source_image,
-        }
-
-
-# ---------- the protocol every backend implements ----------
-
-
-class TableExtractor(Protocol):
-    """Pluggable image -> rows backend."""
+class Column:
+    """A column defined by horizontal pixel slice ``[x1, x2)`` in the source image."""
 
     name: str
+    x1: int
+    x2: int
+    is_image: bool = False  # True for the structure column (saved as PNG)
 
-    def extract_activity(self, image_path: Path) -> list[ActivityRow]: ...
+    @property
+    def width(self) -> int:
+        return self.x2 - self.x1
 
-    def extract_smiles(self, image_path: Path) -> list[SmilesRow]: ...
+
+# Default 7-col activity layout (used when no header text is detected).
+# Values are fractions of image width and get scaled at construction time.
+_DEFAULT_ACTIVITY_FRACS: tuple[tuple[str, float, float, bool], ...] = (
+    ("cmpd_id", 0.00, 0.13, False),
+    ("structure", 0.13, 0.58, True),
+    ("rt_min", 0.58, 0.72, False),
+    ("ms_mz", 0.72, 0.82, False),
+    ("lcms_method", 0.82, 0.89, False),
+    ("ms_polarity", 0.89, 0.95, False),
+    ("kd_nm", 0.95, 1.00, False),
+)
 
 
-# ---------- Local Production Backend: RapidOCR + OpenCV ----------
+def _default_activity_columns(width: int) -> list[Column]:
+    return [
+        Column(name, int(x1 * width), int(x2 * width), is_image)
+        for name, x1, x2, is_image in _DEFAULT_ACTIVITY_FRACS
+    ]
+
+
+# ---------- main extractor ----------
 
 
 class RapidOcrTableExtractor:
-    """Local production extractor using OpenCV grid detection and RapidOCR."""
+    """OpenCV grid detection + RapidOCR per-cell extraction."""
 
     name: str = "rapidocr"
 
+    # Header band covers the top 15% of the image (table-header row).
+    HEADER_FRAC: float = 0.15
+
+    # Two horizontal lines within ~10 px belong to the same border.
+    ROW_LINE_GAP_PX: int = 10
+
+    # A row needs at least this many vertical pixels to be kept.
+    MIN_ROW_PX: int = 30
+
     def __init__(self) -> None:
-        from rapidocr import RapidOCR
+        from rapidocr import RapidOCR  # local import keeps the module lightweight
 
         self.engine = RapidOCR()
 
-    def _find_row_slices(self, img: np.ndarray) -> list[tuple[int, int]]:
+    # ---- public API ----
+
+    def extract_records(
+        self,
+        image_path: Path,
+        cells_dir: Path | None = None,
+        prev_columns: list[Column] | None = None,
+    ) -> tuple[list[CompoundRecord], list[AssayRecord], list[Column]]:
+        """Extract compounds + assays from one table image.
+
+        ``cells_dir`` is the directory where the structure column is
+        cropped to per-row PNGs. ``prev_columns`` is reused for
+        continuation pages whose header band is empty.
+        """
+        img = cv2.imread(str(image_path))
+        if img is None:
+            return [], [], prev_columns or []
+
+        columns = self._detect_columns(img)
+        if not columns:
+            columns = prev_columns or _default_activity_columns(img.shape[1])
+
+        rows = self._detect_row_boundaries(img)
+        compounds, assays = self._extract_rows(
+            img, rows, columns, image_path, cells_dir
+        )
+        return compounds, assays, columns
+
+    def extract_smiles(
+        self,
+        image_path: Path,
+        cells_dir: Path | None = None,
+    ) -> list[CompoundRecord]:
+        """Back-compat helper: return only the CompoundRecords of one image."""
+        compounds, _, _ = self.extract_records(image_path, cells_dir)
+        return compounds
+
+    def extract_activity(
+        self,
+        image_path: Path,
+        cells_dir: Path | None = None,
+    ) -> list[AssayRecord]:
+        """Back-compat helper: return only the AssayRecords of one image."""
+        _, assays, _ = self.extract_records(image_path, cells_dir)
+        return assays
+
+    # ---- column detection ----
+
+    def _detect_columns(self, img: np.ndarray) -> list[Column]:
+        """OCR the header band, then map each cell to a canonical field."""
+        h, w = img.shape[:2]
+        full_width = w
+        crop = self._crop(img, 0, int(h * self.HEADER_FRAC))
+        upscaled = self._scale(crop)
+        result = self.engine(upscaled)
+        if not result:
+            return []
+
+        items = sorted(
+            zip(self._boxes(result), self._txts(result)),
+            key=lambda bt: (bt[0][0][0] + bt[0][1][0]) / 2,
+        )
+        scale_back = self._scale_factor(upscaled.shape[1], full_width)
+
+        # Group cells that map to the same canonical field (e.g. wrapped text)
+        # into one column whose x-range spans the union of all matched cells.
+        grouped: dict[str, list[tuple[int, int]]] = {}
+        for box, text in items:
+            field = canonical_field(text)
+            if field is None:
+                continue
+            x1 = int(box[0][0] * scale_back)
+            x2 = int(box[1][0] * scale_back)
+            grouped.setdefault(field, []).append((min(x1, x2), max(x1, x2)))
+
+        columns = [
+            Column(name, lo, hi, name == "structure")
+            for name, spans in grouped.items()
+            for lo, hi in [_union(spans)]
+        ]
+        columns.sort(key=lambda c: c.x1)
+
+        if columns and columns[0].name != "cmpd_id":
+            columns = self._insert_cmpd_id_column(columns, w)
+
+        return self._fill_gaps(columns, w)
+
+    @staticmethod
+    def _scale_factor(cropped_width: int, full_width: int) -> float:
+        return full_width / max(cropped_width, 1)
+
+    def _scale(self, img: np.ndarray) -> np.ndarray:
+        """Upscale a crop 2x for better OCR recall."""
+        h, w = img.shape[:2]
+        if max(h, w) < 50:
+            return img
+        return cv2.resize(img, (w * 2, h * 2), interpolation=cv2.INTER_CUBIC)
+
+    @staticmethod
+    def _crop(img: np.ndarray, y1: int, y2: int) -> np.ndarray:
+        h = img.shape[0]
+        return img[max(0, y1) : min(h, y2), :]
+
+    @staticmethod
+    def _insert_cmpd_id_column(columns: list[Column], w: int) -> list[Column]:
+        """If header OCR missed ``cmpd_id``, prepend a 12% wide column."""
+        if not columns:
+            return _default_activity_columns(w)
+        x2 = int(columns[0].x1)
+        head = Column("cmpd_id", 0, max(x2, int(w * 0.12)), False)
+        return [head, *columns]
+
+    @staticmethod
+    def _fill_gaps(columns: list[Column], w: int) -> list[Column]:
+        """Stretch each column to abut its neighbour so cell crops don't gap."""
+        if not columns:
+            return []
+        out: list[Column] = []
+        prev_x2 = 0
+        for c in columns:
+            x1 = max(c.x1, prev_x2)
+            if x1 < c.x2:
+                out.append(Column(c.name, x1, c.x2, c.is_image))
+            prev_x2 = c.x2
+        return out
+
+    # ---- row boundary detection ----
+
+    def _detect_row_boundaries(self, img: np.ndarray) -> list[tuple[int, int]]:
+        """Use horizontal-line morphology to split the image into rows."""
         h, w = img.shape[:2]
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
-
         kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (int(w * 0.4), 1))
-        lines_img = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
-        row_sums = np.sum(lines_img, axis=1)
-        line_ys = np.where(row_sums > 0)[0]
+        lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        ys = np.where(np.sum(lines, axis=1) > 0)[0]
+        clusters = self._cluster(ys, gap=self.ROW_LINE_GAP_PX)
+        if not clusters:
+            return []
 
-        clusters: list[int] = []
-        if len(line_ys) > 0:
-            cur = [int(line_ys[0])]
-            for y in line_ys[1:]:
-                if y - cur[-1] <= 10:
-                    cur.append(int(y))
-                else:
-                    clusters.append(int(np.mean(cur)))
-                    cur = [int(y)]
-            clusters.append(int(np.mean(cur)))
+        # Drop the header band: keep only lines that sit below it.
+        header_h = self._first_inner(clusters, h)
+        inner = [y for y in clusters if header_h < y < h - 30]
+        dividers = sorted({0, *inner, h})
 
-        inner_lines = [y for y in clusters if 40 < y < h - 40]
-        if len(inner_lines) == 3:
-            dividers = [0] + inner_lines + [h]
-        else:
-            dividers = [int(i * h / 4) for i in range(5)]
-
-        slices = []
+        slices: list[tuple[int, int]] = []
         for i in range(len(dividers) - 1):
-            y1 = dividers[i] + 1 if i > 0 else 0
-            y2 = dividers[i + 1] - 1 if i < len(dividers) - 2 else h
-            slices.append((y1, y2))
+            y1 = dividers[i] + (1 if i > 0 else 0)
+            y2 = dividers[i + 1] - (1 if i + 1 < len(dividers) - 1 else 0)
+            if y2 - y1 >= self.MIN_ROW_PX:
+                slices.append((y1, y2))
         return slices
 
-    def extract_smiles(self, image_path: Path) -> list[SmilesRow]:
-        """Extract compound ID and SMILES from a SMILES table image."""
-        img = cv2.imread(str(image_path))
-        if img is None:
+    @staticmethod
+    def _cluster(ys: Iterable[int], *, gap: int) -> list[int]:
+        ys = [int(y) for y in ys]
+        if not ys:
             return []
+        clusters: list[list[int]] = [[ys[0]]]
+        for y in ys[1:]:
+            if y - clusters[-1][-1] <= gap:
+                clusters[-1].append(y)
+            else:
+                clusters.append([y])
+        return [int(np.mean(c)) for c in clusters]
 
-        h, w = img.shape[:2]
-        slices = self._find_row_slices(img)
+    @staticmethod
+    def _first_inner(clusters: Sequence[int], h: int) -> int:
+        """Y of the first horizontal line strictly inside the table body."""
+        for y in clusters:
+            if 40 < y < h - 40:
+                return y
+        return int(h * 0.15)
 
-        # 1. 编号识别
-        left_col = img[:, : int(w * 0.15)]
-        id_res = self.engine(left_col)
-        found_ids: list[tuple[float, str]] = []
-        if id_res:
-            txts = (
-                id_res.txts if hasattr(id_res, "txts") else [item[1] for item in id_res]
-            )
-            boxes = (
-                id_res.boxes
-                if hasattr(id_res, "boxes")
-                else [item[0] for item in id_res]
-            )
-            for box, txt in zip(boxes, txts):
-                clean = txt.strip()
-                if re.match(r"^\d{4}$", clean):
-                    center_y = float((box[0][1] + box[2][1]) / 2.0)
-                    found_ids.append((center_y, clean))
+    # ---- cell-level extraction ----
 
-        found_ids.sort(key=lambda x: x[0])
-        cmpd_names = [item[1] for item in found_ids]
-        while len(cmpd_names) < len(slices):
-            cmpd_names.append(f"Row_{len(cmpd_names) + 1}")
+    def _extract_rows(
+        self,
+        img: np.ndarray,
+        rows: Sequence[tuple[int, int]],
+        columns: Sequence[Column],
+        image_path: Path,
+        cells_dir: Path | None,
+    ) -> tuple[list[CompoundRecord], list[AssayRecord]]:
+        compounds: dict[str, CompoundRecord] = {}
+        assays: dict[str, AssayRecord] = {}
 
-        rows: list[SmilesRow] = []
+        cid_col = next((c for c in columns if c.name == "cmpd_id"), None)
+        if cid_col is None:
+            return [], []
 
-        # 2. SMILES 识别
-        for i, (y_start, y_end) in enumerate(slices):
-            cmpd_id = cmpd_names[i]
-            smiles_crop = img[y_start:y_end, int(w * 0.55) :]
-
-            padded = cv2.copyMakeBorder(
-                smiles_crop, 20, 20, 20, 20, cv2.BORDER_CONSTANT, value=[255, 255, 255]
-            )
-            zoomed = cv2.resize(
-                padded, (0, 0), fx=2.0, fy=2.0, interpolation=cv2.INTER_CUBIC
-            )
-
-            smiles_res = self.engine(zoomed)
-            line_items: list[tuple[float, str]] = []
-            if smiles_res:
-                boxes = (
-                    smiles_res.boxes
-                    if hasattr(smiles_res, "boxes")
-                    else [item[0] for item in smiles_res]
-                )
-                txts = (
-                    smiles_res.txts
-                    if hasattr(smiles_res, "txts")
-                    else [item[1] for item in smiles_res]
-                )
-                for box, t in zip(boxes, txts):
-                    clean_t = t.strip()
-                    if len(clean_t) > 2 and not re.match(r"^[().=]+$", clean_t):
-                        box_y = float((box[0][1] + box[2][1]) / 2.0)
-                        line_items.append((box_y, clean_t))
-
-            line_items.sort(key=lambda x: x[0])
-            raw_smiles = "".join(item[1] for item in line_items)
-            fixed_smiles = auto_repair_smiles(raw_smiles)
-
-            if any(k in fixed_smiles.upper() for k in ("MIN", "[M+", "LCMS")):
+        for y1, y2 in rows:
+            cid_cell = img[y1:y2, cid_col.x1:cid_col.x2]
+            cmpd_id = self._read_cmpd_id(cid_cell)
+            if cmpd_id is None:
                 continue
 
-            # RDKit 校验
-            chem_info = validate_and_enrich(fixed_smiles)
+            row_values: dict[str, str | None] = {}
+            structure_path: str | None = None
 
-            rows.append(
-                SmilesRow(
+            for col in columns:
+                if col.name == "cmpd_id":
+                    continue
+                cell = img[y1:y2, col.x1:col.x2]
+                if col.is_image:
+                    if cells_dir is not None and structure_path is None:
+                        structure_path = self._save_structure_crop(
+                            cell, cmpd_id, cells_dir
+                        )
+                    continue
+                row_values[col.name] = self._ocr_cell(cell, col.name)
+
+            if "smiles" in row_values and row_values["smiles"]:
+                # Lazy import: cpd.chem depends on RDKit, which we do not
+                # require just for schema import or lightweight tests.
+                from cpd.chem import auto_repair_smiles, validate_and_enrich
+                fixed = auto_repair_smiles(row_values["smiles"] or "")
+                chem = validate_and_enrich(fixed) if fixed else None
+                compounds[cmpd_id] = CompoundRecord(
                     cmpd_id=cmpd_id,
-                    smiles=fixed_smiles,
-                    canonical_smiles=chem_info.canonical_smiles if chem_info else None,
-                    molecular_weight=chem_info.molecular_weight if chem_info else None,
-                    heavy_atom_count=chem_info.heavy_atom_count if chem_info else None,
-                    is_valid=chem_info is not None,
+                    smiles=fixed or None,
+                    canonical_smiles=chem.canonical_smiles if chem else None,
+                    molecular_weight=chem.molecular_weight if chem else None,
+                    heavy_atom_count=chem.heavy_atom_count if chem else None,
+                    is_valid=chem is not None,
+                    structure_image=structure_path,
                     source_image=image_path.name,
                 )
-            )
 
-        return rows
-
-    def extract_activity(self, image_path: Path) -> list[ActivityRow]:
-        """Extract compound ID and Kd, supporting both 4-row cards and 40-row dense tables."""
-        img = cv2.imread(str(image_path))
-        if img is None:
-            return []
-
-        h, w = img.shape[:2]
-
-        # 针对第二张图这种整页纯数据表：直接 OCR 提取每行文本，精度最高！
-        ocr_res = self.engine(img)
-        if not ocr_res:
-            return []
-
-        boxes = (
-            ocr_res.boxes
-            if hasattr(ocr_res, "boxes")
-            else [item[0] for item in ocr_res]
-        )
-        txts = (
-            ocr_res.txts if hasattr(ocr_res, "txts") else [item[1] for item in ocr_res]
-        )
-
-        # 收集所有的文本框，并计算中心坐标
-        items = []
-        for box, txt in zip(boxes, txts):
-            clean_t = txt.strip()
-            if not clean_t:
-                continue
-            center_y = (box[0][1] + box[2][1]) / 2.0
-            center_x = (box[0][0] + box[1][0]) / 2.0
-            items.append({"text": clean_t, "x": center_x, "y": center_y})
-
-        # 1. 找出所有位于左半边（X < 25%）的 4 位化合物编号 (1001~2999)
-        id_candidates = [
-            it
-            for it in items
-            if it["x"] < w * 0.25 and re.match(r"^[12]\d{3}$", it["text"])
-        ]
-        id_candidates.sort(key=lambda it: it["y"])
-
-        # 2. 找出所有位于右半边（X > 75%）的纯浮点数（Kd 数值）
-        kd_candidates = [
-            it
-            for it in items
-            if it["x"] > w * 0.75 and re.match(r"^\d+\.\d+$", it["text"])
-        ]
-
-        rows: list[ActivityRow] = []
-
-        # 3. 按垂直高度（Y 坐标差 < 20 像素）将编号与 Kd 进行同一行绑定
-        for cid_item in id_candidates:
-            cid_y = cid_item["y"]
-            # 找到同一水平行最接近的 Kd
-            matched_kd = None
-            min_dist = 25.0  # Y 轴公差 25 像素
-            for kd_item in kd_candidates:
-                dist = abs(kd_item["y"] - cid_y)
-                if dist < min_dist:
-                    try:
-                        matched_kd = float(kd_item["text"])
-                        min_dist = dist
-                    except ValueError:
-                        pass
-
-            if matched_kd is not None:
-                rows.append(
-                    ActivityRow(
-                        cmpd_id=cid_item["text"],
-                        kd_nm=matched_kd,
-                        source_image=image_path.name,
-                    )
-                )
-
-        return rows
-
-
-# ---------- regex backend (for tests / OCR-text fallback) ----------
-
-_CMPD_ID_RE = re.compile(r"\b(\d{3,5})\b")
-_KD_RE = re.compile(r"(\d+\.\d+)")
-_RT_RE = re.compile(r"\b(\d+\.\d{1,2})\b")
-_MZ_RE = re.compile(r"\b(\d{3,4}\.\d{1,2})\b")
-_POLARITY_RE = re.compile(r"\[M\+(?:H|Na|K)?\]\+?")
-
-
-@dataclass
-class RegexTableExtractor:
-    """Heuristic regex extractor over already-OCR'd text."""
-
-    name: str = "regex"
-
-    def extract_activity(self, image_path: Path) -> list[ActivityRow]:
-        raise NotImplementedError(
-            "RegexTableExtractor is text-only; use parse_activity_text()."
-        )
-
-    def extract_smiles(self, image_path: Path) -> list[SmilesRow]:
-        raise NotImplementedError(
-            "RegexTableExtractor is text-only; use parse_smiles_text()."
-        )
-
-    def parse_activity_text(
-        self,
-        text: str,
-        *,
-        source_image: str | None = None,
-    ) -> list[ActivityRow]:
-        rows: list[ActivityRow] = []
-        for line in text.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            cmpd_m = _CMPD_ID_RE.search(line)
-            if not cmpd_m:
-                continue
-            cmpd_id = cmpd_m.group(1)
-            floats = _KD_RE.findall(line)
-            if len(floats) < 3:
-                continue
-            try:
-                rt = float(floats[0])
-                mz = float(floats[1])
-                kd = float(floats[-1])
-            except ValueError:
-                continue
-            pol_m = _POLARITY_RE.search(line)
-            rows.append(
-                ActivityRow(
+            activity_keys = {"kd_nm", "rt_min", "ms_mz"}
+            if activity_keys & row_values.keys():
+                assays[cmpd_id] = AssayRecord(
                     cmpd_id=cmpd_id,
-                    kd_nm=kd,
-                    rt_min=rt,
-                    ms_mz=mz,
-                    lcms_method=None,
-                    ms_polarity=pol_m.group(0) if pol_m else None,
-                    source_image=source_image,
+                    kd_nm=_as_float(row_values.get("kd_nm")),
+                    rt_min=_as_float(row_values.get("rt_min")),
+                    ms_mz=_as_float(row_values.get("ms_mz")),
+                    lcms_method=row_values.get("lcms_method"),
+                    ms_polarity=row_values.get("ms_polarity"),
+                    source_image=image_path.name,
                 )
-            )
-        return rows
 
-    def parse_smiles_text(
-        self,
-        text: str,
-        *,
-        source_image: str | None = None,
-    ) -> list[SmilesRow]:
-        rows: list[SmilesRow] = []
-        for line in text.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            cmpd_m = _CMPD_ID_RE.search(line)
-            if not cmpd_m:
-                continue
-            if not re.search(r"[CNO\[]=", line) and "@" not in line:
-                continue
-            tokens = line.split()
-            cmpd_id_str = cmpd_m.group(1)
-            smiles = None
-            for tok in tokens:
-                if tok == cmpd_id_str:
-                    continue
-                if any(c in tok for c in "[@=["):
-                    smiles = tok
-                    break
-            if smiles is None:
-                for tok in tokens:
-                    if tok != cmpd_id_str:
-                        smiles = tok
-                        break
-            rows.append(
-                SmilesRow(
-                    cmpd_id=cmpd_m.group(1),
-                    smiles=smiles,
-                    source_image=source_image,
-                )
-            )
-        return rows
+        return list(compounds.values()), list(assays.values())
 
+    def _read_cmpd_id(self, cell: np.ndarray) -> str | None:
+        """Find the 4-digit compound id in the leftmost cell."""
+        if cell.size == 0:
+            return None
+        result = self.engine(self._scale(cell))
+        if not result:
+            return None
+        for text in self._txts(result):
+            for token in text.split():
+                if re.fullmatch(r"\d{4}", token.strip()):
+                    return token.strip()
+        return None
 
-# ---------- stub / no-op backend ----------
+    def _ocr_cell(self, cell: np.ndarray, field_name: str) -> str | None:
+        """OCR one cell. SMILES lines concatenate; other cells join with spaces."""
+        if cell.size == 0:
+            return None
+        result = self.engine(self._scale(cell))
+        if not result:
+            return None
+        items = sorted(
+            zip(self._boxes(result), self._txts(result)),
+            key=lambda bt: (bt[0][0][1] + bt[0][2][1]) / 2,
+        )
+        parts = [t.strip() for _, t in items if t and t.strip()]
+        if not parts:
+            return None
+        joiner = "" if field_name == "smiles" else " "
+        return joiner.join(parts)
 
+    def _save_structure_crop(
+        self, cell: np.ndarray, cmpd_id: str, cells_dir: Path
+    ) -> str | None:
+        """Write the structure cell as a PNG; return its path relative to cells_dir.parent."""
+        if cell.size == 0:
+            return None
+        cells_dir.mkdir(parents=True, exist_ok=True)
+        padded = cv2.copyMakeBorder(
+            cell, 8, 8, 8, 8, cv2.BORDER_CONSTANT, value=[255, 255, 255]
+        )
+        out = cells_dir / f"{cmpd_id}_struct.png"
+        cv2.imwrite(str(out), padded)
+        return str(out.relative_to(cells_dir.parent))
 
-@dataclass
-class StubTableExtractor:
-    name: str = "stub"
-
-    def extract_activity(self, image_path: Path) -> list[ActivityRow]:
-        return []
-
-    def extract_smiles(self, image_path: Path) -> list[SmilesRow]:
-        return []
-
-
-# ---------- vision-LLM backend skeleton ----------
-
-
-@dataclass
-class VisionLlmTableExtractor:
-    name: str = "vision-llm"
-    llm_call: object | None = None
-    model: str = "gpt-4o-mini"
-
-    ACTIVITY_PROMPT = (
-        "You are looking at a chemistry patent activity table image. "
-        "Each row has columns: Cmpd #, Structure, LCMS RT (min), MS (m/z), "
-        "LCMS Method, MS Polarity, G12V GDP KD nM. "
-        "Return ONLY valid JSON: an array of objects with keys "
-        "cmpd_id (string), kd_nm (number, nM), rt_min (number), ms_mz "
-        "(number), lcms_method (string), ms_polarity (string). "
-        "Do not include any explanation or prose."
-    )
-    SMILES_PROMPT = (
-        "You are looking at a chemistry patent SMILES table image. "
-        "Each row has columns: Cmpd #, Structure, SMILES. "
-        "Return ONLY valid JSON: an array of objects with keys "
-        "cmpd_id (string), smiles (string). "
-        "Do not include any explanation or prose."
-    )
-
-    def extract_activity(self, image_path: Path) -> list[ActivityRow]:
-        raw = self._call(image_path, self.ACTIVITY_PROMPT)
-        return self._parse_activity_json(raw, source_image=image_path.name)
-
-    def extract_smiles(self, image_path: Path) -> list[SmilesRow]:
-        raw = self._call(image_path, self.SMILES_PROMPT)
-        return self._parse_smiles_json(raw, source_image=image_path.name)
-
-    def _call(self, image_path: Path, prompt: str) -> str:
-        if self.llm_call is None:
-            raise RuntimeError("VisionLlmTableExtractor.llm_call is None.")
-        result = self.llm_call(image_path, prompt)
-        if not isinstance(result, str):
-            raise TypeError(f"llm_call must return str, got {type(result)}")
-        return result
+    # ---- RapidOCR result adapters (new SDK vs legacy list-of-tuples) ----
 
     @staticmethod
-    def _parse_activity_json(
-        raw: str, *, source_image: str | None
-    ) -> list[ActivityRow]:
-        rows = _safe_json_loads(raw)
-        if not isinstance(rows, list):
-            return []
-        out: list[ActivityRow] = []
-        for r in rows:
-            if not isinstance(r, dict):
-                continue
-            cmpd_id = str(r.get("cmpd_id", "")).strip()
-            if not cmpd_id:
-                continue
-            out.append(
-                ActivityRow(
-                    cmpd_id=cmpd_id,
-                    kd_nm=_as_float(r.get("kd_nm")),
-                    rt_min=_as_float(r.get("rt_min")),
-                    ms_mz=_as_float(r.get("ms_mz")),
-                    lcms_method=_as_str_or_none(r.get("lcms_method")),
-                    ms_polarity=_as_str_or_none(r.get("ms_polarity")),
-                    source_image=source_image,
-                )
-            )
-        return out
+    def _boxes(result):
+        return result.boxes if hasattr(result, "boxes") else [r[0] for r in result]
 
     @staticmethod
-    def _parse_smiles_json(raw: str, *, source_image: str | None) -> list[SmilesRow]:
-        rows = _safe_json_loads(raw)
-        if not isinstance(rows, list):
-            return []
-        out: list[SmilesRow] = []
-        for r in rows:
-            if not isinstance(r, dict):
-                continue
-            cmpd_id = str(r.get("cmpd_id", "")).strip()
-            smiles = _as_str_or_none(r.get("smiles"))
-            if not cmpd_id or not smiles:
-                continue
-            out.append(
-                SmilesRow(
-                    cmpd_id=cmpd_id,
-                    smiles=smiles,
-                    source_image=source_image,
-                )
-            )
-        return out
+    def _txts(result):
+        return result.txts if hasattr(result, "txts") else [r[1] for r in result]
 
 
-def _safe_json_loads(raw: str) -> object:
-    text = raw.strip()
-    fence = re.search(r"```(?:json)?\s*(.+?)\s*```", text, re.DOTALL)
-    if fence:
-        text = fence.group(1)
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
+# ---------- helpers ----------
+
+
+def _as_float(text: str | None) -> float | None:
+    if text is None:
         return None
-
-
-def _as_float(v: object) -> float | None:
-    if v is None:
+    cleaned = text.strip().replace(",", "").replace(" ", "")
+    if not cleaned:
         return None
     try:
-        return float(v)
-    except (TypeError, ValueError):
+        return float(cleaned)
+    except ValueError:
         return None
 
 
-def _as_str_or_none(v: object) -> str | None:
-    if v is None:
-        return None
-    s = str(v).strip()
-    return s or None
-
-
-# ---------- high-level helpers ----------
-
-
-def enrich_smiles_with_rdkit(
-    rows: list[SmilesRow],
-    *,
-    validate: bool = True,
-) -> list[SmilesRow]:
-    """Populate canonical_smiles using cpd.chem.validate_and_enrich."""
-    out: list[SmilesRow] = []
-    for r in rows:
-        if not r.smiles or not validate:
-            out.append(r)
-            continue
-        chem = validate_and_enrich(r.smiles)
-        out.append(
-            SmilesRow(
-                cmpd_id=r.cmpd_id,
-                smiles=r.smiles,
-                canonical_smiles=chem.canonical_smiles if chem else None,
-                molecular_weight=chem.molecular_weight if chem else None,
-                heavy_atom_count=chem.heavy_atom_count if chem else None,
-                is_valid=chem is not None,
-                source_image=r.source_image,
-            )
-        )
-    return out
+def _union(spans: Sequence[tuple[int, int]]) -> tuple[int, int]:
+    return min(s[0] for s in spans), max(s[1] for s in spans)
 
 
 __all__ = [
-    "ActivityRow",
-    "SmilesRow",
-    "TableExtractor",
+    "AssayRecord",
+    "Column",
+    "CompoundRecord",
     "RapidOcrTableExtractor",
-    "RegexTableExtractor",
-    "StubTableExtractor",
-    "VisionLlmTableExtractor",
-    "enrich_smiles_with_rdkit",
 ]

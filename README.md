@@ -1,17 +1,26 @@
 # Cyclic Peptide Dataset Pipeline
 
-Automated extraction of cyclic-peptide chemical structures (SMILES) and RAS bioactivity data ($K_D$) from patent characterization tables (e.g. WO2025162428).
+Extract cyclic-peptide SMILES and RAS bioactivity data from patent
+characterization tables (e.g. WO2025162428).
 
 ## Pipeline Workflow
 
-1. **Table Identification (`cpd.parsers.table_finder`)**:
-   Scans FullText patent images and classifies them into SMILES tables and bioactivity ($K_D$) tables based on image dimensions and aspect ratios.
-2. **Cell-Aligned OCR Extraction (`cpd.parsers.table_extractor`)**:
-   Detects table grid lines with OpenCV morphological operations, performs cell-level text recognition via RapidOCR, and extracts compound rows.
-3. **Chemical Validation & Auto-Repair (`cpd.chem`)**:
-   Auto-repairs common OCR wrapping artifacts (e.g. amide carbonyl bonds and unclosed chiral brackets) and validates cyclic peptide descriptors using RDKit.
-4. **Data Assembly (`main.py`)**:
-   Joins SMILES structures with quantitative $K_D$ values on `Cmpd #` and exports the final benchmark dataset.
+1. **Header aliasing (`cpd.parsers.headers`)**:
+   Patent authors write the same column under different names
+   (`Cmpd #` vs `Compound #`, `G12V GDP KD nM` vs `KRAS G12V GDP KD (nM)`).
+   A small dictionary collapses every variant to one canonical field.
+2. **Unified table extraction (`cpd.parsers.table_extractor`)**:
+   OCR the top header band to learn the column layout, then for every
+   row OCR each text cell and crop the `structure` column to a PNG.
+   One code path handles all three layouts found in golden tables:
+   3-col SMILES, 7-col activity (with structure), and 6-col dense
+   activity (no structure).
+3. **Chemical validation (`cpd.chem`)**:
+   Auto-repair common OCR artefacts (amide carbonyls, unclosed chiral
+   brackets) and validate the canonicalised SMILES with RDKit.
+4. **Dual-table output (`main.py`)**:
+   Write `compounds.csv` and `assays.csv` joined on `cmpd_id`, plus a
+   `cells/` folder of cropped structure PNGs.
 
 ## Quick Start
 
@@ -19,7 +28,7 @@ Automated extraction of cyclic-peptide chemical structures (SMILES) and RAS bioa
 # 1. Install dependencies
 uv sync
 
-# 2. Run the full extraction pipeline
+# 2. Run the pipeline (reads data/raw/WO2025162428/golden_tables by default)
 uv run python main.py
 
 # 3. Run the test suite
@@ -28,52 +37,37 @@ uv run pytest
 
 ## Key Outputs
 
-- `data/processed/cyclic_peptides_benchmark.csv`: Merged dataset containing compound IDs, canonical SMILES, molecular weights, heavy atom counts, and G12V GDP $K_D$ (nM) affinities.
+- `data/processed/compounds.csv` &mdash; one row per cyclic peptide
+  (cmpd_id, canonical SMILES, RDKit descriptors, cropped structure PNG
+  path).
+- `data/processed/assays.csv` &mdash; one row per KD/LCMS measurement
+  (cmpd_id, kd_nm, rt_min, ms_mz, lcms_method, ms_polarity).
+- `data/processed/cells/{cmpd_id}_struct.png` &mdash; cropped structure
+  image per compound.
+
+The two CSVs share `cmpd_id`; either or both may be populated for a
+given compound depending on which patent pages cover it.
 
 ## Project Structure
 
 ```text
 cyclic-peptide/
 ├── pyproject.toml              # Project dependencies and configurations
-├── main.py                     # Single-entry pipeline execution script
+├── main.py                     # Pipeline entry point
 ├── src/cpd/
 │   ├── chem.py                 # RDKit validation and SMILES syntax repair
-│   ├── merge.py                # Dataset join and export utilities
-│   ├── parsers/
-│   │   ├── table_finder.py     # Table image classifier
-│   │   ├── table_extractor.py  # RapidOCR-backed table row extractor
-│   │   └── wipo_xml.py         # FullText body XML parser
-│   └── ocr/
-│       ├── base.py             # StructureReader interface
-│       └── decimer.py          # DECIMER backup engine (for structure-only patents)
-├── tests/                      # Core pytest test suite
+│   ├── merge.py                # cmpd_id normalisation + row dedupe
+│   └── parsers/
+│       ├── headers.py          # Header alias map (Cmpd # / Compound # / ...)
+│       └── table_extractor.py  # RapidOCR + OpenCV cell-aligned extractor
+├── tests/                      # pytest suite
 └── data/
-    ├── raw/                    # Raw patent images and documents
-    └── processed/              # Generated benchmark datasets
+    ├── raw/                    # Raw patent images (FullText, golden_tables, ...)
+    └── processed/              # Generated compounds.csv / assays.csv / cells/
 ```
 
 ### Package Installation
 
-**Recommended: Using uv (faster and more reliable)**
-
 ```shell
-# Install uv if you haven't already
-pip install uv
-
-# Install the package with development dependencies
 uv sync --extra dev
-
-# Activate the virtual environment
-source .venv/bin/activate
-```
-
-**Alternative: Using pip**
-
-```shell
-$ python3 -m venv .venv
-$ source .venv/bin/activate
-# Ensure you have a recent version of pip (required for editable installs with pyproject.toml)
-$ python3 -m pip install --upgrade pip
-# Install the package in editable mode
-$ pip install -e .
 ```

@@ -1,88 +1,162 @@
-"""Pipeline entry point: Extract cyclic-peptide SMILES & RAS bioactivity from patent tables."""
+"""Extract dual-table dataset (compounds.csv + assays.csv) from patent JPGs.
 
+Pipeline overview
+-----------------
+For every JPG in ``img_dir`` (default: WO2025162428's golden_tables):
+
+  1. :class:`RapidOcrTableExtractor.extract_records` returns CompoundRecords
+     (SMILES + structure PNG) and AssayRecords (KD + LCMS).
+  2. Compound-id spelling variants collapse through
+     :func:`cpd.merge.normalise_cmpd_id`.
+  3. The two streams are written to ``data/processed/compounds.csv`` and
+     ``data/processed/assays.csv``. Structure PNGs land in
+     ``data/processed/cells/``.
+
+Output schema
+-------------
+``compounds.csv``::
+
+    cmpd_id, smiles, canonical_smiles, molecular_weight,
+    heavy_atom_count, is_valid, structure_image, source_image
+
+``assays.csv``::
+
+    cmpd_id, kd_nm, rt_min, ms_mz, lcms_method, ms_polarity, source_image
+
+The two tables share ``cmpd_id``; a compound may appear in either one
+or both depending on which patent pages cover it.
+"""
+
+from __future__ import annotations
+
+import csv
+from dataclasses import asdict
 from pathlib import Path
-import pandas as pd
-from cpd.parsers.table_finder import TableType, scan_directory
-from cpd.parsers.table_extractor import RapidOcrTableExtractor
+from typing import Iterable
+
+from cpd.merge import dedupe_assays, dedupe_compounds, normalise_cmpd_id
+from cpd.parsers.table_extractor import (
+    AssayRecord,
+    Column,
+    CompoundRecord,
+    RapidOcrTableExtractor,
+)
+
+
+COMPOUND_COLUMNS: tuple[str, ...] = (
+    "cmpd_id",
+    "smiles",
+    "canonical_smiles",
+    "molecular_weight",
+    "heavy_atom_count",
+    "is_valid",
+    "structure_image",
+    "source_image",
+)
+
+ASSAY_COLUMNS: tuple[str, ...] = (
+    "cmpd_id",
+    "kd_nm",
+    "rt_min",
+    "ms_mz",
+    "lcms_method",
+    "ms_polarity",
+    "source_image",
+)
+
+
+def _iter_jpgs(img_dir: Path) -> Iterable[Path]:
+    """Yield every ``*.jpg`` in ``img_dir``, sorted by filename."""
+    return sorted(img_dir.glob("*.jpg"))
+
+
+def _extract_all(
+    img_dir: Path,
+    cells_dir: Path,
+) -> tuple[list[CompoundRecord], list[AssayRecord]]:
+    """Run the extractor over every image, deduping across pages."""
+    extractor = RapidOcrTableExtractor()
+    compounds: dict[str, CompoundRecord] = {}
+    assays: dict[str, AssayRecord] = {}
+    prev_columns: list[Column] = []
+
+    for idx, image_path in enumerate(_iter_jpgs(img_dir), start=1):
+        page_compounds, page_assays, columns = extractor.extract_records(
+            image_path, cells_dir=cells_dir, prev_columns=prev_columns
+        )
+        prev_columns = columns or prev_columns
+
+        page_compounds = [c for c in page_compounds if normalise_cmpd_id(c.cmpd_id)]
+        page_assays = [a for a in page_assays if normalise_cmpd_id(a.cmpd_id)]
+
+        for cid, rec in dedupe_compounds(page_compounds).items():
+            compounds.setdefault(cid, rec)  # first image wins
+        for cid, rec in dedupe_assays(page_assays).items():
+            assays.setdefault(cid, rec)
+
+        print(
+            f"   [{idx}] {image_path.name} -> "
+            f"+{len(page_compounds)} cmpd, +{len(page_assays)} assay "
+            f"| total: {len(compounds)} cmpd, {len(assays)} assay",
+            end="\r",
+        )
+    print()
+    return list(compounds.values()), list(assays.values())
+
+
+def _write_csv(
+    rows: Iterable[dict],
+    path: Path,
+    columns: tuple[str, ...],
+) -> int:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    n = 0
+    with path.open("w", encoding="utf-8-sig", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=list(columns), extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row)
+            n += 1
+    return n
 
 
 def run_pipeline(
     img_dir: str = "data/raw/WO2025162428/golden_tables",
-    out_csv: str = "data/processed/cyclic_peptides_benchmark.csv",
+    out_dir: str = "data/processed",
 ) -> None:
-    source_dir = Path(img_dir)
-    out_path = Path(out_csv)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img_path = Path(img_dir)
+    out_path = Path(out_dir)
+    cells_dir = out_path / "cells"
 
-    print(f"🚀 [1/3] 扫描目录中的表格图片: {source_dir}...")
-    images = scan_directory(source_dir)
-    smiles_images = [img for img in images if img.table_type == TableType.SMILES]
-    activity_images = [img for img in images if img.table_type == TableType.ACTIVITY]
+    print(f"🚀 [1/3] 扫描目录中的表格图片: {img_path} ...")
+    jpgs = list(_iter_jpgs(img_path))
+    print(f"   -> 共发现 {len(jpgs)} 张 JPG")
 
-    print(f"   -> 发现 {len(smiles_images)} 张 SMILES 结构表")
-    print(f"   -> 发现 {len(activity_images)} 张 G12V KD 活性表")
+    print(f"\n📦 [2/3] 正在提取 SMILES + 结构图，并解析 KD/LCMS ...")
+    compounds, assays = _extract_all(img_path, cells_dir)
 
-    extractor = RapidOcrTableExtractor()
+    print(f"\n🧪 [3/3] 写入双表数据集到 {out_path} ...")
+    n_compounds = _write_csv(
+        (asdict(c) for c in compounds),
+        out_path / "compounds.csv",
+        COMPOUND_COLUMNS,
+    )
+    n_assays = _write_csv(
+        (asdict(a) for a in assays),
+        out_path / "assays.csv",
+        ASSAY_COLUMNS,
+    )
 
-    # 1. 提取所有 SMILES
-    print(f"\n📦 [2/3] 正在提取 SMILES 结构并进行 RDKit 语法自愈...")
-    all_smiles = []
-    for idx, img in enumerate(smiles_images):
-        rows = extractor.extract_smiles(img.image_path)
-        all_smiles.extend([r.to_dict() for r in rows if r.is_valid])
-        print(
-            f"   [{idx + 1}/{len(smiles_images)}] {img.filename} -> 累计有效环肽: {len(all_smiles)} 个",
-            end="\r",
-        )
-    print()
-
-    # 2. 提取所有活性数值
-    print(f"\n🧪 [3/3] 正在提取 RAS G12V GDP KD (nM) 亲和力数值...")
-    all_activity = []
-    for idx, img in enumerate(activity_images):
-        rows = extractor.extract_activity(img.image_path)
-        all_activity.extend([r.to_dict() for r in rows if r.kd_nm is not None])
-        print(
-            f"   [{idx + 1}/{len(activity_images)}] {img.filename} -> 累计活性数据: {len(all_activity)} 条",
-            end="\r",
-        )
-    print()
-
-    # 3. 按 Cmpd # 连接并输出最终数据宽表
-    df_smiles = pd.DataFrame(all_smiles)
-    df_act = pd.DataFrame(all_activity)
-
-    if df_smiles.empty:
-        print("❌ 未能提取到有效的 SMILES 数据，请检查图片路径。")
-        return
-
-    df_smiles["cmpd_id"] = df_smiles["cmpd_id"].astype(str).str.strip()
-
-    if not df_act.empty:
-        df_act["cmpd_id"] = df_act["cmpd_id"].astype(str).str.strip()
-        # 过滤掉非数字的脏 ID（例如可能偶发的 Row_X）
-        df_act = df_act[df_act["cmpd_id"].str.match(r"^\d+$")]
-        df_act = df_act.drop_duplicates(subset=["cmpd_id"])
-
-        # 执行左连接 (保留所有有效的 SMILES，有活性的填入 kd_nm)
-        final_df = pd.merge(
-            df_smiles, df_act[["cmpd_id", "kd_nm"]], on="cmpd_id", how="left"
-        )
-    else:
-        final_df = df_smiles
-
-    final_df.to_csv(out_path, index=False, encoding="utf-8-sig")
+    n_valid = sum(1 for c in compounds if c.is_valid)
+    n_struct = sum(1 for c in compounds if c.structure_image)
 
     print("\n" + "=" * 55)
-    print("🎉 数据集构建圆满完成！")
-    print(f"📊 提取到的总环肽分子数: {len(final_df)}")
-    if "kd_nm" in final_df.columns:
-        valid_kd = final_df["kd_nm"].notna().sum()
-        print(f"🎯 成功匹配到 G12V KD 亲和力的分子数: {valid_kd}")
-    print(f"📁 最终交付数据集已保存至: {out_path}")
+    print("🎉 双表数据集构建完成！")
+    print(f"📊 化合物表 compounds.csv : {n_compounds} 条 (RDKit 有效: {n_valid}, 含结构图: {n_struct})")
+    print(f"🎯 活性表 assays.csv       : {n_assays} 条")
+    print(f"📁 结构图裁剪目录          : {cells_dir}")
     print("=" * 55)
 
 
 if __name__ == "__main__":
-    # 如果你想先拿 golden_tables 测试，可以把参数改为 data/raw/WO2025162428/golden_tables
     run_pipeline()
