@@ -12,6 +12,9 @@ For every JPG in ``img_dir`` (default: WO2025162428's golden_tables):
      ``data/processed/assays.csv``. Structure PNGs land in
      ``data/processed/cells/``.
 
+Per-image failures (corrupt JPG, OCR backend crash, empty header) are
+caught and logged so one bad page doesn't take down the whole run.
+
 Output schema
 -------------
 ``compounds.csv``::
@@ -30,9 +33,20 @@ or both depending on which patent pages cover it.
 from __future__ import annotations
 
 import csv
+import logging
+import sys
 from dataclasses import asdict
 from pathlib import Path
 from typing import Iterable
+
+# Windows consoles default to cp1252 which can't encode the status emojis;
+# force UTF-8 (with replacement fallback) so the banner prints cleanly.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
+    except (AttributeError, ValueError):
+        pass
+
 
 from cpd.merge import dedupe_assays, dedupe_compounds, normalise_cmpd_id
 from cpd.parsers.table_extractor import (
@@ -41,6 +55,9 @@ from cpd.parsers.table_extractor import (
     CompoundRecord,
     RapidOcrTableExtractor,
 )
+
+
+log = logging.getLogger("cpd")
 
 
 COMPOUND_COLUMNS: tuple[str, ...] = (
@@ -70,21 +87,43 @@ def _iter_jpgs(img_dir: Path) -> Iterable[Path]:
     return sorted(img_dir.glob("*.jpg"))
 
 
+def _safe_extract(
+    extractor: RapidOcrTableExtractor,
+    image_path: Path,
+    cells_dir: Path,
+    prev_columns: list[Column],
+) -> tuple[list[CompoundRecord], list[AssayRecord], list[Column]]:
+    """Run one image through the extractor; never raise."""
+    try:
+        return extractor.extract_records(
+            image_path, cells_dir=cells_dir, prev_columns=prev_columns
+        )
+    except Exception as exc:  # pragma: no cover - defensive
+        log.exception("skipping %s: extractor crashed: %s", image_path.name, exc)
+        return [], [], prev_columns
+
+
 def _extract_all(
     img_dir: Path,
     cells_dir: Path,
-) -> tuple[list[CompoundRecord], list[AssayRecord]]:
+) -> tuple[list[CompoundRecord], list[AssayRecord], dict[str, str]]:
     """Run the extractor over every image, deduping across pages."""
     extractor = RapidOcrTableExtractor()
     compounds: dict[str, CompoundRecord] = {}
     assays: dict[str, AssayRecord] = {}
+    failures: dict[str, str] = {}
     prev_columns: list[Column] = []
 
-    for idx, image_path in enumerate(_iter_jpgs(img_dir), start=1):
-        page_compounds, page_assays, columns = extractor.extract_records(
-            image_path, cells_dir=cells_dir, prev_columns=prev_columns
+    jpgs = list(_iter_jpgs(img_dir))
+    for idx, image_path in enumerate(jpgs, start=1):
+        page_compounds, page_assays, columns = _safe_extract(
+            extractor, image_path, cells_dir, prev_columns
         )
-        prev_columns = columns or prev_columns
+        if columns:
+            prev_columns = columns
+
+        if not (page_compounds or page_assays):
+            failures[image_path.name] = "no rows"
 
         page_compounds = [c for c in page_compounds if normalise_cmpd_id(c.cmpd_id)]
         page_assays = [a for a in page_assays if normalise_cmpd_id(a.cmpd_id)]
@@ -95,13 +134,13 @@ def _extract_all(
             assays.setdefault(cid, rec)
 
         print(
-            f"   [{idx}] {image_path.name} -> "
+            f"   [{idx}/{len(jpgs)}] {image_path.name} -> "
             f"+{len(page_compounds)} cmpd, +{len(page_assays)} assay "
             f"| total: {len(compounds)} cmpd, {len(assays)} assay",
             end="\r",
         )
     print()
-    return list(compounds.values()), list(assays.values())
+    return list(compounds.values()), list(assays.values()), failures
 
 
 def _write_csv(
@@ -133,7 +172,7 @@ def run_pipeline(
     print(f"   -> 共发现 {len(jpgs)} 张 JPG")
 
     print(f"\n📦 [2/3] 正在提取 SMILES + 结构图，并解析 KD/LCMS ...")
-    compounds, assays = _extract_all(img_path, cells_dir)
+    compounds, assays, failures = _extract_all(img_path, cells_dir)
 
     print(f"\n🧪 [3/3] 写入双表数据集到 {out_path} ...")
     n_compounds = _write_csv(
@@ -155,6 +194,8 @@ def run_pipeline(
     print(f"📊 化合物表 compounds.csv : {n_compounds} 条 (RDKit 有效: {n_valid}, 含结构图: {n_struct})")
     print(f"🎯 活性表 assays.csv       : {n_assays} 条")
     print(f"📁 结构图裁剪目录          : {cells_dir}")
+    if failures:
+        print(f"⚠️  无数据的图片 ({len(failures)} 张): {', '.join(list(failures)[:5])}{'...' if len(failures) > 5 else ''}")
     print("=" * 55)
 
 

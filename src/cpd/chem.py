@@ -33,9 +33,18 @@ def auto_repair_smiles(raw_smiles: str) -> str:
     # 2. Repair wrapped amide carbonyls: C(O)N or C(=0)N -> C(=O)N
     s = re.sub(r"C\(O\)N", "C(=O)N", s)
     s = re.sub(r"C\(=[0O]\)?N", "C(=O)N", s)
+    # Same flavour for generic C(=0) -> C(=O) anywhere in the string
+    s = re.sub(r"C\(=0\)", "C(=O)", s)
 
     # 3. Repair unclosed chiral brackets: [C@H( or [C@@H( -> [C@H]( or [C@@H](
     s = re.sub(r"(\[C@{1,2}H)\(", r"\1](", s)
+
+    # 4. Re-attach the "CC[C@" prefix the OCR tends to lop off when the
+    #    first SMILES characters touch the left column boundary.
+    if s.startswith("H](") or s.startswith("@H]("):
+        s = "CC[C@" + s
+    elif s.startswith("[C@H](") and not s.startswith("CC[C@H]("):
+        s = "CC" + s
 
     return s.strip()
 

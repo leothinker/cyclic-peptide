@@ -7,13 +7,25 @@ extractor handles them all with one code path:
   * 7-col activity table         (Cmpd # | Structure | RT | MS | Method | Polarity | KD)
   * 6-col dense activity table   (Compound # | RT | MS | Method | Polarity | KD)
 
-The pipeline for every image is:
+Pipeline for every image:
 
-  1. OCR the top header band and map each detected header cell to a
-     canonical field name via :mod:`cpd.parsers.headers` (so ``Compound #``
-     and ``Cmpd #`` collapse to the same field).
-  2. Detect horizontal row boundaries with OpenCV morphology.
-  3. For each row, OCR every text cell; for the ``structure`` column,
+  1. Detect the layout. First try to OCR the top header band and look
+     for canonical field names (``SMILES``, ``KD (nM)``, ...). If that
+     finds nothing (continuation pages usually have no header at all)
+     fall back to **counting the visible vertical dividers** in the
+     image body -- 2 inner dividers means 3 columns (smiles), 6 means 7
+     (activity), 5 means 6 (dense). As a final safety net, reuse the
+     previous image's columns when this is also inconclusive.
+  2. Use the layout's predefined column widths (fractions of image
+     width). We deliberately do **not** use individual word bounding
+     boxes as column edges -- the word "Structure" is much narrower
+     than the structure column itself, and using word widths would
+     shrink the cropped cell to just the header text.
+  3. Detect horizontal row boundaries with OpenCV morphology. The
+     first inner horizontal line marks the bottom of the header band;
+     data rows start there, so the first row slice is the first
+     *data* row, not the header itself.
+  4. For each row, OCR every text cell; for the ``structure`` column,
      crop the cell to a PNG under ``cells_dir``.
 
 Output is **two flat lists**, joined on ``cmpd_id`` by the caller:
@@ -23,10 +35,10 @@ Output is **two flat lists**, joined on ``cmpd_id`` by the caller:
   * :class:`AssayRecord`  carries ``cmpd_id``, ``kd_nm``, ``rt_min``,
     ``ms_mz``, ``lcms_method``, ``ms_polarity``.
 
-Continuation pages without a header (``I100382``) reuse the previous
-image's column layout (passed via ``prev_columns``) so we never lose a
-row. Header-only images (``I100287``) emit zero records and are filtered
-out by the row count.
+Continuation pages without a header (``I100382``, ``I100330``) reuse
+the visual column structure (or the previous image's layout when even
+the dividers are ambiguous). Header-only images (``I100287``) emit
+zero records and are filtered out.
 """
 
 from __future__ import annotations
@@ -95,24 +107,96 @@ class Column:
         return self.x2 - self.x1
 
 
-# Default 7-col activity layout (used when no header text is detected).
-# Values are fractions of image width and get scaled at construction time.
+# Predefined column widths (fractions of image width). These are
+# hand-tuned on the WO2025162428 golden tables; update them here if a
+# new patent shows a different ratio.
 _DEFAULT_ACTIVITY_FRACS: tuple[tuple[str, float, float, bool], ...] = (
     ("cmpd_id", 0.00, 0.13, False),
-    ("structure", 0.13, 0.58, True),
-    ("rt_min", 0.58, 0.72, False),
+    ("structure", 0.13, 0.55, True),
+    ("rt_min", 0.57, 0.72, False),
     ("ms_mz", 0.72, 0.82, False),
     ("lcms_method", 0.82, 0.89, False),
     ("ms_polarity", 0.89, 0.95, False),
     ("kd_nm", 0.95, 1.00, False),
 )
 
+_DENSE_ACTIVITY_FRACS: tuple[tuple[str, float, float, bool], ...] = (
+    ("cmpd_id", 0.00, 0.12, False),
+    ("rt_min", 0.22, 0.32, False),
+    ("ms_mz", 0.33, 0.48, False),
+    ("lcms_method", 0.50, 0.68, False),
+    ("ms_polarity", 0.69, 0.81, False),
+    ("kd_nm", 0.83, 0.97, False),
+)
 
-def _default_activity_columns(width: int) -> list[Column]:
+_SMILES_FRACS: tuple[tuple[str, float, float, bool], ...] = (
+    ("cmpd_id", 0.00, 0.11, False),
+    ("structure", 0.13, 0.55, True),
+    ("smiles", 0.57, 0.99, False),
+)
+
+
+def _scale_fracs(width: int, fracs: Sequence[tuple[str, float, float, bool]]) -> list[Column]:
     return [
         Column(name, int(x1 * width), int(x2 * width), is_image)
-        for name, x1, x2, is_image in _DEFAULT_ACTIVITY_FRACS
+        for name, x1, x2, is_image in fracs
     ]
+
+
+def default_columns(width: int, layout: str = "activity") -> list[Column]:
+    """Return the predefined column layout for a given table kind."""
+    if layout == "smiles":
+        return _scale_fracs(width, _SMILES_FRACS)
+    if layout == "dense":
+        return _scale_fracs(width, _DENSE_ACTIVITY_FRACS)
+    return _scale_fracs(width, _DEFAULT_ACTIVITY_FRACS)
+
+
+def detect_layout(fields: set[str]) -> str | None:
+    """Pick a layout string from the canonical field names found in the header.
+
+    Returns ``None`` when no canonical field names are recognised, so the
+    caller can fall back to visual column-count detection or the previous
+    page's layout (continuation pages often have no header text).
+    """
+    if not fields:
+        return None
+    if "smiles" in fields:
+        return "smiles"
+    if "kd_nm" in fields and "structure" not in fields:
+        return "dense"
+    if "kd_nm" in fields:
+        return "activity"
+    return None  # unknown mix -> let caller fall back
+
+
+def detect_layout_from_columns(n_columns: int) -> str | None:
+    """Pick a layout from the count of visible columns in the image body.
+
+    Columns here means "data columns between full-height vertical lines";
+    i.e. ``n_dividers + 1``. The three target layouts have very
+    distinctive counts so the mapping is unambiguous:
+
+      * 3 columns  -> smiles
+      * 7 columns  -> activity (with structure)
+      * 6 columns  -> dense activity (no structure)
+
+    Anything else returns ``None`` and the caller keeps the previous
+    page's layout.
+    The off-by-one counts ``5`` and ``8`` are deliberately mapped to ``None``:
+    a dense table whose morphology picks up one extra stroke and an activity
+    table whose morphology drops one divider are both plausible, and the
+    layout that the column gets mis-applied to (e.g. activity onto a dense page)
+    is far more harmful than trusting the previous image's layout. So we let
+    the caller fall back to ``prev_columns`` instead of guessing.
+    """
+    if n_columns == 3:
+        return "smiles"
+    if n_columns == 7:
+        return "activity"
+    if n_columns == 6:
+        return "dense"
+    return None
 
 
 # ---------- main extractor ----------
@@ -123,14 +207,13 @@ class RapidOcrTableExtractor:
 
     name: str = "rapidocr"
 
-    # Header band covers the top 15% of the image (table-header row).
-    HEADER_FRAC: float = 0.15
-
-    # Two horizontal lines within ~10 px belong to the same border.
-    ROW_LINE_GAP_PX: int = 10
-
-    # A row needs at least this many vertical pixels to be kept.
-    MIN_ROW_PX: int = 30
+    HEADER_FRAC: float = 0.12     # top slice used for header OCR
+    ROW_LINE_GAP_PX: int = 10     # two horizontal lines within this gap merge
+    MIN_ROW_PX: int = 30          # rows shorter than this are dropped
+    MIN_HEADER_PX: int = 40       # floor on header-band height (avoid 0-px crops)
+    COLUMN_GAP_PX: int = 25       # two vertical lines within this gap merge
+    COLUMN_BODY_FRAC: float = 0.15  # skip header band when counting dividers
+    COLUMN_BORDER_PX: int = 50    # ignore page borders when counting dividers
 
     def __init__(self) -> None:
         from rapidocr import RapidOCR  # local import keeps the module lightweight
@@ -145,19 +228,14 @@ class RapidOcrTableExtractor:
         cells_dir: Path | None = None,
         prev_columns: list[Column] | None = None,
     ) -> tuple[list[CompoundRecord], list[AssayRecord], list[Column]]:
-        """Extract compounds + assays from one table image.
-
-        ``cells_dir`` is the directory where the structure column is
-        cropped to per-row PNGs. ``prev_columns`` is reused for
-        continuation pages whose header band is empty.
-        """
+        """Extract compounds + assays from one table image."""
         img = cv2.imread(str(image_path))
-        if img is None:
+        if img is None or img.size == 0 or min(img.shape[:2]) < self.MIN_HEADER_PX:
             return [], [], prev_columns or []
 
-        columns = self._detect_columns(img)
+        columns = self._detect_columns(img, prev_columns)
         if not columns:
-            columns = prev_columns or _default_activity_columns(img.shape[1])
+            columns = prev_columns or default_columns(img.shape[1], "activity")
 
         rows = self._detect_row_boundaries(img)
         compounds, assays = self._extract_rows(
@@ -183,90 +261,86 @@ class RapidOcrTableExtractor:
         _, assays, _ = self.extract_records(image_path, cells_dir)
         return assays
 
-    # ---- column detection ----
+    # ---- column / layout detection ----
 
-    def _detect_columns(self, img: np.ndarray) -> list[Column]:
-        """OCR the header band, then map each cell to a canonical field."""
+    def _detect_columns(
+        self,
+        img: np.ndarray,
+        prev_columns: list[Column] | None = None,
+    ) -> list[Column]:
+        """Pick a column layout for this image.
+
+        Strategy, in order: header OCR -> visual column count -> reuse
+        ``prev_columns``. The three targets are mutually exclusive so
+        the fallback chain only fires when the previous step genuinely
+        produced no signal.
+        """
         h, w = img.shape[:2]
-        full_width = w
-        crop = self._crop(img, 0, int(h * self.HEADER_FRAC))
-        upscaled = self._scale(crop)
-        result = self.engine(upscaled)
+        y_end = max(self.MIN_HEADER_PX, int(h * self.HEADER_FRAC))
+        header = img[0:y_end, :] if y_end > 0 else None
+
+        layout: str | None = None
+        if header is not None and header.size:
+            fields = self._scan_header_fields(header)
+            layout = detect_layout(fields)
+        if layout is None:
+            layout = detect_layout_from_columns(self._count_columns(img))
+        if layout is None and prev_columns:
+            return list(prev_columns)
+        if layout is None:
+            layout = "activity"  # last-resort default
+        return default_columns(w, layout)
+
+    def _scan_header_fields(self, header_img: np.ndarray) -> set[str]:
+        """Return the set of canonical field names found in the header band."""
+        result = self.engine(self._upscale(header_img))
         if not result:
-            return []
-
-        items = sorted(
-            zip(self._boxes(result), self._txts(result)),
-            key=lambda bt: (bt[0][0][0] + bt[0][1][0]) / 2,
-        )
-        scale_back = self._scale_factor(upscaled.shape[1], full_width)
-
-        # Group cells that map to the same canonical field (e.g. wrapped text)
-        # into one column whose x-range spans the union of all matched cells.
-        grouped: dict[str, list[tuple[int, int]]] = {}
-        for box, text in items:
+            return set()
+        fields: set[str] = set()
+        for text in self._txts(result):
             field = canonical_field(text)
-            if field is None:
-                continue
-            x1 = int(box[0][0] * scale_back)
-            x2 = int(box[1][0] * scale_back)
-            grouped.setdefault(field, []).append((min(x1, x2), max(x1, x2)))
+            if field is not None:
+                fields.add(field)
+        return fields
 
-        columns = [
-            Column(name, lo, hi, name == "structure")
-            for name, spans in grouped.items()
-            for lo, hi in [_union(spans)]
-        ]
-        columns.sort(key=lambda c: c.x1)
+    def _count_columns(self, img: np.ndarray) -> int:
+        """Count visible data columns in the image body.
 
-        if columns and columns[0].name != "cmpd_id":
-            columns = self._insert_cmpd_id_column(columns, w)
-
-        return self._fill_gaps(columns, w)
-
-    @staticmethod
-    def _scale_factor(cropped_width: int, full_width: int) -> float:
-        return full_width / max(cropped_width, 1)
-
-    def _scale(self, img: np.ndarray) -> np.ndarray:
-        """Upscale a crop 2x for better OCR recall."""
+        Uses the same morphological trick as :meth:`_detect_row_boundaries`
+        but rotated: a tall vertical kernel collapses short text into
+        noise and keeps only full-height vertical rules. The header band
+        is excluded because its top/bottom rules confuse the count.
+        """
         h, w = img.shape[:2]
-        if max(h, w) < 50:
-            return img
-        return cv2.resize(img, (w * 2, h * 2), interpolation=cv2.INTER_CUBIC)
-
-    @staticmethod
-    def _crop(img: np.ndarray, y1: int, y2: int) -> np.ndarray:
-        h = img.shape[0]
-        return img[max(0, y1) : min(h, y2), :]
-
-    @staticmethod
-    def _insert_cmpd_id_column(columns: list[Column], w: int) -> list[Column]:
-        """If header OCR missed ``cmpd_id``, prepend a 12% wide column."""
-        if not columns:
-            return _default_activity_columns(w)
-        x2 = int(columns[0].x1)
-        head = Column("cmpd_id", 0, max(x2, int(w * 0.12)), False)
-        return [head, *columns]
-
-    @staticmethod
-    def _fill_gaps(columns: list[Column], w: int) -> list[Column]:
-        """Stretch each column to abut its neighbour so cell crops don't gap."""
-        if not columns:
-            return []
-        out: list[Column] = []
-        prev_x2 = 0
-        for c in columns:
-            x1 = max(c.x1, prev_x2)
-            if x1 < c.x2:
-                out.append(Column(c.name, x1, c.x2, c.is_image))
-            prev_x2 = c.x2
-        return out
+        y0 = int(h * self.COLUMN_BODY_FRAC)
+        body = img[y0:h, :]
+        if body.size == 0:
+            return 0
+        gray = cv2.cvtColor(body, cv2.COLOR_BGR2GRAY)
+        _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, int(h * 0.4)))
+        lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        # Vertical-rule density per column. Many thin text strokes will
+        # produce small spikes; we only keep columns where the black
+        # pixel count is overwhelmingly high (i.e. a full-height rule).
+        col_sum = np.sum(lines, axis=0)
+        body_h = body.shape[0]
+        threshold = int(body_h * 0.5)
+        xs = np.where(col_sum > threshold)[0]
+        if len(xs) == 0:
+            return 0
+        clusters = self._cluster(xs, gap=self.COLUMN_GAP_PX)
+        # Drop page borders and noise.
+        clusters = [
+            x for x in clusters
+            if self.COLUMN_BORDER_PX < x < w - self.COLUMN_BORDER_PX
+        ]
+        return len(clusters) + 1
 
     # ---- row boundary detection ----
 
     def _detect_row_boundaries(self, img: np.ndarray) -> list[tuple[int, int]]:
-        """Use horizontal-line morphology to split the image into rows."""
+        """Horizontal-line morphology. First inner line = bottom of header."""
         h, w = img.shape[:2]
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
@@ -277,11 +351,16 @@ class RapidOcrTableExtractor:
         if not clusters:
             return []
 
-        # Drop the header band: keep only lines that sit below it.
-        header_h = self._first_inner(clusters, h)
-        inner = [y for y in clusters if header_h < y < h - 30]
-        dividers = sorted({0, *inner, h})
+        # Keep only horizontal lines that sit strictly inside the image
+        # body. This drops the top + bottom page borders.
+        inner = [y for y in clusters if 40 < y < h - 40]
+        if len(inner) < 2:
+            return []
 
+        # ``inner[0]`` is the bottom edge of the header band; data rows
+        # start there. We deliberately omit ``0`` from the divider set so
+        # the first row slice is the first *data* row, not the header.
+        dividers = sorted(set(inner) | {h})
         slices: list[tuple[int, int]] = []
         for i in range(len(dividers) - 1):
             y1 = dividers[i] + (1 if i > 0 else 0)
@@ -303,14 +382,6 @@ class RapidOcrTableExtractor:
                 clusters.append([y])
         return [int(np.mean(c)) for c in clusters]
 
-    @staticmethod
-    def _first_inner(clusters: Sequence[int], h: int) -> int:
-        """Y of the first horizontal line strictly inside the table body."""
-        for y in clusters:
-            if 40 < y < h - 40:
-                return y
-        return int(h * 0.15)
-
     # ---- cell-level extraction ----
 
     def _extract_rows(
@@ -325,7 +396,7 @@ class RapidOcrTableExtractor:
         assays: dict[str, AssayRecord] = {}
 
         cid_col = next((c for c in columns if c.name == "cmpd_id"), None)
-        if cid_col is None:
+        if cid_col is None or cid_col.x2 <= cid_col.x1:
             return [], []
 
         for y1, y2 in rows:
@@ -340,12 +411,12 @@ class RapidOcrTableExtractor:
             for col in columns:
                 if col.name == "cmpd_id":
                     continue
+                if col.x2 <= col.x1:
+                    continue
                 cell = img[y1:y2, col.x1:col.x2]
                 if col.is_image:
                     if cells_dir is not None and structure_path is None:
-                        structure_path = self._save_structure_crop(
-                            cell, cmpd_id, cells_dir
-                        )
+                        structure_path = self._save_structure_crop(cell, cmpd_id, cells_dir, image_path.stem)
                     continue
                 row_values[col.name] = self._ocr_cell(cell, col.name)
 
@@ -353,6 +424,7 @@ class RapidOcrTableExtractor:
                 # Lazy import: cpd.chem depends on RDKit, which we do not
                 # require just for schema import or lightweight tests.
                 from cpd.chem import auto_repair_smiles, validate_and_enrich
+
                 fixed = auto_repair_smiles(row_values["smiles"] or "")
                 chem = validate_and_enrich(fixed) if fixed else None
                 compounds[cmpd_id] = CompoundRecord(
@@ -384,7 +456,7 @@ class RapidOcrTableExtractor:
         """Find the 4-digit compound id in the leftmost cell."""
         if cell.size == 0:
             return None
-        result = self.engine(self._scale(cell))
+        result = self.engine(self._upscale(cell))
         if not result:
             return None
         for text in self._txts(result):
@@ -397,12 +469,12 @@ class RapidOcrTableExtractor:
         """OCR one cell. SMILES lines concatenate; other cells join with spaces."""
         if cell.size == 0:
             return None
-        result = self.engine(self._scale(cell))
+        result = self.engine(self._upscale(cell))
         if not result:
             return None
         items = sorted(
             zip(self._boxes(result), self._txts(result)),
-            key=lambda bt: (bt[0][0][1] + bt[0][2][1]) / 2,
+            key=lambda bt: ((bt[0][0][1] + bt[0][2][1]) / 2),
         )
         parts = [t.strip() for _, t in items if t and t.strip()]
         if not parts:
@@ -411,16 +483,39 @@ class RapidOcrTableExtractor:
         return joiner.join(parts)
 
     def _save_structure_crop(
-        self, cell: np.ndarray, cmpd_id: str, cells_dir: Path
+        self,
+        cell: np.ndarray,
+        cmpd_id: str,
+        cells_dir: Path,
+        src_stem: str,
     ) -> str | None:
-        """Write the structure cell as a PNG; return its path relative to cells_dir.parent."""
+        """Write the structure cell as a PNG; return path relative to cells_dir.parent.
+
+        Two guard rails:
+
+        1. **Content check.** Binarise the cell and reject crops whose dark-pixel
+           ratio is too low (<2%, effectively empty) or suspiciously uniform —
+           that is the signature of a text cell (RT/MS/Method) wrongly labelled
+           as the structure column because the layout detector picked the
+           wrong table type.
+        2. **Unique filename.** ``src_stem`` is the source image filename
+           without extension; including it in the output name prevents two
+           images containing the same ``cmpd_id`` from clobbering each other's
+           crop on disk.
+        """
         if cell.size == 0:
             return None
+        gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY)
+        _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
+        dark_ratio = float(binary.mean()) / 255.0
+        if dark_ratio < 0.02 or dark_ratio > 0.55:
+            return None  # empty / solid cell, not a structure drawing
+
         cells_dir.mkdir(parents=True, exist_ok=True)
         padded = cv2.copyMakeBorder(
             cell, 8, 8, 8, 8, cv2.BORDER_CONSTANT, value=[255, 255, 255]
         )
-        out = cells_dir / f"{cmpd_id}_struct.png"
+        out = cells_dir / f"{src_stem}_{cmpd_id}_struct.png"
         cv2.imwrite(str(out), padded)
         return str(out.relative_to(cells_dir.parent))
 
@@ -433,6 +528,14 @@ class RapidOcrTableExtractor:
     @staticmethod
     def _txts(result):
         return result.txts if hasattr(result, "txts") else [r[1] for r in result]
+
+    @staticmethod
+    def _upscale(img: np.ndarray) -> np.ndarray:
+        """Upscale small crops 2x for better OCR recall."""
+        h, w = img.shape[:2]
+        if max(h, w) < 50:
+            return img
+        return cv2.resize(img, (w * 2, h * 2), interpolation=cv2.INTER_CUBIC)
 
 
 # ---------- helpers ----------
@@ -450,13 +553,12 @@ def _as_float(text: str | None) -> float | None:
         return None
 
 
-def _union(spans: Sequence[tuple[int, int]]) -> tuple[int, int]:
-    return min(s[0] for s in spans), max(s[1] for s in spans)
-
-
 __all__ = [
     "AssayRecord",
     "Column",
     "CompoundRecord",
     "RapidOcrTableExtractor",
+    "default_columns",
+    "detect_layout",
+    "detect_layout_from_columns",
 ]
