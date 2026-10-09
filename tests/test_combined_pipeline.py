@@ -75,7 +75,7 @@ def test_build_combined_rows_basic() -> None:
             source_image="a.jpg",
         ),
     ]
-    assays = {
+    assays: dict = {
         "1001": AssayRecord(cmpd_id="1001", kd_nm=0.062, rt_min=1.7,
                             ms_mz=1512.8, lcms_method="10-80- 2min",
                             ms_polarity="[M+H]+", source_image="b.jpg"),

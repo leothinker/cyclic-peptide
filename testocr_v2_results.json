@@ -1,0 +1,29 @@
+{
+  "image": "testocr.jpg",
+  "models": {
+    "en_PP-OCRv4_mobile": {
+      "time_sec": 0.016,
+      "line_score": 0.0,
+      "text": "",
+      "per_char": [],
+      "ambiguity": {
+        "non_blank_frames": 0,
+        "low_p1_lt_080": 0,
+        "strong_2nd_p2_gt_005": 0,
+        "similar_2nd_p2_gt_03p1": 0
+      }
+    },
+    "en_PP-OCRv5_mobile": {
+      "time_sec": 0.016,
+      "line_score": 0.0,
+      "text": "",
+      "per_char": [],
+      "ambiguity": {
+        "non_blank_frames": 0,
+        "low_p1_lt_080": 0,
+        "strong_2nd_p2_gt_005": 0,
+        "similar_2nd_p2_gt_03p1": 0
+      }
+    }
+  }
+}

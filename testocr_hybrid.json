@@ -1,0 +1,161 @@
+{
+  "image": "testocr.jpg",
+  "zh_det_then_en_rec": [
+    {
+      "i": 0,
+      "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H]{C2CCCC",
+      "score": 0.9286,
+      "bbox": [
+        0,
+        1,
+        826,
+        50
+      ]
+    },
+    {
+      "i": 1,
+      "text": "C2)C=O)N3[C@@H](CC3)C=O)N(C)[C@@H]4C(",
+      "score": 0.9658,
+      "bbox": [
+        0,
+        45,
+        824,
+        94
+      ]
+    },
+    {
+      "i": 2,
+      "text": "-O)N(C)CC(-O)N[C@@H](CCC5-CC(F)-C(C(F)=C",
+      "score": 0.9298,
+      "bbox": [
+        0,
+        90,
+        837,
+        135
+      ]
+    },
+    {
+      "i": 3,
+      "text": "5)C(F)(F)F)C(=O)N6[C@@H]CCC6)C(-O)NC7(CC",
+      "score": 0.889,
+      "bbox": [
+        0,
+        134,
+        827,
+        177
+      ]
+    },
+    {
+      "i": 4,
+      "text": "CC7)C=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@",
+      "score": 0.972,
+      "bbox": [
+        0,
+        174,
+        837,
+        223
+      ]
+    },
+    {
+      "i": 5,
+      "text": "@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C",
+      "score": 0.9416,
+      "bbox": [
+        0,
+        218,
+        837,
+        264
+      ]
+    },
+    {
+      "i": 6,
+      "text": "(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C",
+      "score": 0.9647,
+      "bbox": [
+        0,
+        261,
+        621,
+        308
+      ]
+    }
+  ],
+  "en_det_then_en_rec": [
+    {
+      "i": 0,
+      "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC",
+      "score": 0.9205,
+      "bbox": [
+        0,
+        5,
+        823,
+        44
+      ]
+    },
+    {
+      "i": 1,
+      "text": "C2)C=O)N3[C@@H](CC3)C=O)N(C)[C@@H]4C",
+      "score": 0.9279,
+      "bbox": [
+        0,
+        49,
+        822,
+        88
+      ]
+    },
+    {
+      "i": 2,
+      "text": "O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C",
+      "score": 0.9288,
+      "bbox": [
+        11,
+        92,
+        833,
+        132
+      ]
+    },
+    {
+      "i": 3,
+      "text": "5)C(F)(F)F)C=O)N6[C@@H]CCC6)C(=O)NC7(CC",
+      "score": 0.9418,
+      "bbox": [
+        0,
+        135,
+        827,
+        175
+      ]
+    },
+    {
+      "i": 4,
+      "text": "CC7)C(=O)N(C)[C@@H](C8CCCC8)C-O)N(C)[C@",
+      "score": 0.9254,
+      "bbox": [
+        0,
+        178,
+        836,
+        217
+      ]
+    },
+    {
+      "i": 5,
+      "text": "@H](CC=O)N(C)C@H](CCNC-S)C9=C(F)C(F)=C",
+      "score": 0.912,
+      "bbox": [
+        1,
+        221,
+        833,
+        260
+      ]
+    },
+    {
+      "i": 6,
+      "text": "(SC4)C(F)=C9F)C(=O)N1)C=O)N(C)C",
+      "score": 0.9018,
+      "bbox": [
+        3,
+        263,
+        621,
+        304
+      ]
+    }
+  ]
+}

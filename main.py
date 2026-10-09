@@ -119,7 +119,14 @@ def _safe_extract(
 def _extract_all(
     img_dir: Path,
     cells_dir: Path,
-) -> tuple[list[CompoundRecord], list[AssayRecord], dict[str, str]]:
+) -> tuple[list[CompoundRecord], dict[str, AssayRecord], dict[str, str]]:
+    """Run the extractor over every image, deduping across pages.
+
+    Returns ``(compounds, assays, failures)``:
+      * ``compounds`` is a list of unique CompoundRecord (one per cmpd_id).
+      * ``assays``    is a dict keyed by cmpd_id for fast lookup in
+        ``_build_combined_rows``.
+    """
     extractor = RapidOcrTableExtractor()
     compounds: dict[str, CompoundRecord] = {}
     assays: dict[str, AssayRecord] = {}
@@ -152,7 +159,7 @@ def _extract_all(
             end="\r",
         )
     print()
-    return list(compounds.values()), list(assays.values()), failures
+    return list(compounds.values()), assays, failures
 
 
 def _run_decimer(
@@ -306,7 +313,7 @@ def run_pipeline(
         COMPOUND_COLUMNS,
     )
     n_assays = _write_csv(
-        (a.__dict__ for a in assays),
+        (a.__dict__ for a in assays.values()),
         out_path / "assays.csv",
         ASSAY_COLUMNS,
     )
