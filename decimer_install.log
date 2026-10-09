@@ -1,3 +1,0 @@
-error: Failed to inspect Python interpreter from provided path at `.venv/Scripts/python.exe`
-  Caused by: Failed to query Python interpreter at `D:/GitHub/drugdesign/cyclic-peptide/.venv/Scripts/python.exe`
-  Caused by: Access is denied. (os error 5)

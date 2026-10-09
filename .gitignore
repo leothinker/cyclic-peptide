@@ -74,3 +74,9 @@ data/raw/*.pdf
 data/images/*.png
 
 data
+
+# Read-only OCSR reference clones (track README.md, ignore the upstream trees)
+references/RapidOCR/
+references/DECIMER-Image_Transformer/
+references/Hiro-OCSR/
+

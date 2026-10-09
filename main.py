@@ -22,6 +22,8 @@ Combined ``compounds.csv`` columns::
     kd_nm, rt_min, ms_mz, lcms_method, ms_polarity, assay_source_image
 
 Empty string when a value is missing (CSV-friendly).
+
+Run:  python main.py
 """
 
 from __future__ import annotations
@@ -54,28 +56,7 @@ from cpd.parsers.table_extractor import (
 
 log = logging.getLogger("cpd")
 
-# Legacy back-compat outputs (kept so existing downstream tooling still works).
-COMPOUND_COLUMNS: tuple[str, ...] = (
-    "cmpd_id",
-    "smiles",
-    "canonical_smiles",
-    "molecular_weight",
-    "heavy_atom_count",
-    "is_valid",
-    "structure_image",
-    "source_image",
-)
-ASSAY_COLUMNS: tuple[str, ...] = (
-    "cmpd_id",
-    "kd_nm",
-    "rt_min",
-    "ms_mz",
-    "lcms_method",
-    "ms_polarity",
-    "source_image",
-)
-
-# New combined output (one row per cmpd_id, both SMILES streams side by side).
+# Combined output: one row per cmpd_id, both SMILES streams side by side.
 COMBINED_COLUMNS: tuple[str, ...] = (
     "cmpd_id",
     "smiles",
@@ -307,16 +288,6 @@ def run_pipeline(
     decimer_raw, decimer_canon = _run_decimer(compounds, out_path)
 
     print(f"\n[4/4] writing combined dataset to {out_path} ...")
-    n_legacy_compounds = _write_csv(
-        (c.__dict__ for c in compounds),
-        out_path / "compounds.csv",
-        COMPOUND_COLUMNS,
-    )
-    n_assays = _write_csv(
-        (a.__dict__ for a in assays.values()),
-        out_path / "assays.csv",
-        ASSAY_COLUMNS,
-    )
     combined_rows = _build_combined_rows(compounds, assays, decimer_raw, decimer_canon)
     n_combined = _write_csv(
         combined_rows,
@@ -324,20 +295,14 @@ def run_pipeline(
         COMBINED_COLUMNS,
     )
 
-    n_valid = sum(1 for c in compounds if c.is_valid)
-    n_struct = sum(1 for c in compounds if c.structure_image)
     n_decimer = len(decimer_raw)
     n_agree = sum(1 for r in combined_rows if r["smiles_agree"] == "True")
 
     print("\n" + "=" * 60)
-    print("Combined dataset ready.")
-    print(f"  compounds_combined.csv : {n_combined} rows")
-    print(f"  compounds.csv (legacy) : {n_legacy_compounds} rows "
-          f"(RDKit valid: {n_valid}, with structure: {n_struct})")
-    print(f"  assays.csv (legacy)    : {n_assays} rows")
-    print(f"  DECIMER SMILES         : {n_decimer} rows; agreement: {n_agree}")
+    print(f"compounds_combined.csv : {n_combined} rows")
+    print(f"DECIMER SMILES         : {n_decimer} rows; agreement: {n_agree}")
     if failures:
-        print(f"  [!] images without rows ({len(failures)}): {', '.join(list(failures)[:5])}"
+        print(f"[!] images without rows ({len(failures)}): {', '.join(list(failures)[:5])}"
               + ("..." if len(failures) > 5 else ""))
     print("=" * 60)
 
