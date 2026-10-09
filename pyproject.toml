@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Pipeline that turns cyclic-peptide patents into a structured SMILES + bioactivity dataset."
 requires-python = ">=3.11,<3.14"
 dependencies = [
+    "decimer>=2.8.0",
     "numpy>=2.0.0",
     "onnxruntime>=1.30.0",
     "opencv-python>=5.0.0.93",

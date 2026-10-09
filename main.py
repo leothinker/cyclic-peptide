@@ -1,33 +1,27 @@
-"""Extract dual-table dataset (compounds.csv + assays.csv) from patent JPGs.
+"""Combined-table pipeline: OCR + optional DECIMER + assays in ONE CSV.
 
-Pipeline overview
------------------
-For every JPG in ``img_dir`` (default: WO2025162428's golden_tables):
-
-  1. :class:`RapidOcrTableExtractor.extract_records` returns CompoundRecords
+Per image:
+  1. ``RapidOcrTableExtractor.extract_records`` returns CompoundRecords
      (SMILES + structure PNG) and AssayRecords (KD + LCMS).
-  2. Compound-id spelling variants collapse through
-     :func:`cpd.merge.normalise_cmpd_id`.
-  3. The two streams are written to ``data/processed/compounds.csv`` and
-     ``data/processed/assays.csv``. Structure PNGs land in
-     ``data/processed/cells/``.
+  2. Compound-id spelling variants collapse through ``normalise_cmpd_id``.
+  3. Optional DECIMER (OCSR) generates a SECOND SMILES for every cropped
+     structure PNG. When DECIMER is not present the column stays empty --
+     install ``DECIMER`` and re-run to fill it.
+  4. The two SMILES streams + activity stream merge on ``cmpd_id`` into a
+     single wide ``compounds.csv``. Legacy ``compounds.csv`` (smiles only)
+     and ``assays.csv`` (kd/rt/ms) are also written so anything downstream
+     still works.
 
-Per-image failures (corrupt JPG, OCR backend crash, empty header) are
-caught and logged so one bad page doesn't take down the whole run.
+Combined ``compounds.csv`` columns::
 
-Output schema
--------------
-``compounds.csv``::
+    cmpd_id,
+    smiles, canonical_smiles, smiles_decimer, canonical_smiles_decimer,
+    smiles_agree,
+    molecular_weight, heavy_atom_count, is_valid,
+    structure_image, source_image,
+    kd_nm, rt_min, ms_mz, lcms_method, ms_polarity, assay_source_image
 
-    cmpd_id, smiles, canonical_smiles, molecular_weight,
-    heavy_atom_count, is_valid, structure_image, source_image
-
-``assays.csv``::
-
-    cmpd_id, kd_nm, rt_min, ms_mz, lcms_method, ms_polarity, source_image
-
-The two tables share ``cmpd_id``; a compound may appear in either one
-or both depending on which patent pages cover it.
+Empty string when a value is missing (CSV-friendly).
 """
 
 from __future__ import annotations
@@ -35,12 +29,11 @@ from __future__ import annotations
 import csv
 import logging
 import sys
-from dataclasses import asdict
 from pathlib import Path
 from typing import Iterable
 
-# Windows consoles default to cp1252 which can't encode the status emojis;
-# force UTF-8 (with replacement fallback) so the banner prints cleanly.
+# Windows consoles default to cp1252 which cannot encode the status emojis;
+# force UTF-8 so the banner prints cleanly even when piped to a file.
 for _stream in (sys.stdout, sys.stderr):
     try:
         _stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
@@ -48,6 +41,8 @@ for _stream in (sys.stdout, sys.stderr):
         pass
 
 
+from cpd.chem import validate_and_enrich
+from cpd.decimer import is_available, predict_smiles
 from cpd.merge import dedupe_assays, dedupe_compounds, normalise_cmpd_id
 from cpd.parsers.table_extractor import (
     AssayRecord,
@@ -59,7 +54,7 @@ from cpd.parsers.table_extractor import (
 
 log = logging.getLogger("cpd")
 
-
+# Legacy back-compat outputs (kept so existing downstream tooling still works).
 COMPOUND_COLUMNS: tuple[str, ...] = (
     "cmpd_id",
     "smiles",
@@ -70,7 +65,6 @@ COMPOUND_COLUMNS: tuple[str, ...] = (
     "structure_image",
     "source_image",
 )
-
 ASSAY_COLUMNS: tuple[str, ...] = (
     "cmpd_id",
     "kd_nm",
@@ -81,9 +75,29 @@ ASSAY_COLUMNS: tuple[str, ...] = (
     "source_image",
 )
 
+# New combined output (one row per cmpd_id, both SMILES streams side by side).
+COMBINED_COLUMNS: tuple[str, ...] = (
+    "cmpd_id",
+    "smiles",
+    "canonical_smiles",
+    "smiles_decimer",
+    "canonical_smiles_decimer",
+    "smiles_agree",
+    "molecular_weight",
+    "heavy_atom_count",
+    "is_valid",
+    "structure_image",
+    "source_image",
+    "kd_nm",
+    "rt_min",
+    "ms_mz",
+    "lcms_method",
+    "ms_polarity",
+    "assay_source_image",
+)
+
 
 def _iter_jpgs(img_dir: Path) -> Iterable[Path]:
-    """Yield every ``*.jpg`` in ``img_dir``, sorted by filename."""
     return sorted(img_dir.glob("*.jpg"))
 
 
@@ -93,7 +107,6 @@ def _safe_extract(
     cells_dir: Path,
     prev_columns: list[Column],
 ) -> tuple[list[CompoundRecord], list[AssayRecord], list[Column]]:
-    """Run one image through the extractor; never raise."""
     try:
         return extractor.extract_records(
             image_path, cells_dir=cells_dir, prev_columns=prev_columns
@@ -107,7 +120,6 @@ def _extract_all(
     img_dir: Path,
     cells_dir: Path,
 ) -> tuple[list[CompoundRecord], list[AssayRecord], dict[str, str]]:
-    """Run the extractor over every image, deduping across pages."""
     extractor = RapidOcrTableExtractor()
     compounds: dict[str, CompoundRecord] = {}
     assays: dict[str, AssayRecord] = {}
@@ -129,7 +141,7 @@ def _extract_all(
         page_assays = [a for a in page_assays if normalise_cmpd_id(a.cmpd_id)]
 
         for cid, rec in dedupe_compounds(page_compounds).items():
-            compounds.setdefault(cid, rec)  # first image wins
+            compounds.setdefault(cid, rec)
         for cid, rec in dedupe_assays(page_assays).items():
             assays.setdefault(cid, rec)
 
@@ -141,6 +153,111 @@ def _extract_all(
         )
     print()
     return list(compounds.values()), list(assays.values()), failures
+
+
+def _run_decimer(
+    compounds: list[CompoundRecord],
+    out_dir: Path,
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Run DECIMER over every cropped structure PNG.
+
+    Returns ``(decimer_raw, decimer_canon)`` keyed by ``cmpd_id``:
+
+    * ``decimer_raw``    = the SMILES string DECIMER returned, or ``""``.
+    * ``decimer_canon``  = the RDKit-canonical form (empty when invalid).
+
+    When DECIMER is not installed the function logs once and returns two
+    empty dicts so the rest of the pipeline still runs.
+    """
+    raw: dict[str, str] = {}
+    canon: dict[str, str] = {}
+    if not is_available():
+        print("   [DECIMER] not installed -> smiles_decimer column will be empty")
+        print("              install with:  uv pip install --python .venv/Scripts/python.exe DECIMER")
+        return raw, canon
+
+    targets = [c for c in compounds if c.structure_image]
+    print(f"   [DECIMER] running on {len(targets)} cropped structures ...")
+    cells_root = out_dir  # structure_image paths are relative to out_dir.
+    for i, c in enumerate(targets, start=1):
+        img_path = cells_root / c.structure_image  # type: ignore[operator]
+        smi = predict_smiles(img_path)
+        if not smi:
+            continue
+        raw[c.cmpd_id] = smi
+        chem = validate_and_enrich(smi)
+        if chem is not None:
+            canon[c.cmpd_id] = chem.canonical_smiles
+        if i % 25 == 0 or i == len(targets):
+            print(f"      [{i}/{len(targets)}] parsed", end="\r")
+    print()
+    print(f"   [DECIMER] got SMILES for {len(raw)} / {len(targets)} structures")
+    return raw, canon
+
+
+def _build_combined_rows(
+    compounds: list[CompoundRecord],
+    assays: dict[str, AssayRecord],
+    decimer_raw: dict[str, str],
+    decimer_canon: dict[str, str],
+) -> list[dict]:
+    """Flatten compounds + assays + DECIMER into COMBINED_COLUMNS-shaped dicts."""
+    rows: list[dict] = []
+    seen_assay_ids: set[str] = set()
+    for c in compounds:
+        a = assays.get(c.cmpd_id)
+        if a is not None:
+            seen_assay_ids.add(c.cmpd_id)
+        d_raw = decimer_raw.get(c.cmpd_id, "")
+        d_can = decimer_canon.get(c.cmpd_id, "")
+        agree = (
+            bool(c.canonical_smiles and d_can and c.canonical_smiles == d_can)
+            if c.canonical_smiles and d_can
+            else False
+        )
+        rows.append({
+            "cmpd_id": c.cmpd_id,
+            "smiles": c.smiles or "",
+            "canonical_smiles": c.canonical_smiles or "",
+            "smiles_decimer": d_raw,
+            "canonical_smiles_decimer": d_can,
+            "smiles_agree": "True" if agree else "False",
+            "molecular_weight": c.molecular_weight if c.molecular_weight is not None else "",
+            "heavy_atom_count": c.heavy_atom_count if c.heavy_atom_count is not None else "",
+            "is_valid": "True" if c.is_valid else "False",
+            "structure_image": c.structure_image or "",
+            "source_image": c.source_image or "",
+            "kd_nm": a.kd_nm if a is not None and a.kd_nm is not None else "",
+            "rt_min": a.rt_min if a is not None and a.rt_min is not None else "",
+            "ms_mz": a.ms_mz if a is not None and a.ms_mz is not None else "",
+            "lcms_method": (a.lcms_method or "") if a is not None else "",
+            "ms_polarity": (a.ms_polarity or "") if a is not None else "",
+            "assay_source_image": (a.source_image or "") if a is not None else "",
+        })
+    # Cmpds that appear only in the assay stream (no compound record).
+    for cid, a in assays.items():
+        if cid in seen_assay_ids:
+            continue
+        rows.append({
+            "cmpd_id": cid,
+            "smiles": "",
+            "canonical_smiles": "",
+            "smiles_decimer": "",
+            "canonical_smiles_decimer": "",
+            "smiles_agree": "False",
+            "molecular_weight": "",
+            "heavy_atom_count": "",
+            "is_valid": "False",
+            "structure_image": "",
+            "source_image": "",
+            "kd_nm": a.kd_nm if a.kd_nm is not None else "",
+            "rt_min": a.rt_min if a.rt_min is not None else "",
+            "ms_mz": a.ms_mz if a.ms_mz is not None else "",
+            "lcms_method": a.lcms_method or "",
+            "ms_polarity": a.ms_polarity or "",
+            "assay_source_image": a.source_image or "",
+        })
+    return rows
 
 
 def _write_csv(
@@ -163,40 +280,59 @@ def run_pipeline(
     img_dir: str = "data/raw/WO2025162428/golden_tables",
     out_dir: str = "data/processed",
 ) -> None:
+    """Run extraction -> DECIMER -> write all three CSVs in order.
+
+    Prints a short banner between every step so progress is visible
+    even when stdout is piped to a log file.
+    """
     img_path = Path(img_dir)
     out_path = Path(out_dir)
     cells_dir = out_path / "cells"
 
-    print(f"🚀 [1/3] 扫描目录中的表格图片: {img_path} ...")
+    print(f"[1/4] scanning {img_path} ...")
     jpgs = list(_iter_jpgs(img_path))
-    print(f"   -> 共发现 {len(jpgs)} 张 JPG")
+    print(f"   -> {len(jpgs)} JPGs")
 
-    print(f"\n📦 [2/3] 正在提取 SMILES + 结构图，并解析 KD/LCMS ...")
+    print(f"\n[2/4] extracting SMILES + structure + KD/LCMS ...")
     compounds, assays, failures = _extract_all(img_path, cells_dir)
 
-    print(f"\n🧪 [3/3] 写入双表数据集到 {out_path} ...")
-    n_compounds = _write_csv(
-        (asdict(c) for c in compounds),
+    print(f"\n[3/4] running DECIMER (OCSR) on cropped structures ...")
+    decimer_raw, decimer_canon = _run_decimer(compounds, out_path)
+
+    print(f"\n[4/4] writing combined dataset to {out_path} ...")
+    n_legacy_compounds = _write_csv(
+        (c.__dict__ for c in compounds),
         out_path / "compounds.csv",
         COMPOUND_COLUMNS,
     )
     n_assays = _write_csv(
-        (asdict(a) for a in assays),
+        (a.__dict__ for a in assays),
         out_path / "assays.csv",
         ASSAY_COLUMNS,
+    )
+    combined_rows = _build_combined_rows(compounds, assays, decimer_raw, decimer_canon)
+    n_combined = _write_csv(
+        combined_rows,
+        out_path / "compounds_combined.csv",
+        COMBINED_COLUMNS,
     )
 
     n_valid = sum(1 for c in compounds if c.is_valid)
     n_struct = sum(1 for c in compounds if c.structure_image)
+    n_decimer = len(decimer_raw)
+    n_agree = sum(1 for r in combined_rows if r["smiles_agree"] == "True")
 
-    print("\n" + "=" * 55)
-    print("🎉 双表数据集构建完成！")
-    print(f"📊 化合物表 compounds.csv : {n_compounds} 条 (RDKit 有效: {n_valid}, 含结构图: {n_struct})")
-    print(f"🎯 活性表 assays.csv       : {n_assays} 条")
-    print(f"📁 结构图裁剪目录          : {cells_dir}")
+    print("\n" + "=" * 60)
+    print("Combined dataset ready.")
+    print(f"  compounds_combined.csv : {n_combined} rows")
+    print(f"  compounds.csv (legacy) : {n_legacy_compounds} rows "
+          f"(RDKit valid: {n_valid}, with structure: {n_struct})")
+    print(f"  assays.csv (legacy)    : {n_assays} rows")
+    print(f"  DECIMER SMILES         : {n_decimer} rows; agreement: {n_agree}")
     if failures:
-        print(f"⚠️  无数据的图片 ({len(failures)} 张): {', '.join(list(failures)[:5])}{'...' if len(failures) > 5 else ''}")
-    print("=" * 55)
+        print(f"  [!] images without rows ({len(failures)}): {', '.join(list(failures)[:5])}"
+              + ("..." if len(failures) > 5 else ""))
+    print("=" * 60)
 
 
 if __name__ == "__main__":

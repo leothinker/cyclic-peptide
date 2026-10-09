@@ -24,7 +24,9 @@ Pipeline for every image:
   3. Detect horizontal row boundaries with OpenCV morphology. The
      first inner horizontal line marks the bottom of the header band;
      data rows start there, so the first row slice is the first
-     *data* row, not the header itself.
+     *data* row, not the header itself. The first slice may also be
+     a single trailing ``[cmpd_id | structure | SMILES]`` row above
+     a dense activity table (see ``_detect_first_row_columns``).
   4. For each row, OCR every text cell; for the ``structure`` column,
      crop the cell to a PNG under ``cells_dir``.
 
@@ -111,28 +113,28 @@ class Column:
 # hand-tuned on the WO2025162428 golden tables; update them here if a
 # new patent shows a different ratio.
 _DEFAULT_ACTIVITY_FRACS: tuple[tuple[str, float, float, bool], ...] = (
-    ("cmpd_id", 0.00, 0.13, False),
-    ("structure", 0.13, 0.55, True),
-    ("rt_min", 0.57, 0.72, False),
-    ("ms_mz", 0.72, 0.82, False),
-    ("lcms_method", 0.82, 0.89, False),
-    ("ms_polarity", 0.89, 0.95, False),
-    ("kd_nm", 0.95, 1.00, False),
+    ("cmpd_id", 0.00, 0.09, False),
+    ("structure", 0.10, 0.48, True),
+    ("rt_min", 0.48, 0.57, False),
+    ("ms_mz", 0.58, 0.67, False),
+    ("lcms_method", 0.67, 0.78, False),
+    ("ms_polarity", 0.79, 0.88, False),
+    ("kd_nm", 0.89, 1.00, False),
 )
 
 _DENSE_ACTIVITY_FRACS: tuple[tuple[str, float, float, bool], ...] = (
-    ("cmpd_id", 0.00, 0.12, False),
-    ("rt_min", 0.22, 0.32, False),
-    ("ms_mz", 0.33, 0.48, False),
-    ("lcms_method", 0.50, 0.68, False),
-    ("ms_polarity", 0.69, 0.81, False),
-    ("kd_nm", 0.83, 0.97, False),
+    ("cmpd_id", 0.00, 0.17, False),
+    ("rt_min", 0.19, 0.34, False),
+    ("ms_mz", 0.35, 0.50, False),
+    ("lcms_method", 0.51, 0.67, False),
+    ("ms_polarity", 0.68, 0.79, False),
+    ("kd_nm", 0.80, 0.97, False),
 )
 
 _SMILES_FRACS: tuple[tuple[str, float, float, bool], ...] = (
-    ("cmpd_id", 0.00, 0.11, False),
-    ("structure", 0.13, 0.55, True),
-    ("smiles", 0.57, 0.99, False),
+    ("cmpd_id", 0.00, 0.10, False),
+    ("structure", 0.11, 0.56, True),
+    ("smiles", 0.58, 0.99, False),
 )
 
 
@@ -289,7 +291,8 @@ class RapidOcrTableExtractor:
             return list(prev_columns)
         if layout is None:
             layout = "activity"  # last-resort default
-        return default_columns(w, layout)
+        columns = default_columns(w, layout)
+        return self._snap_to_borders(img, columns)
 
     def _scan_header_fields(self, header_img: np.ndarray) -> set[str]:
         """Return the set of canonical field names found in the header band."""
@@ -337,6 +340,122 @@ class RapidOcrTableExtractor:
         ]
         return len(clusters) + 1
 
+
+    # ---- per-row layout override ----
+
+    def _detect_first_row_columns(
+        self,
+        img: np.ndarray,
+        rows: Sequence[tuple[int, int]],
+    ) -> list[Column] | None:
+        """Return a column layout to use only for the first row when it
+        differs from the rest of the image.
+
+        Some images (e.g. ``I100376``) start with a single 3-col SMILES-
+        style row ``[cmpd_id | structure | SMILES]`` and follow it with
+        a 6-col dense activity table. ``_detect_columns`` only inspects
+        the body below the header band, so it picks the dense layout
+        for the whole image and the leading SMILES row gets dropped
+        because dense has no SMILES or structure column.
+
+        Detection mirrors :meth:`_count_columns` but is restricted to
+        the first slice. If the slice is too thin or the column count
+        does not map to a known layout, returns ``None`` so the caller
+        falls back to the main columns. Normal SMILES / dense / activity
+        tables always have a header band as the first slice, which has
+        no 4-digit cmpd_id, so they hit the fallback even when the
+        divider count happens to match a layout.
+        """
+        if not rows:
+            return None
+        y1, y2 = rows[0]
+        if y2 - y1 < 50:
+            return None  # too thin to be a real data row -> header band
+        h, w = img.shape[:2]
+        body = img[y1:y2, :]
+        if body.size == 0:
+            return None
+        gray = cv2.cvtColor(body, cv2.COLOR_BGR2GRAY)
+        _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
+        kernel = cv2.getStructuringElement(
+            cv2.MORPH_RECT, (1, max(20, int(body.shape[0] * 0.5)))
+        )
+        lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        col_sum = np.sum(lines, axis=0)
+        threshold = int(body.shape[0] * 0.4)
+        xs = np.where(col_sum > threshold)[0]
+        if len(xs) == 0:
+            return None
+        clusters = self._cluster(xs, gap=self.COLUMN_GAP_PX)
+        clusters = [
+            x for x in clusters
+            if self.COLUMN_BORDER_PX < x < w - self.COLUMN_BORDER_PX
+        ]
+        layout = detect_layout_from_columns(len(clusters) + 1)
+        if layout is None:
+            return None
+        return default_columns(w, layout)
+
+    # ---- border-driven column refinement ----
+
+    def _detect_vertical_borders(self, img: np.ndarray) -> list[int]:
+        """Return x positions of full-height vertical table lines.
+
+        Uses the same morphological recipe as ``_count_columns`` so the two
+        agree on what counts as a "real" divider (vs noise or partial strokes).
+        """
+        h, w = img.shape[:2]
+        y0 = int(h * self.COLUMN_BODY_FRAC)
+        body = img[y0:h, :]
+        if body.size == 0:
+            return []
+        gray = cv2.cvtColor(body, cv2.COLOR_BGR2GRAY)
+        _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, int(body.shape[0] * 0.5)))
+        lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        col_sum = np.sum(lines, axis=0)
+        threshold = int(body.shape[0] * 0.4)
+        xs = np.where(col_sum > threshold)[0]
+        if len(xs) == 0:
+            return []
+        clusters = self._cluster(xs, gap=self.COLUMN_GAP_PX)
+        return [
+            x for x in clusters
+            if self.COLUMN_BORDER_PX < x < w - self.COLUMN_BORDER_PX
+        ]
+
+    def _snap_to_borders(
+        self,
+        img: np.ndarray,
+        columns: list[Column],
+    ) -> list[Column]:
+        """Adjust each column's x1/x2 to the nearest detected vertical border.
+
+        Falls back to the original boundaries when no border is within
+        ``BORDER_SNAP_PX`` so a bad detection cannot move the crop wildly.
+        """
+        borders = self._detect_vertical_borders(img)
+        if not borders:
+            return columns
+        snapped: list[Column] = []
+        for col in columns:
+            best_left = col.x1
+            best_left_dist = self.BORDER_SNAP_PX + 1
+            best_right = col.x2
+            best_right_dist = self.BORDER_SNAP_PX + 1
+            for b in borders:
+                dl = abs(b - col.x1)
+                if dl < best_left_dist:
+                    best_left_dist = dl
+                    best_left = b
+                dr = abs(b - col.x2)
+                if dr < best_right_dist:
+                    best_right_dist = dr
+                    best_right = b
+            snapped.append(Column(col.name, best_left, best_right, col.is_image))
+        return snapped
+
+    BORDER_SNAP_PX: int = 90
     # ---- row boundary detection ----
 
     def _detect_row_boundaries(self, img: np.ndarray) -> list[tuple[int, int]]:
@@ -352,15 +471,30 @@ class RapidOcrTableExtractor:
             return []
 
         # Keep only horizontal lines that sit strictly inside the image
-        # body. This drops the top + bottom page borders.
-        inner = [y for y in clusters if 40 < y < h - 40]
-        if len(inner) < 2:
-            return []
+        # body. The border band scales with image height: a fixed 40-px
+        # band excludes every line on short images (e.g. I100382 is
+        # 70 px tall -- the band becomes empty and the table is dropped
+        # entirely). 8 px on each side clears page borders on images of
+        # any size while keeping the bulk of the body.
+        band_lo = 8
+        band_hi = max(band_lo + 1, h - 8)
+        inner = [y for y in clusters if band_lo < y < band_hi]
 
-        # ``inner[0]`` is the bottom edge of the header band; data rows
-        # start there. We deliberately omit ``0`` from the divider set so
-        # the first row slice is the first *data* row, not the header.
-        dividers = sorted(set(inner) | {h})
+        # If we still cannot find enough dividers (single-row continuation
+        # pages, header-only images, etc.) treat the whole image as one
+        # slice. This recovers cases like I100382 which holds a single
+        # dense activity row for cmpd 2173.
+        if len(inner) < 2:
+            inner = []
+
+        # ``inner[0]`` is the bottom edge of the header band for normal
+        # single-table pages; data rows start there. We DO include ``0`` as a
+        # divider so a page with a continuation row above the main table
+        # (e.g. I100376's cmpd 2173 above the dense activity table) still
+        # emits that row as a slice. For ordinary tables the resulting first
+        # slice is the header band; OCR fails to find a 4-digit cmpd_id and
+        # the row is dropped downstream.
+        dividers = sorted({0} | set(inner) | {h})
         slices: list[tuple[int, int]] = []
         for i in range(len(dividers) - 1):
             y1 = dividers[i] + (1 if i > 0 else 0)
@@ -399,8 +533,29 @@ class RapidOcrTableExtractor:
         if cid_col is None or cid_col.x2 <= cid_col.x1:
             return [], []
 
-        for y1, y2 in rows:
-            cid_cell = img[y1:y2, cid_col.x1:cid_col.x2]
+        # Some images open with a single SMILES-style row before the main
+        # table (see ``_detect_first_row_columns``). The override only makes
+        # sense when the main body is a dense activity table (6 cols); for
+        # SMILES or 7-col activity tables the first slice is the header
+        # band, and a wrongly-triggered override shrinks the structure
+        # column (I100371 was getting 892-px crops with the leftmost F atom
+        # clipped because the override fired on a merged header+row slice).
+        first_row_columns = (
+            self._detect_first_row_columns(img, rows)
+            if len(columns) == 6
+            else None
+        )
+
+        for slice_idx, (y1, y2) in enumerate(rows):
+            slice_columns = (
+                first_row_columns
+                if slice_idx == 0 and first_row_columns is not None
+                else columns
+            )
+            cid_col_local = (
+                next((c for c in slice_columns if c.name == "cmpd_id"), cid_col)
+            )
+            cid_cell = img[y1:y2, cid_col_local.x1:cid_col_local.x2]
             cmpd_id = self._read_cmpd_id(cid_cell)
             if cmpd_id is None:
                 continue
@@ -408,7 +563,7 @@ class RapidOcrTableExtractor:
             row_values: dict[str, str | None] = {}
             structure_path: str | None = None
 
-            for col in columns:
+            for col in slice_columns:
                 if col.name == "cmpd_id":
                     continue
                 if col.x2 <= col.x1:
@@ -420,13 +575,22 @@ class RapidOcrTableExtractor:
                     continue
                 row_values[col.name] = self._ocr_cell(cell, col.name)
 
-            if "smiles" in row_values and row_values["smiles"]:
-                # Lazy import: cpd.chem depends on RDKit, which we do not
-                # require just for schema import or lightweight tests.
-                from cpd.chem import auto_repair_smiles, validate_and_enrich
+            has_smiles = "smiles" in row_values and row_values["smiles"]
+            # Build a CompoundRecord whenever we have a structure crop
+            # OR a SMILES string. SMILES validation still runs when
+            # present; structure-only rows get is_valid=False with
+            # SMILES fields left null.
+            if structure_path is not None or has_smiles:
+                if has_smiles:
+                    # Lazy import: cpd.chem depends on RDKit, which we do not
+                    # require just for schema import or lightweight tests.
+                    from cpd.chem import auto_repair_smiles, validate_and_enrich
 
-                fixed = auto_repair_smiles(row_values["smiles"] or "")
-                chem = validate_and_enrich(fixed) if fixed else None
+                    fixed = auto_repair_smiles(row_values["smiles"] or "")
+                    chem = validate_and_enrich(fixed) if fixed else None
+                else:
+                    fixed = None
+                    chem = None
                 compounds[cmpd_id] = CompoundRecord(
                     cmpd_id=cmpd_id,
                     smiles=fixed or None,
@@ -512,8 +676,11 @@ class RapidOcrTableExtractor:
             return None  # empty / solid cell, not a structure drawing
 
         cells_dir.mkdir(parents=True, exist_ok=True)
+        # 12 px on every side so molecules drawn close to the column edge
+        # (e.g. the F group on the left of cmpd 2143) still get a white
+        # margin in the cropped file instead of touching the boundary.
         padded = cv2.copyMakeBorder(
-            cell, 8, 8, 8, 8, cv2.BORDER_CONSTANT, value=[255, 255, 255]
+            cell, 12, 12, 12, 12, cv2.BORDER_CONSTANT, value=[255, 255, 255]
         )
         out = cells_dir / f"{src_stem}_{cmpd_id}_struct.png"
         cv2.imwrite(str(out), padded)
