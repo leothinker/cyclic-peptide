@@ -46,6 +46,7 @@ for _stream in (sys.stdout, sys.stderr):
 from cpd.chem import validate_and_enrich
 from cpd.decimer import is_available, low_confidence_tokens, predict
 from cpd.merge import dedupe_assays, dedupe_compounds, normalise_cmpd_id
+import statistics
 from cpd.parsers.table_extractor import (
     AssayRecord,
     Column,
@@ -370,6 +371,37 @@ def run_pipeline(
     if failures:
         print(f"[!] images without rows ({len(failures)}): {', '.join(list(failures)[:5])}"
               + ("..." if len(failures) > 5 else ""))
+
+    # L1 phantom-fragment breakdown. The per-row confidence column
+    # distinguishes two failure modes the raw "agreement" number
+    # collapses: DECIMER phantom fragments (low conf) and real
+    # OCR errors (DECIMER conf >= threshold, disagree). This is the
+    # metric to put on the report -- the "0% agreement" headline
+    # is misleading because most disagreements are DECIMER's.
+    threshold = 0.5
+    both = [
+        r for r in combined_rows
+        if r["smiles"].strip()
+        and r["smiles_decimer"].strip()
+        and r["decimer_min_conf"]
+    ]
+    n_both = len(both)
+    if n_both:
+        n_agree = sum(1 for r in both if r["smiles_agree"] == "True")
+        low_conf = [r for r in both if float(r["decimer_min_conf"]) < threshold]
+        n_phantom = sum(1 for r in low_conf if r["smiles_agree"] != "True")
+        n_real_ocr_err = sum(
+            1 for r in both
+            if r["smiles_agree"] != "True" and float(r["decimer_min_conf"]) >= threshold
+        )
+        median_conf = statistics.median(
+            float(r["decimer_min_conf"]) for r in both
+        )
+        print(f"\n   L1 phantom-fragment breakdown (where both OCR+DECIMER have SMILES, n={n_both}):")
+        print(f"     agree                          : {n_agree:>4}  ({n_agree/n_both*100:.0f}%)")
+        print(f"     disagree, DECIMER phantom frg.: {n_phantom:>4}  ({n_phantom/n_both*100:.0f}%)  conf < {threshold}")
+        print(f"     disagree, real OCR error       : {n_real_ocr_err:>4}  ({n_real_ocr_err/n_both*100:.0f}%)  conf >= {threshold}")
+        print(f"     median DECIMER min_conf        : {median_conf:.3f}")
     print("=" * 60)
 
 
