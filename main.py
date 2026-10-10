@@ -149,6 +149,7 @@ def _run_decimer(
     compounds: list[CompoundRecord],
     out_dir: Path,
     low_conf_threshold: float = 0.5,
+    limit: int = 0,
 ) -> tuple[dict[str, str], dict[str, str], dict[str, float], dict[str, int]]:
     """Run DECIMER over every cropped structure PNG.
 
@@ -176,8 +177,17 @@ def _run_decimer(
         return raw, canon, min_conf, low_conf
 
     targets = [c for c in compounds if c.structure_image]
-    print(f"   [DECIMER] running on {len(targets)} cropped structures "
-          f"(per-token confidence enabled, low-conf threshold={low_conf_threshold}) ...")
+    if limit and limit > 0 and len(targets) > limit:
+        # Deterministic slice so successive overnight runs cover
+        # cmpd_id ranges like [0, limit), [limit, 2*limit), ...
+        offset = globals().get("_DECIMER_OFFSET", 0)
+        targets = sorted(targets, key=lambda c: c.cmpd_id)
+        targets = targets[offset:offset + limit]
+        print(f"   [DECIMER] running on {len(targets)} cropped structures (offset={offset}, "
+              f"per-token confidence enabled, low-conf threshold={low_conf_threshold}) ...")
+    else:
+        print(f"   [DECIMER] running on {len(targets)} cropped structures "
+              f"(per-token confidence enabled, low-conf threshold={low_conf_threshold}) ...")
     cells_root = out_dir  # structure_image paths are relative to out_dir.
     for i, c in enumerate(targets, start=1):
         img_path = cells_root / c.structure_image  # type: ignore[operator]
@@ -311,6 +321,9 @@ def _write_csv(
 def run_pipeline(
     img_dir: str = "data/raw/WO2025162428/golden_tables",
     out_dir: str = "data/processed",
+    skip_decimer: bool = False,
+    decimer_limit: int = 0,
+    decimer_offset: int = 0,
 ) -> None:
     """Run extraction -> DECIMER -> write all three CSVs in order.
 
@@ -328,8 +341,15 @@ def run_pipeline(
     print(f"\n[2/4] extracting SMILES + structure + KD/LCMS ...")
     compounds, assays, failures = _extract_all(img_path, cells_dir)
 
-    print(f"\n[3/4] running DECIMER (OCSR) on cropped structures ...")
-    decimer_raw, decimer_canon, decimer_min_conf, decimer_low_conf = _run_decimer(compounds, out_path)
+    if skip_decimer:
+        print("\n[3/4] skipping DECIMER (--skip-decimer); combined CSV will have empty decimer columns")
+        decimer_raw, decimer_canon, decimer_min_conf, decimer_low_conf = {}, {}, {}, {}
+    else:
+        print(f"\n[3/4] running DECIMER (OCSR) on cropped structures (limit={decimer_limit}, offset={decimer_offset}) ...")
+        globals()["_DECIMER_OFFSET"] = decimer_offset
+        decimer_raw, decimer_canon, decimer_min_conf, decimer_low_conf = _run_decimer(
+            compounds, out_path, limit=decimer_limit,
+        )
 
     print(f"\n[4/4] writing combined dataset to {out_path} ...")
     combined_rows = _build_combined_rows(
@@ -353,5 +373,32 @@ def run_pipeline(
     print("=" * 60)
 
 
+import argparse  # local import keeps the module re-usable as a library.
+
+
+def _parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(
+        description="Extract compounds + assays + DECIMER SMILES from patent tables.",
+    )
+    p.add_argument("--img-dir", default="data/raw/WO2025162428/golden_tables",
+                   help="Directory of source table JPGs (default: %(default)s).")
+    p.add_argument("--out-dir", default="data/processed",
+                   help="Output directory for CSVs and cropped structures (default: %(default)s).")
+    p.add_argument("--skip-decimer", action="store_true",
+                   help="Skip the ~33h DECIMER pass; the combined CSV will have empty decimer columns.")
+    p.add_argument("--decimer-limit", type=int, default=0,
+                   help="Process at most N cropped structures through DECIMER (0 = all).")
+    p.add_argument("--decimer-offset", type=int, default=0,
+                   help="Skip the first N cropped structures (use with --decimer-limit to split work across nights).")
+    return p.parse_args()
+
+
 if __name__ == "__main__":
-    run_pipeline()
+    args = _parse_args()
+    run_pipeline(
+        img_dir=args.img_dir,
+        out_dir=args.out_dir,
+        skip_decimer=args.skip_decimer,
+        decimer_limit=args.decimer_limit,
+        decimer_offset=args.decimer_offset,
+    )
