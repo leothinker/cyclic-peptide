@@ -216,9 +216,64 @@ class RapidOcrTableExtractor:
     FIRST_ROW_MIN_PX: int = 50      # skip first-row probe when the slice is thinner
     ROW_BORDER_PX: int = 8          # horizontal-line border band on each side
 
-    def __init__(self) -> None:
+    def __init__(self, rec_lang: str = 'en', rec_top_k: int = 0) -> None:
+        """Build the OCR engine(s).
+
+        ``rec_lang`` selects the language of the *recogniser*:
+
+        * ``'en'`` (default) -- Chinese detector (best boxes on dense
+          patent text) + English recogniser (clean ASCII dictionary,
+          much better for SMILES / numbers / parentheses). This is the
+          hybrid setting validated in our golden-table experiments.
+        * ``'ch'`` -- both detector and recogniser in Chinese; the
+          default in the upstream RapidOCR package. Cell-level SMILES
+          often comes out wrong (``C`` vs ``(``, ``0`` vs ``O``).
+
+        The detector (always Chinese) and recogniser are separate
+        engines so that header OCR can still see Chinese field names
+        while every cell-level OCR call goes through the recogniser
+        with the ASCII-friendly dictionary.
+
+        ``rec_top_k`` (default ``0``) is the per-character top-k
+        returned by the recogniser. When ``> 1``, SMILES cells are
+        re-validated against RDKit across every top-k swap and the
+        first canonical SMILES that parses wins. The legacy
+        single-argmax behaviour is preserved when ``rec_top_k == 0``.
+        """
         from rapidocr import RapidOCR  # local import keeps the module lightweight
+        # Detector is always the Chinese model -- it has the cleanest
+        # box proposals on dense patent text. Cell-level OCR runs the
+        # full pipeline so the recogniser always sees a tight
+        # text-line crop, never a sparse cell.
         self.engine = RapidOCR()
+        self.rec_lang = rec_lang
+        if rec_lang == 'en':
+            from rapidocr.utils.typings import (
+                EngineType, ModelType, OCRVersion, TaskType,
+            )
+            self.rec_engine = RapidOCR(params={
+                'Det.lang_type': 'en',
+                'Det.ocr_version': OCRVersion.PPOCRV4,
+                'Det.model_type': ModelType.MOBILE,
+                'Det.engine_type': EngineType.ONNXRUNTIME,
+                'Det.task_type': TaskType.DET,
+                'Rec.lang_type': 'en',
+                'Rec.ocr_version': OCRVersion.PPOCRV4,
+                'Rec.model_type': ModelType.MOBILE,
+                'Rec.engine_type': EngineType.ONNXRUNTIME,
+                'Rec.task_type': TaskType.REC,
+                'Global.text_score': 0.0,
+                'Global.use_cls': False,
+            })
+        else:
+            self.rec_engine = self.engine
+
+        # Attach the top-k parameter to whichever recogniser we will
+        # use for SMILES cells. ``Global.return_top_k`` is read by
+        # the patched RapidOCR main.py; 0 is the legacy default.
+        self.rec_top_k = max(0, int(rec_top_k))
+        if self.rec_top_k > 1:
+            self.rec_engine.cfg.Global.return_top_k = self.rec_top_k
 
     # ---- public API ----
 
@@ -546,7 +601,14 @@ class RapidOcrTableExtractor:
         """Find the 4-digit compound id in the leftmost cell."""
         if cell.size == 0:
             return None
-        result = self.engine(self._upscale(cell))
+        # cmpd_id cells are tall narrow columns (e.g. 492x173 px) where
+        # the 4-digit text sits in the middle surrounded by whitespace
+        # and the cell's own border lines. _trim_to_content cannot
+        # tighten them further (the borders make the bbox effectively
+        # the full cell), so we let the detector auto-crop to the text
+        # band like it does for header rows. The recogniser below
+        # (CH or EN) then reads the digit string reliably.
+        result = self.rec_engine(self._upscale(cell))
         if not result:
             return None
         for text in self._txts(result):
@@ -556,21 +618,41 @@ class RapidOcrTableExtractor:
         return None
 
     def _ocr_cell(self, cell: np.ndarray, field_name: str) -> str | None:
-        """OCR one cell. SMILES lines concatenate; other cells join with spaces."""
+        """OCR one cell. SMILES lines concatenate; other cells join with spaces.
+
+        When the recogniser was built with ``rec_top_k > 1`` and the
+        cell is a SMILES column, we run the recogniser once and then
+        feed every top-k swap through RDKit; the first canonical
+        SMILES that parses wins. This catches bracket/paren confusion
+        (``C)[C@H]`` instead of ``(C)[C@H]``) and 0/O swaps that the
+        argmax alone cannot disambiguate.
+        """
         if cell.size == 0:
             return None
-        result = self.engine(self._upscale(cell))
+        cell = self._trim_to_content(cell)
+        if cell.size == 0:
+            return None
+        result = self.rec_engine(self._upscale(cell))
         if not result:
             return None
-        items = sorted(
-            zip(self._boxes(result), self._txts(result)),
-            key=lambda bt: ((bt[0][0][1] + bt[0][2][1]) / 2),
-        )
+        boxes = self._boxes(result)
+        txts = self._txts(result)
+        if boxes is not None:
+            items = sorted(
+                zip(boxes, txts),
+                key=lambda bt: ((bt[0][0][1] + bt[0][2][1]) / 2),
+            )
+        else:
+            items = list(zip([None] * len(txts), txts))
         parts = [t.strip() for _, t in items if t and t.strip()]
         if not parts:
             return None
         joiner = "" if field_name == "smiles" else " "
-        return joiner.join(parts)
+        text = joiner.join(parts)
+
+        if field_name == "smiles" and self.rec_top_k > 1:
+            return self._fix_smiles_with_top_k(result, parts)
+        return text
 
     def _save_structure_crop(
         self,
@@ -616,7 +698,23 @@ class RapidOcrTableExtractor:
 
     @staticmethod
     def _boxes(result):
-        return result.boxes if hasattr(result, "boxes") else [r[0] for r in result]
+        """Return per-region boxes from a RapidOCR result.
+
+        New SDK returns ``RapidOCROutput`` with a ``.boxes`` ndarray;
+        legacy SDK returns a list of (box, txt, score) tuples. Both are
+        iterable so the same loop works. ``None`` is returned only when
+        the recogniser-only path produced an empty ``TextRecOutput``
+        (no boxes available); callers should skip spatial sorting in
+        that case and use the textual emission order instead.
+        """
+        if hasattr(result, "boxes") and result.boxes is not None:
+            return result.boxes
+        if hasattr(result, "txts"):
+            try:
+                return [r[0] for r in result]
+            except TypeError:
+                return None
+        return [r[0] for r in result]
 
     @staticmethod
     def _txts(result):
@@ -629,6 +727,101 @@ class RapidOcrTableExtractor:
         if max(h, w) < 50:
             return img
         return cv2.resize(img, (w * 2, h * 2), interpolation=cv2.INTER_CUBIC)
+
+    @staticmethod
+    def _trim_to_content(img: np.ndarray, pad: int = 4) -> np.ndarray:
+        """Crop a sparse cell to the bounding box of its dark content.
+
+        Even with the full pipeline (det+rec), a tall sparse cell like
+        a SMILES column with whitespace at the top makes the detector
+        less reliable and the rec output noisy. Tightening to the
+        bounding box first improves both steps.
+        """
+        if img.size == 0:
+            return img
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
+        coords = cv2.findNonZero(binary)
+        if coords is None or len(coords) == 0:
+            return img
+        x, y, w, h = cv2.boundingRect(coords)
+        h_full, w_full = img.shape[:2]
+        x0 = max(0, x - pad)
+        y0 = max(0, y - pad)
+        x1 = min(w_full, x + w + pad)
+        y1 = min(h_full, y + h + pad)
+        cropped = img[y0:y1, x0:x1]
+        return cropped if cropped.size else img
+
+
+    # ---- top-k SMILES validation ----
+
+    def _fix_smiles_with_top_k(
+        self, result, parts: list[str]
+    ) -> str | None:
+        """Pick the first RDKit-valid SMILES among top-k candidates.
+
+        ``result`` is the full RapidOCROutput; its ``top_k_lines``
+        carries per-character alternatives. ``parts`` is the
+        already-sorted text rows; we rebuild the full SMILES
+        string and then try every per-position top-k swap.
+        """
+        top_k_lines = getattr(result, "top_k_lines", None)
+        if not top_k_lines:
+            return "".join(parts) or None
+        from cpd.chem import validate_and_enrich
+
+        full_text = "".join(parts)
+        if not full_text:
+            return None
+        char_alts: list[list[tuple[str, float]]] = []
+        for row_text, row_alts in zip(parts, top_k_lines):
+            # The recogniser may emit None for an empty line;
+            # fall back to a single-argmax list so the greedy swap
+            # loop below does not crash.
+            row_alts = row_alts or []
+            for c_i, ch in enumerate(row_text):
+                if c_i < len(row_alts):
+                    char_alts.append(row_alts[c_i])
+                else:
+                    char_alts.append([(ch, 1.0)])
+
+        seen: set[str] = set()
+
+        def try_text(t: str) -> str | None:
+            if t in seen:
+                return None
+            seen.add(t)
+            chem = validate_and_enrich(t)
+            if chem is not None:
+                return chem.canonical_smiles or t
+            return None
+
+        hit = try_text(full_text)
+        if hit is not None:
+            return hit
+
+        # Greedy single-swap search. For each char position with more
+        # than one alternative, try the next-best alt in place.
+        # O(top_k * len(smiles)) worst case; in practice most
+        # positions have only 1 candidate so the loop ends after
+        # the first OCR error is corrected.
+        chars = list(full_text)
+        for pos, alts in enumerate(char_alts):
+            if len(alts) <= 1:
+                continue
+            original = chars[pos]
+            for alt_ch, _p in alts[1:]:
+                if alt_ch == original:
+                    continue
+                chars[pos] = alt_ch
+                cand_text = "".join(chars)
+                hit = try_text(cand_text)
+                if hit is not None:
+                    return hit
+                chars[pos] = original
+
+        return full_text
 
 
 # ---------- helpers ----------

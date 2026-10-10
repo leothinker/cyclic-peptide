@@ -44,7 +44,7 @@ for _stream in (sys.stdout, sys.stderr):
 
 
 from cpd.chem import validate_and_enrich
-from cpd.decimer import is_available, predict_smiles
+from cpd.decimer import is_available, low_confidence_tokens, predict
 from cpd.merge import dedupe_assays, dedupe_compounds, normalise_cmpd_id
 from cpd.parsers.table_extractor import (
     AssayRecord,
@@ -75,6 +75,8 @@ COMBINED_COLUMNS: tuple[str, ...] = (
     "lcms_method",
     "ms_polarity",
     "assay_source_image",
+    "decimer_min_conf",
+    "decimer_low_conf_count",
 )
 
 
@@ -146,23 +148,57 @@ def _extract_all(
 def _run_decimer(
     compounds: list[CompoundRecord],
     out_dir: Path,
-) -> tuple[dict[str, str], dict[str, str]]:
+    low_conf_threshold: float = 0.5,
+) -> tuple[dict[str, str], dict[str, str], dict[str, float], dict[str, int]]:
     """Run DECIMER over every cropped structure PNG.
 
-    Returns ``(decimer_raw, decimer_canon)`` keyed by ``cmpd_id``:
+    Returns ``(decimer_raw, decimer_canon, decimer_min_conf,
+    decimer_low_conf_count)`` keyed by ``cmpd_id``:
 
-    * ``decimer_raw``    = the SMILES string DECIMER returned, or ``""``.
-    * ``decimer_canon``  = the RDKit-canonical form (empty when invalid).
+    * ``decimer_raw``             = the SMILES string DECIMER returned, or ``""``.
+    * ``decimer_canon``           = the RDKit-canonical form (empty when invalid).
+    * ``decimer_min_conf``        = lowest per-token softmax confidence in the
+      emitted SMILES (empty when DECIMER is not installed or returns no
+      per-token data).
+    * ``decimer_low_conf_count``  = how many tokens fall below
+      ``low_conf_threshold`` -- the signature of phantom fragments.
 
-    When DECIMER is not installed the function logs once and returns two
+    When DECIMER is not installed the function logs once and returns four
     empty dicts so the rest of the pipeline still runs.
     """
     raw: dict[str, str] = {}
     canon: dict[str, str] = {}
+    min_conf: dict[str, float] = {}
+    low_conf: dict[str, int] = {}
     if not is_available():
         print("   [DECIMER] not installed -> smiles_decimer column will be empty")
         print("              install with:  uv pip install --python .venv/Scripts/python.exe DECIMER")
-        return raw, canon
+        return raw, canon, min_conf, low_conf
+
+    targets = [c for c in compounds if c.structure_image]
+    print(f"   [DECIMER] running on {len(targets)} cropped structures "
+          f"(per-token confidence enabled, low-conf threshold={low_conf_threshold}) ...")
+    cells_root = out_dir  # structure_image paths are relative to out_dir.
+    for i, c in enumerate(targets, start=1):
+        img_path = cells_root / c.structure_image  # type: ignore[operator]
+        pred = predict(img_path)
+        if pred is None or not pred.smiles:
+            continue
+        raw[c.cmpd_id] = pred.smiles
+        if pred.tokens:
+            min_conf[c.cmpd_id] = round(pred.min_conf, 4)
+            low_conf[c.cmpd_id] = len(low_confidence_tokens(pred, low_conf_threshold))
+        chem = validate_and_enrich(pred.smiles)
+        if chem is not None:
+            canon[c.cmpd_id] = chem.canonical_smiles
+        if i % 25 == 0 or i == len(targets):
+            print(f"      [{i}/{len(targets)}] parsed", end="\r")
+    print()
+    print(f"   [DECIMER] got SMILES for {len(raw)} / {len(targets)} structures")
+    if low_conf:
+        worst = sorted(low_conf.items(), key=lambda kv: -kv[1])[:5]
+        print(f"   [DECIMER] top-5 low-confidence compounds: {worst}")
+    return raw, canon, min_conf, low_conf
 
     targets = [c for c in compounds if c.structure_image]
     print(f"   [DECIMER] running on {len(targets)} cropped structures ...")
@@ -188,6 +224,8 @@ def _build_combined_rows(
     assays: dict[str, AssayRecord],
     decimer_raw: dict[str, str],
     decimer_canon: dict[str, str],
+    decimer_min_conf: dict[str, float] | None = None,
+    decimer_low_conf: dict[str, int] | None = None,
 ) -> list[dict]:
     """Flatten compounds + assays + DECIMER into COMBINED_COLUMNS-shaped dicts."""
     rows: list[dict] = []
@@ -198,6 +236,8 @@ def _build_combined_rows(
             seen_assay_ids.add(c.cmpd_id)
         d_raw = decimer_raw.get(c.cmpd_id, "")
         d_can = decimer_canon.get(c.cmpd_id, "")
+        d_min = (decimer_min_conf or {}).get(c.cmpd_id)
+        d_low = (decimer_low_conf or {}).get(c.cmpd_id)
         agree = (
             bool(c.canonical_smiles and d_can and c.canonical_smiles == d_can)
             if c.canonical_smiles and d_can
@@ -221,6 +261,8 @@ def _build_combined_rows(
             "lcms_method": (a.lcms_method or "") if a is not None else "",
             "ms_polarity": (a.ms_polarity or "") if a is not None else "",
             "assay_source_image": (a.source_image or "") if a is not None else "",
+            "decimer_min_conf": d_min if d_min is not None else "",
+            "decimer_low_conf_count": d_low if d_low is not None else "",
         })
     # Cmpds that appear only in the assay stream (no compound record).
     for cid, a in assays.items():
@@ -244,6 +286,8 @@ def _build_combined_rows(
             "lcms_method": a.lcms_method or "",
             "ms_polarity": a.ms_polarity or "",
             "assay_source_image": a.source_image or "",
+            "decimer_min_conf": "",
+            "decimer_low_conf_count": "",
         })
     return rows
 
@@ -285,10 +329,12 @@ def run_pipeline(
     compounds, assays, failures = _extract_all(img_path, cells_dir)
 
     print(f"\n[3/4] running DECIMER (OCSR) on cropped structures ...")
-    decimer_raw, decimer_canon = _run_decimer(compounds, out_path)
+    decimer_raw, decimer_canon, decimer_min_conf, decimer_low_conf = _run_decimer(compounds, out_path)
 
     print(f"\n[4/4] writing combined dataset to {out_path} ...")
-    combined_rows = _build_combined_rows(compounds, assays, decimer_raw, decimer_canon)
+    combined_rows = _build_combined_rows(
+        compounds, assays, decimer_raw, decimer_canon, decimer_min_conf, decimer_low_conf
+    )
     n_combined = _write_csv(
         combined_rows,
         out_path / "compounds_combined.csv",
