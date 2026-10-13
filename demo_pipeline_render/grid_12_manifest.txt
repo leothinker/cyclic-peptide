@@ -1,0 +1,12 @@
+  1001  source=PCTCN2025075389-ftappb-I100280.jpg  decimer_min_conf=0.4206  ocr_avg_entropy=
+  1002  source=PCTCN2025075389-ftappb-I100280.jpg  decimer_min_conf=0.3374  ocr_avg_entropy=
+  1003  source=PCTCN2025075389-ftappb-I100280.jpg  decimer_min_conf=0.5217  ocr_avg_entropy=
+  1004  source=PCTCN2025075389-ftappb-I100280.jpg  decimer_min_conf=0.3425  ocr_avg_entropy=
+  1005  source=PCTCN2025075389-ftappb-I100281.jpg  decimer_min_conf=0.6182  ocr_avg_entropy=
+  1006  source=PCTCN2025075389-ftappb-I100281.jpg  decimer_min_conf=0.5207  ocr_avg_entropy=
+  1007  source=PCTCN2025075389-ftappb-I100281.jpg  decimer_min_conf=0.5163  ocr_avg_entropy=
+  1008  source=PCTCN2025075389-ftappb-I100281.jpg  decimer_min_conf=0.527  ocr_avg_entropy=
+  1010  source=PCTCN2025075389-ftappb-I100281.jpg  decimer_min_conf=0.3908  ocr_avg_entropy=
+  1011  source=PCTCN2025075389-ftappb-I100282.jpg  decimer_min_conf=0.583  ocr_avg_entropy=
+  1012  source=PCTCN2025075389-ftappb-I100282.jpg  decimer_min_conf=0.4804  ocr_avg_entropy=
+  1013  source=PCTCN2025075389-ftappb-I100282.jpg  decimer_min_conf=0.3963  ocr_avg_entropy=

@@ -66,6 +66,7 @@ COMBINED_COLUMNS: tuple[str, ...] = (
     "assay_source_image",
     "decimer_min_conf",
     "decimer_low_conf_count",
+    "decimer_render_path",
     "ocr_avg_entropy",
     "ocr_min_top1",
     "ocr_low_conf_count",
@@ -358,6 +359,47 @@ def _run_decimer(
     return raw, canon, min_conf, low_conf
 
 
+
+
+
+def _render_decimer(
+    decimer_canon: dict[str, str],
+    out_dir: Path,
+    linearize: bool = True,
+) -> dict[str, str]:
+    """Render every DECIMER canonical SMILES to a 2D structure PNG.
+
+    Returns ``{cmpd_id: relative_png_path}`` for the entries that
+    rendered successfully. Failed renders (RDKit parse error, blank
+    output) are silently skipped and do not appear in the dict, so the
+    CSV column will be empty for them.
+
+    Output files are written under ``<out_dir>/rendered/<cid>.png`` and
+    the returned path is relative to ``out_dir`` so it slots straight
+    into the combined CSV without further processing.
+    """
+    from cpd.render import render_mol_pil
+
+    rendered_dir = out_dir / "rendered"
+    rendered_dir.mkdir(parents=True, exist_ok=True)
+    paths: dict[str, str] = {}
+    for cid, smi in decimer_canon.items():
+        if not smi:
+            continue
+        img = render_mol_pil(
+            smi, size=(520, 360), linearize_macrocycle=linearize
+        )
+        if img is None:
+            continue
+        out = rendered_dir / f"{cid}.png"
+        try:
+            img.save(out)
+        except Exception:
+            continue
+        paths[cid] = str(out.relative_to(out_dir))
+    return paths
+
+
 def _build_combined_rows(
     compounds: list[CompoundRecord],
     assays: dict[str, AssayRecord],
@@ -365,6 +407,7 @@ def _build_combined_rows(
     decimer_canon: dict[str, str],
     decimer_min_conf: dict[str, float] | None = None,
     decimer_low_conf: dict[str, int] | None = None,
+    decimer_render: dict[str, str] | None = None,
 ) -> list[dict]:
     """Flatten compounds + assays + DECIMER into COMBINED_COLUMNS-shaped dicts."""
     rows: list[dict] = []
@@ -377,6 +420,7 @@ def _build_combined_rows(
         d_can = decimer_canon.get(c.cmpd_id, "")
         d_min = (decimer_min_conf or {}).get(c.cmpd_id)
         d_low = (decimer_low_conf or {}).get(c.cmpd_id)
+        d_render = (decimer_render or {}).get(c.cmpd_id, "")
         agree = bool(
             c.canonical_smiles and d_can and c.canonical_smiles == d_can
         )
@@ -441,6 +485,7 @@ def _build_combined_rows(
             "assay_source_image": (a.source_image or "") if a is not None else "",
             "decimer_min_conf": d_min if d_min is not None else "",
             "decimer_low_conf_count": d_low if d_low is not None else "",
+            "decimer_render_path": d_render,
             "ocr_avg_entropy": (
                 c.ocr_avg_entropy if c.ocr_avg_entropy is not None else ""
             ),
@@ -472,6 +517,7 @@ def _build_combined_rows(
             "assay_source_image": a.source_image or "",
             "decimer_min_conf": "",
             "decimer_low_conf_count": "",
+            "decimer_render_path": "",
             "ocr_avg_entropy": "",
             "ocr_min_top1": "",
             "ocr_low_conf_count": "",
@@ -582,10 +628,14 @@ def run_pipeline(
             compounds, out_path, cache_path=cache_path,
             limit=decimer_limit, offset=decimer_offset,
         )
+        print(f"\n[3b/4] rendering DECIMER structures to 2D PNGs (linearize=True) ...")
+        decimer_render = _render_decimer(decimer_canon, out_path, linearize=True)
+        print(f"   rendered {len(decimer_render)} / {len(decimer_canon)} structures")
 
     print(f"\n[4/4] writing combined dataset to {out_path} ...")
     combined_rows = _build_combined_rows(
-        compounds, assays, decimer_raw, decimer_canon, decimer_min_conf, decimer_low_conf
+        compounds, assays, decimer_raw, decimer_canon,
+        decimer_min_conf, decimer_low_conf, decimer_render,
     )
     n_combined = _write_csv(
         combined_rows,
