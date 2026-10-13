@@ -174,3 +174,39 @@ Source of best SMILES:
 - [ ] 夜间跑 `main.py --skip-decimer --rec-top-k 5`（1-2h）刷新 `compounds_combined.csv` 24 列
 - [ ] 检查 ocr_avg_entropy × is_valid 关系 → 调阈值
 - [ ] Hiro-OCSR：仍在等 HF 审批
+
+### 夜间跑（2026-10-14 01:00-02:30）
+
+- 跑了 `main.py --skip-decimer --rec-top-k 5`，**~27 min**（103 张图，406 cmpd）
+- 第一次跑因 `--skip-decimer` 分支没初始化 `decimer_render` 写 CSV 时崩了 → 已修（`580e8e2`）
+- 用 cache 合并回 DECIMER 列 + 重渲染 327/327 PNG + 刷 `smiles_best_source` 列
+
+**关键发现（决定下一步方向）**：
+1. OCR top-k swap **救不回来** cyclic peptide SMILES
+2. 原因：raw OCR 输出有累积性错位（不只是字符级）
+   - `C=O)N` → 应该是 `C(=O)N`（缺左括号，`auto_repair` 不管）
+   - `C=ON3` → 应该是 `C(=O)N3`（括号被压平）
+   - `C-O` → OCR 读不出 `=O` 时替换成 `-`
+   - 噪声段 `CCCF)F)F`
+3. **结果**：335 个有 OCR 的 cmpd，`canonical_smiles` **全部为空**（`auto_repair_smiles` 救不回累积性错误）
+4. 熵门接通了但没机会触发（OCR 自己就废了），`smiles_best_source` 仍全部走 `decimer`
+5. **结论**：top-k swap 路线对当前 OCR 质量已触底，要突破必须换方法（见下面"下一步"）
+
+**OCR 熵分布**（335 cmpd）：
+| 指标 | min | median | max |
+|---|---|---|---|
+| ocr_avg_entropy (bits/char) | 0.191 | 0.244 | 0.281 |
+| ocr_min_top1 | 0.26 | 0.42 | 0.50 |
+| ocr_low_conf_count | 25 | 42 | 63 |
+
+**L1 breakdown（无变化）**：
+- 0/335 agree；77% DECIMER phantom；23% real OCR error；median min_conf 0.420
+
+### 下一步（明天要决定的）
+
+1. **保留**：OCR 熵列 + DECIMER 兜底逻辑（数据基础已就位，等 OCR 质量上来后能立即生效）
+2. **可选实验**：在 `auto_repair_smiles` 加针对性正则修常见 collapse pattern（`C=O)N` → `C(=O)N` 等）
+3. **突破方向**：
+   - **chemistry-constrained beam search**：每步 swap 后用 RDKit 局部 parse 验证 prefix 合法，否则剪枝
+   - **多 pass OCR + 投票**：高/低对比度、放大倍率不同的几张图分别 OCR，按字符投票
+   - **Hiro-OCSR**（仍在等 HF 审批）：第二个独立 OCSR，跨模型对比
