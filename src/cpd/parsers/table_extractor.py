@@ -71,6 +71,11 @@ class CompoundRecord:
     is_valid: bool | None = None
     structure_image: str | None = None  # path relative to cells_dir parent
     source_image: str | None = None
+    # OCR trust score from the SMILES-cell top-k distribution. All three
+    # stay None when the recogniser was built with rec_top_k=0.
+    ocr_avg_entropy: float | None = None
+    ocr_min_top1: float | None = None
+    ocr_low_conf_count: int | None = None
 
     def to_dict(self) -> dict:
         return self.__dict__.copy()
@@ -92,6 +97,29 @@ class AssayRecord:
         return self.__dict__.copy()
 
 
+@dataclass(frozen=True)
+class OcrStats:
+    """Per-cell OCR trust score from the SMILES-cell top-k distribution.
+
+    ``avg_entropy`` is the mean of ``-sum(p * log2(p))`` over every
+    character position in the cell. Higher entropy = the recogniser
+    spread probability across many candidates = less trustworthy.
+    ``min_top1`` is the lowest top-1 probability seen across the cell
+    (0.0 if no top-k data is available). ``low_conf_count`` is the
+    number of character positions whose top-1 probability is below
+    ``LOW_CONF_PROB_THRESHOLD`` (0.7) -- a count of "I had to guess"
+    moments that the swap-based fix cannot always repair.
+    """
+
+    avg_entropy: float | None = None
+    min_top1: float | None = None
+    low_conf_count: int | None = None
+
+
+# Top-1 probability below this is counted as a low-confidence character.
+# Empirically PP-OCRv4 returns top-1 ~0.99 for confident characters and
+# ~0.5-0.7 for genuinely ambiguous ones (0/O, 1/l, etc.).
+LOW_CONF_PROB_THRESHOLD = 0.7
 # ---------- column geometry ----------
 
 
@@ -520,6 +548,7 @@ class RapidOcrTableExtractor:
     ) -> tuple[list[CompoundRecord], list[AssayRecord]]:
         compounds: dict[str, CompoundRecord] = {}
         assays: dict[str, AssayRecord] = {}
+        row_smiles_stats: dict[str, OcrStats] = {}
 
         cid_col = next((c for c in columns if c.name == "cmpd_id"), None)
         if cid_col is None or cid_col.x2 <= cid_col.x1:
@@ -567,7 +596,12 @@ class RapidOcrTableExtractor:
                             cell, cmpd_id, cells_dir, image_path.stem
                         )
                     continue
-                row_values[col.name] = self._ocr_cell(cell, col.name)
+                if col.name == "smiles" and self.rec_top_k > 1:
+                    text, ocr_stats = self._ocr_smiles_with_stats(cell)
+                    row_values[col.name] = text
+                    row_smiles_stats[cmpd_id] = ocr_stats
+                else:
+                    row_values[col.name] = self._ocr_cell(cell, col.name)
 
             has_smiles = "smiles" in row_values and row_values["smiles"]
             # Build a CompoundRecord whenever we have a structure crop
@@ -582,6 +616,7 @@ class RapidOcrTableExtractor:
                     from cpd.chem import auto_repair_smiles, validate_and_enrich
                     fixed = auto_repair_smiles(row_values["smiles"] or "")
                     chem = validate_and_enrich(fixed) if fixed else None
+                stats = row_smiles_stats.get(cmpd_id) or OcrStats()
                 compounds[cmpd_id] = CompoundRecord(
                     cmpd_id=cmpd_id,
                     smiles=fixed or None,
@@ -591,6 +626,9 @@ class RapidOcrTableExtractor:
                     is_valid=chem is not None,
                     structure_image=structure_path,
                     source_image=image_path.name,
+                    ocr_avg_entropy=stats.avg_entropy,
+                    ocr_min_top1=stats.min_top1,
+                    ocr_low_conf_count=stats.low_conf_count,
                 )
 
             if {"kd_nm", "rt_min", "ms_mz"} & row_values.keys():
@@ -833,6 +871,89 @@ class RapidOcrTableExtractor:
         return full_text
 
 
+
+    def _compute_ocr_stats(self, result, parts: list[str]) -> OcrStats:
+        """Aggregate per-char top-k entropy across a SMILES cell.
+
+        Returns OcrStats with all None fields when ``result`` has no
+        top-k data (e.g. the recogniser was built with
+        ``rec_top_k=0`` or the SDK did not attach ``top_k_lines``).
+        """
+        top_k_lines = getattr(result, "top_k_lines", None)
+        if not top_k_lines:
+            return OcrStats()
+
+        entropies: list[float] = []
+        top1s: list[float] = []
+        for row_text, row_alts in zip(parts, top_k_lines):
+            row_alts = row_alts or []
+            for c_i, ch in enumerate(row_text):
+                if c_i >= len(row_alts):
+                    # No alternatives -- trust the argmax fully.
+                    top1s.append(1.0)
+                    entropies.append(0.0)
+                    continue
+                alts = row_alts[c_i]
+                probs = [float(p) for _, p in alts if p is not None]
+                if not probs:
+                    top1s.append(1.0)
+                    entropies.append(0.0)
+                    continue
+                top1s.append(probs[0])
+                h = 0.0
+                for p in probs:
+                    if p > 0.0:
+                        h -= p * (p and __import__("math").log2(p))
+                entropies.append(h)
+
+        if not entropies:
+            return OcrStats()
+        low = sum(1 for p in top1s if p < LOW_CONF_PROB_THRESHOLD)
+        return OcrStats(
+            avg_entropy=round(sum(entropies) / len(entropies), 4),
+            min_top1=round(min(top1s), 4),
+            low_conf_count=low,
+        )
+
+    def _ocr_smiles_with_stats(
+        self, cell: np.ndarray
+    ) -> tuple[str | None, OcrStats]:
+        """OCR a SMILES cell, returning the (text, OcrStats) pair.
+
+        The text is the same one ``_ocr_cell`` would have produced
+        (including the top-k swap fix when ``rec_top_k > 1``); the
+        stats are computed from the same top-k distribution. Returns
+        ``(None, OcrStats())`` when the cell is empty or the OCR
+        engine yields nothing.
+        """
+        if cell.size == 0:
+            return None, OcrStats()
+        cell = self._trim_to_content(cell)
+        if cell.size == 0:
+            return None, OcrStats()
+        result = self.rec_engine(self._upscale(cell))
+        if not result:
+            return None, OcrStats()
+        boxes = self._boxes(result)
+        txts = self._txts(result)
+        if boxes is not None:
+            items = sorted(
+                zip(boxes, txts),
+                key=lambda bt: ((bt[0][0][1] + bt[0][2][1]) / 2),
+            )
+        else:
+            items = list(zip([None] * len(txts), txts))
+        parts = [t.strip() for _, t in items if t and t.strip()]
+        if not parts:
+            return None, OcrStats()
+        text = "".join(parts)  # SMILES lines concatenate (no space join)
+        stats = self._compute_ocr_stats(result, parts)
+        if self.rec_top_k > 1:
+            fixed = self._fix_smiles_with_top_k(result, parts)
+            if fixed:
+                text = fixed
+        return text, stats
+
 # ---------- helpers ----------
 
 
@@ -857,3 +978,6 @@ __all__ = [
     "detect_layout",
     "detect_layout_from_columns",
 ]
+
+
+

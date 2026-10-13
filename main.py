@@ -66,7 +66,24 @@ COMBINED_COLUMNS: tuple[str, ...] = (
     "assay_source_image",
     "decimer_min_conf",
     "decimer_low_conf_count",
+    "ocr_avg_entropy",
+    "ocr_min_top1",
+    "ocr_low_conf_count",
 )
+
+# OCR entropy gate: when the average per-char entropy of the SMILES
+# cell exceeds this AND DECIMER has a valid canonical SMILES,
+# prefer DECIMER. Higher entropy = the recogniser spread probability
+# across many candidates, which empirically correlates with SMILES
+# that fail RDKit validation. 0.5 bits/char is roughly the
+# transition between "argmax picked a clear winner" (~0.0) and
+# "the recogniser was guessing" (~1.0+).
+OCR_TRUST_ENTROPY_THRESHOLD = 0.5
+
+# As a coarser safety net, a SMILES with this many low-confidence
+# characters (top-1 < 0.7) is treated as untrustworthy regardless
+# of the average entropy.
+OCR_TRUST_LOW_CONF_LIMIT = 5
 
 DECIMER_CACHE_FILENAME = "decimer_cache.json"
 DECIMER_CACHE_VERSION = 2  # bumped when the schema changes (e.g. adding confidence)
@@ -366,15 +383,35 @@ def _build_combined_rows(
 
         # Pick the best SMILES. Source precedence:
         #   * "ocr+decimer" - both canonical SMILES match (highest confidence)
-        #   * "ocr"         - OCR canonical SMILES parses (patent text is authoritative)
-        #   * "decimer"     - DECIMER canonical SMILES parses (fallback for cmpds
-        #                     where OCR returned nothing or produced an invalid string)
+        #   * "ocr"         - OCR canonical SMILES parses AND the cell's
+        #                     top-k distribution looks trustworthy
+        #   * "decimer_fallback" - OCR canonical parses but the cell entropy
+        #                     is high / too many low-conf chars; DECIMER is
+        #                     RDKit-valid so we prefer it
+        #   * "ocr_only_invalid" - OCR canonical parses but DECIMER is empty
+        #                     (we still keep the OCR string; flag it for review)
+        #   * "decimer"     - DECIMER canonical SMILES parses (OCR was empty
+        #                     or invalid)
+        #   * ""            - both empty (rare; cmpd only had a structure crop)
+        ocr_trustworthy = (
+            c.ocr_avg_entropy is None  # no top-k data -> trust OCR as before
+            or c.ocr_avg_entropy <= OCR_TRUST_ENTROPY_THRESHOLD
+        ) and (
+            c.ocr_low_conf_count is None
+            or c.ocr_low_conf_count <= OCR_TRUST_LOW_CONF_LIMIT
+        )
         if c.canonical_smiles and c.canonical_smiles == d_can:
             best = c.canonical_smiles
             best_src = "ocr+decimer"
-        elif c.canonical_smiles:
+        elif c.canonical_smiles and ocr_trustworthy:
             best = c.canonical_smiles
             best_src = "ocr"
+        elif c.canonical_smiles and d_can:
+            best = d_can
+            best_src = "decimer_fallback"
+        elif c.canonical_smiles:
+            best = c.canonical_smiles
+            best_src = "ocr_only_invalid"
         elif d_can:
             best = d_can
             best_src = "decimer"
@@ -404,6 +441,13 @@ def _build_combined_rows(
             "assay_source_image": (a.source_image or "") if a is not None else "",
             "decimer_min_conf": d_min if d_min is not None else "",
             "decimer_low_conf_count": d_low if d_low is not None else "",
+            "ocr_avg_entropy": (
+                c.ocr_avg_entropy if c.ocr_avg_entropy is not None else ""
+            ),
+            "ocr_min_top1": c.ocr_min_top1 if c.ocr_min_top1 is not None else "",
+            "ocr_low_conf_count": (
+                c.ocr_low_conf_count if c.ocr_low_conf_count is not None else ""
+            ),
         })
     for cid, a in assays.items():
         if cid in seen_assay_ids:
@@ -428,6 +472,9 @@ def _build_combined_rows(
             "assay_source_image": a.source_image or "",
             "decimer_min_conf": "",
             "decimer_low_conf_count": "",
+            "ocr_avg_entropy": "",
+            "ocr_min_top1": "",
+            "ocr_low_conf_count": "",
         })
     return rows
 
