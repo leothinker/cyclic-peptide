@@ -269,11 +269,20 @@ class RapidOcrTableExtractor:
             self.rec_engine = self.engine
 
         # Attach the top-k parameter to whichever recogniser we will
-        # use for SMILES cells. ``Global.return_top_k`` is read by
-        # the patched RapidOCR main.py; 0 is the legacy default.
+        # use for SMILES cells. The plumbing goes through three places
+        # because the patched RapidOCR reads top_k at three different
+        # moments: the ``RapidOCR.__init__`` captures ``return_top_k``
+        # from ``cfg.Global`` into a Python attribute, the
+        # ``recognize_txt`` method then copies it into ``cfg.Rec.top_k``
+        # for the lazy-loaded ``TextRecognizer``, and the patched
+        # ``TextRecognizer.__call__`` reads it via ``cfg.get("top_k", 1)``.
+        # Setting all three keeps every code path consistent. 0 keeps the
+        # original argmax behaviour (cheaper, no top-k array materialised).
         self.rec_top_k = max(0, int(rec_top_k))
         if self.rec_top_k > 1:
+            self.rec_engine.return_top_k = self.rec_top_k
             self.rec_engine.cfg.Global.return_top_k = self.rec_top_k
+            self.rec_engine.cfg.Rec["top_k"] = self.rec_top_k
 
     # ---- public API ----
 

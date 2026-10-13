@@ -24,6 +24,52 @@ class ChemInfo:
     formula: str
 
 
+def largest_fragment_canonical(smiles: str) -> str | None:
+    """Drop small phantom fragments from a SMILES string.
+
+    DECIMER occasionally appends tiny fragments like ``CC`` or ``CCO``
+    when it gets confused on a structure, separated from the real
+    peptide by ``.``. RDKit then parses the dot as a multi-fragment
+    molecule and canonicalises differently, so the SMILES never
+    matches the OCR's single-fragment output. Keeping only the
+    largest fragment by atom count recovers the real peptide.
+
+    Returns the canonical SMILES of the largest fragment, or ``None``
+    if the input cannot be parsed.
+    """
+    if not smiles:
+        return None
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None:
+        return None
+    frags = list(Chem.GetMolFrags(mol, asMols=True))
+    if len(frags) <= 1:
+        return Chem.MolToSmiles(mol)
+    frags.sort(key=lambda m: m.GetNumHeavyAtoms(), reverse=True)
+    return Chem.MolToSmiles(frags[0])
+
+
+def close_unbalanced_brackets(smiles: str) -> str | None:
+    """Append the missing ``)`` and ``]`` so a truncated SMILES parses.
+
+    The DECIMER transformer decoder has a positional-encoding maxlen of
+    ~300, so cyclic-peptide SMILES longer than that get truncated mid-
+    branch (e.g. ``...C(=O)N(C)C)F)F)F``). RDKit cannot parse them
+    because of the dangling parens. Counting ``(`` minus ``)`` and
+    ``[`` minus ``]`` and appending the missing closers recovers a
+    surprising fraction of these cases (~33% in our benchmark).
+
+    Returns the patched SMILES, or ``None`` if it has nothing to fix.
+    """
+    if not smiles:
+        return None
+    open_p = smiles.count("(") - smiles.count(")")
+    open_b = smiles.count("[") - smiles.count("]")
+    if open_p <= 0 and open_b <= 0:
+        return None
+    return smiles + ")" * max(0, open_p) + "]" * max(0, open_b)
+
+
 def auto_repair_smiles(raw_smiles: str) -> str:
     """Auto-heal common OCR syntax flaws in peptide SMILES strings."""
     s = raw_smiles

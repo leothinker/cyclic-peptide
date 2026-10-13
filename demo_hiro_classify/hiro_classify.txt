@@ -1,0 +1,28 @@
+# Hiro-OCSR classify_smiles sweep
+# source: data\processed\decimer_cache.json  (405 entries)
+
+## image_type distribution
+  - molecule  :  303  ( 74.8%)
+  - fragment  :    0  (  0.0%)
+  - markush   :    0  (  0.0%)
+  - irregular :    0  (  0.0%)
+  - invalid   :  102  ( 25.2%)
+  - empty     :    0  (  0.0%)
+
+## feature distribution
+  (counted over all entries)
+  - isotope   : 0
+  - h2o       : 0
+  - salt      : 123
+  - metal     : 0
+  - charge    : 0
+
+## sample cmpds per image_type (first 5 each)
+  - molecule  : 1001, 1002, 1003, 1004, 1005
+  - fragment  : (none)
+  - markush   : (none)
+  - irregular : (none)
+  - invalid   : 1014, 1019, 1040, 1045, 1064
+  - empty     : (none)
+
+## invalid SMILES (first 10)

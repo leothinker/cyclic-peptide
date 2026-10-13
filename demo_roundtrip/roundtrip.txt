@@ -1,0 +1,17 @@
+# Round-trip visual validation (CoordGen render)
+
+# DECIMER predicted SMILES, RDKit re-rendered with CoordGen + ring templates + stereo.
+
+## cmpd 1036
+  source : data\processed\cells\PCTCN2025075389-ftappb-I100297_1036_struct.png
+  smiles : 'CC[C@H](C)[C@H]1C(=O)N(C)[C@H](C2CCCCC2)C(=O)N3CC[C@@H]3C(=O)N[C@@H]4CSC5=C(C(=C(C(=C5F)F)C(=S)NCCC(=O)N1)F)SC[C@@H](C(=O)N(C)CC(=O)N[C@H](C'
+  tokens : 269, mean_conf=0.9477, min_conf=0.4761, low_conf=1
+  rdkit  : True, formula=C77H104F8N14O13S3
+  side-by-side image : cmpd_1036_side_by_side.png
+
+## cmpd 1037
+  source : data\processed\cells\PCTCN2025075389-ftappb-I100297_1037_struct.png
+  smiles : 'CC[C@H](C)[C@H]1C(=O)N(C)[C@H](CC2=CC=CC=C2)C(=O)N3CC[C@H]3C(=O)N[C@@H](C)C(=O)N(C)CC(=O)N[C@H](CCC4=CC(=C(C(=C4)F)C(F)(F)F)F)C(=O)N5CCC[C@H'
+  tokens : 237, mean_conf=0.9474, min_conf=0.5034, low_conf=0
+  rdkit  : True, formula=C69H99F5N12O12
+  side-by-side image : cmpd_1037_side_by_side.png
