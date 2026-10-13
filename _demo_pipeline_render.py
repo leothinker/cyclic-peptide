@@ -40,7 +40,13 @@ renders = {p.stem: p for p in rendered_dir.glob("*.png")}
 print(f"available renders: {len(renders)}")
 
 both = sorted(set(structs) & set(renders))
-both = both[:12]  # 12-cmpd grid
+# Prefer cmpds that have a measured ocr_avg_entropy (i.e. came from a
+# SMILES table, not an activity-only table) so the title shows real
+# numbers instead of n/a.
+with_entropy = [cid for cid in both if by_id.get(cid, {}).get("ocr_avg_entropy", "") not in ("", None)]
+without = [cid for cid in both if cid not in with_entropy]
+both = (with_entropy + without)[:12]
+print(f"  of which {len(with_entropy)} have ocr entropy data")
 print(f"showing {len(both)} cmpds with both crops")
 
 # Layout: 4 cols x 3 rows, each cell 540x440 (left = orig, right = render)

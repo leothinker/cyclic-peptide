@@ -621,6 +621,7 @@ def run_pipeline(
     if skip_decimer:
         print("\n[3/4] skipping DECIMER (--skip-decimer); combined CSV will have empty decimer columns")
         decimer_raw, decimer_canon, decimer_min_conf, decimer_low_conf = {}, {}, {}, {}
+        decimer_render = {}
     else:
         print(f"\n[3/4] running DECIMER (OCSR) on cropped structures "
               f"(limit={decimer_limit}, offset={decimer_offset}) ...")
