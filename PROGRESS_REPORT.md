@@ -140,3 +140,37 @@ Source of best SMILES:
   ocr+decimer (both agree):           0
   empty (neither valid):              56
 ```
+
+---
+
+## 更新（2026-10-14 早上）
+
+### OCR 熵信任度 + DECIMER 兜底（commit 16d0e90）
+
+- 新增 `OcrStats` dataclass：per-char 熵 + min_top1 + low_conf_count（top-1 < 0.7 计为低置信）
+- 新增 `_ocr_smiles_with_stats()` 在 `rec_top_k>1` 时同时计算熵
+- `CompoundRecord` +3 字段；`COMBINED_COLUMNS` +3 列
+- `smiles_best_source` 新增 `decimer_fallback`（OCR 有效但不可信 + DECIMER 有效）和 `ocr_only_invalid` 两个标签
+- 阈值常量：`OCR_TRUST_ENTROPY_THRESHOLD=0.5` bits/char，`OCR_TRUST_LOW_CONF_LIMIT=5`
+
+烟测 6 张 SMILES 表（23 cmpd）：
+| 指标 | 值 |
+|---|---|
+| ocr_avg_entropy | 0.23–0.25 bits/char |
+| ocr_min_top1 | 0.26–0.50 |
+| ocr_low_conf_count | 35–50 / ~270 chars |
+| source 分布 | decimer: 22, empty: 1 |
+
+确认：top-k swap 还不够，所有 cmpd OCR canonical 都为空→全部走 decimer fallback。
+
+### DECIMER 2D 重绘接入 pipeline（commit d3a46d1）
+
+- `_render_decimer()` 用 `cpd.render.render_mol_pil(linearize_macrocycle=True)` 把 327/327 valid DECIMER canonical SMILES 画成 PNG
+- 写到 `data/processed/rendered/<cmpd_id>.png`，CSV 新增 `decimer_render_path` 列
+- `[3b/4]` phase 嵌入 `run_pipeline`，~6s 完成
+- 报告素材：`_demo_pipeline_render.py` + `demo_pipeline_render/grid_12.png`
+
+### 待办
+- [ ] 夜间跑 `main.py --skip-decimer --rec-top-k 5`（1-2h）刷新 `compounds_combined.csv` 24 列
+- [ ] 检查 ocr_avg_entropy × is_valid 关系 → 调阈值
+- [ ] Hiro-OCSR：仍在等 HF 审批
