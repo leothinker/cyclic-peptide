@@ -33,7 +33,27 @@
 - `demo_roundtrip/cmpd_1036_side_by_side.png` — 单 cmpd 1036 高清对比
 - `compounds_combined.csv` — 24 列主交付物（gitignored，可重生成）
 
-## commit 状态
+## 早上的两个补充实验
+
+### 1. beam search (best-of-N-swap) -- commit `5079b1e`
+- 实现：``src/cpd/parsers/_beam_search.py``
+- 方法：argmax → 1-swap 按 confidence drop 排序 → 2-swap（budget=2000）
+- 速度：**0.25 s/cmpd**，全 335 推算 1.4 min
+- 12/12 demo cmpd **0 hits** → 跟 single-swap 一样触底
+- 结论：替换式搜索救不回结构性错位（需要 insert/delete + 语法 parser）
+
+### 2. DECIMER 闭环完整性 -- commit `5079b1e`
+- cmpd 1036 DECIMER canonical：**115 heavy atoms**, formula ``C77H104F8N14O13S3``
+- 渲染闭环（``linearize_macrocycle=False``）后**宏环完整可见**：2 个 S 环、1 个 F-aromatic、1 个 cyclopentane、1 个 pyrrolidine 都在
+- linearize 之后"看着短"是**几何效应**（开链后沿一方向延展），**不是原子丢失**
+- 但跟原图对比：少 1-2 个小支链（N-甲基 isoleucine/valine 类），主链有轻微重排
+- ``demo_pipeline_render/cmpd_1036_render_compare.png`` 三联对比图（原图/闭环/开链）
+
+### 修正之前的判断
+- 之前说"DECIMER 把环丢了、侧链截断"是**夸张**了
+- 实际：宏环 ✅，F ✅，S 环 ✅，**少数小支链** ⚠️ 被简化
+- L1 phantom 仍然真实（median 0.42, 77% phantom），但跟"完全空白"差得远
+
 ```
 ef190cf docs: log overnight OCR re-run + root-cause for swap-fix failure
 580e8e2 fix: decimer_render in --skip-decimer branch; demo prefers SMILES-table cmpds
@@ -56,3 +76,4 @@ b82adff chore: drop superseded test scripts and AB experiments
 ## 还没动的
 - Hiro-OCSR 仍在等 HF 审批（你可以去 https://huggingface.co/settings/gated-repos 看看批了没）
 - 任何 references/ 下的源码修改（结论是不需要改——OCR 错误不是模型问题，是预处理/字符混淆问题）
+
