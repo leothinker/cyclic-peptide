@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Iterable, Optional
 
 from cpd.chem import validate_and_enrich
+from cpd.parsers._grammar import is_grammar_valid
 
 
 @dataclass
@@ -74,7 +75,7 @@ def beam_search_smiles(
         return None, 0
 
     # Pass 0: argmax as-is
-    chem = validate_and_enrich(full_text)
+    chem = validate_and_enrich(full_text) if is_grammar_valid(full_text) else None
     if chem is not None:
         return chem.canonical_smiles, 0
 
@@ -89,7 +90,10 @@ def beam_search_smiles(
             continue
         chars[a.pos] = a.alt_ch
         cand = "".join(chars)
-        chem = validate_and_enrich(cand)
+        if is_grammar_valid(cand):
+            chem = validate_and_enrich(cand)
+        else:
+            chem = None
         chars[a.pos] = a.orig_ch
         if chem is not None:
             return chem.canonical_smiles, 1
@@ -112,7 +116,7 @@ def beam_search_smiles(
             chars2[a2.pos] = a2.alt_ch
             cand = "".join(chars2)
             tried += 1
-            chem = validate_and_enrich(cand)
+            chem = validate_and_enrich(cand) if is_grammar_valid(cand) else None
             if chem is not None:
                 return chem.canonical_smiles, 2
             if tried >= max_2_swap:
