@@ -35,7 +35,12 @@
 
 ## 早上的两个补充实验
 
-### 1. beam search (best-of-N-swap) -- commit `5079b1e`
+### 1. beam search 三连测试（穷尽字符级修复）
+- **`5079b1e`** best-of-N-swap (sub only): 0/12 hits, 0.25s/cmpd
+- **`47c240c`** + grammar-aware prune: 0/12 hits, 0.02s/cmpd（10x 加速）
+- **`144d09e`** + insert/delete edit ops: 0/12 hits, 0.031s/cmpd
+- **结论**：字符级 sub/ins/del 都救不回——多数错误需要**同时 2+ 个 edit**（如 `C=ON`→`C(=O)N` 需要同时插入 `(` 和 `)`）
+- grammar walker 验出 **0/335 raw OCR 是合法 SMILES**（100% 有结构性错误）
 - 实现：``src/cpd/parsers/_beam_search.py``
 - 方法：argmax → 1-swap 按 confidence drop 排序 → 2-swap（budget=2000）
 - 速度：**0.25 s/cmpd**，全 335 推算 1.4 min
@@ -76,4 +81,5 @@ b82adff chore: drop superseded test scripts and AB experiments
 ## 还没动的
 - Hiro-OCSR 仍在等 HF 审批（你可以去 https://huggingface.co/settings/gated-repos 看看批了没）
 - 任何 references/ 下的源码修改（结论是不需要改——OCR 错误不是模型问题，是预处理/字符混淆问题）
+
 
