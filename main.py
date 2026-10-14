@@ -638,9 +638,22 @@ def run_pipeline(
         compounds, assays, decimer_raw, decimer_canon,
         decimer_min_conf, decimer_low_conf, decimer_render,
     )
+    # VSCode holds an exclusive write lock on compounds_combined.csv while
+    # it is open in the Source Control diff view; writing to the canonical
+    # filename raises PermissionError on Windows. Auto-detect and fall back
+    # to a sibling name; the user can swap once the editor releases the file.
+    canonical_csv = out_path / "compounds_combined.csv"
+    swap_csv = out_path / "compounds_combined.new.csv"
+    try:
+        with open(canonical_csv, "r+b"):
+            target_csv = canonical_csv
+    except PermissionError:
+        target_csv = swap_csv
+        print(f"   [!] {canonical_csv.name} is locked; writing to {swap_csv.name} instead")
+
     n_combined = _write_csv(
         combined_rows,
-        out_path / "compounds_combined.csv",
+        target_csv,
         COMBINED_COLUMNS,
     )
 

@@ -330,6 +330,15 @@ class RapidOcrTableExtractor:
             columns = prev_columns or default_columns(img.shape[1], "activity")
 
         rows = self._detect_row_boundaries(img)
+        # Single-row continuation pages (often a wide 70-px strip with
+        # one cmpd row) make the vertical-line finder unreliable: it
+        # tends to over-count dividers (the 2173 row on I100382 was
+        # getting 7 detected columns instead of the dense 6). When we
+        # have the previous image's layout, trust it for these thin
+        # pages so the column widths and the cmpd_id x-range carry
+        # over correctly.
+        if prev_columns and len(rows) <= 1:
+            columns = list(prev_columns)
         compounds, assays = self._extract_rows(
             img, rows, columns, image_path, cells_dir
         )
@@ -648,20 +657,22 @@ class RapidOcrTableExtractor:
         """Find the 4-digit compound id in the leftmost cell."""
         if cell.size == 0:
             return None
-        # cmpd_id cells are tall narrow columns (e.g. 492x173 px) where
-        # the 4-digit text sits in the middle surrounded by whitespace
-        # and the cell's own border lines. _trim_to_content cannot
-        # tighten them further (the borders make the bbox effectively
-        # the full cell), so we let the detector auto-crop to the text
-        # band like it does for header rows. The recogniser below
-        # (CH or EN) then reads the digit string reliably.
-        result = self.rec_engine(self._upscale(cell))
-        if not result:
-            return None
-        for text in self._txts(result):
-            for token in text.split():
-                if re.fullmatch(r"\d{4}", token.strip()):
-                    return token.strip()
+        # cmpd_id cells are tall narrow columns where the 4-digit text
+        # sits in the middle surrounded by whitespace and the cell's own
+        # border lines. We try the Chinese (default) engine first because
+        # the EN recogniser (PP-OCRv4 mobile) routinely misreads dense-
+        # table cmpd_ids as 2-character garbage ("1037" -> "?, 4, C")
+        # while the Chinese recogniser returns the digit string cleanly.
+        # Falling back to the EN engine only matters when the Chinese
+        # detector finds nothing on a tight crop.
+        for engine in (self.engine, self.rec_engine):
+            result = engine(self._upscale(cell))
+            if not result:
+                continue
+            for text in self._txts(result):
+                for token in text.split():
+                    if re.fullmatch(r"\d{4}", token.strip()):
+                        return token.strip()
         return None
 
     def _ocr_cell(self, cell: np.ndarray, field_name: str) -> str | None:

@@ -210,3 +210,40 @@ Source of best SMILES:
    - **chemistry-constrained beam search**：每步 swap 后用 RDKit 局部 parse 验证 prefix 合法，否则剪枝
    - **多 pass OCR + 投票**：高/低对比度、放大倍率不同的几张图分别 OCR，按字符投票
    - **Hiro-OCSR**（仍在等 HF 审批）：第二个独立 OCSR，跨模型对比
+   - **Hiro-OCSR**（仍在等 HF 审批）：第二个独立 OCSR，跨模型对比
+
+### 复跑补数据 (2026-10-14 晚间) — I100376+ 修复
+
+**问题**：汇报时发现 `compounds_combined.csv` 没有 I100376+ 的表格内容（71 assays 到顶）。
+
+**根因**（两点 bug 都已修）：
+
+1. `src/cpd/parsers/table_extractor.py::_read_cmpd_id`：原来只调 PP-OCRv4 EN mobile，密集活动表里 "1037" / "1108" 被识别成 `D, 0` 这种 2 字符垃圾。改为先试 Chinese 默认 engine，识别失败才 fallback。Cell 测试：`cv2.imread('.dbg_dense_first_row.png')` → CH 返回 `('1080',)`、EN 返回 `('D', '0')`。
+2. `extract_records`：I100382 那种单行 70px 切片被 over-detect 到 7 列，cmpd_id 列被 snap 到 x=0-156、"2173" 被截成 "21"。修复：`if prev_columns and len(rows) <= 1: columns = list(prev_columns)` — 薄切片直接继承上一页的列。
+
+**重现提取**：后台跑 `_run_full_reextract.bat`（`main.py --rec-top-k 5`，完整 103 张表），~30 分钟完成。
+
+| 图 | cmpd (fix 前) | cmpd (fix 后) | assay (前) | assay (后) |
+|---|---|---|---|---|
+| I100376 | 1 | 1 | 0 | **19** |
+| I100377 | 0 | 0 | 0 | **26** |
+| I100378 | 0 | 0 | 0 | **9** |
+| I100379 | 0 | 0 | 0 | **33** |
+| I100380 | 0 | 0 | 0 | **52** |
+| I100381 | 0 | 0 | 0 | **12** |
+| I100382 | 0 | 0 | 0 | 0 (单行 fill 列后 cmpd OCR 还失败) |
+
+**结果**（详细见 `data/processed/pipeline_full_reextract_20261014_202400.log`）：
+
+| 指标 | 修复前 | 修复后 | 变化 |
+|---|---|---|---|
+| cmpd_id 行数 | 406 | 406 | — |
+| KD 列填充 | 71 | 91 | **+20** |
+| RT 列填充 | 71 | 79 | +8 |
+| MS m/z 填充 | 71 | 80 | +9 |
+| 提取的 assay 总数 | 71 | 222 | **+151** |
+
+**关键限制**：I100376+ 是"密集活动行"，每张图最多 1 个 cmpd 结构 (cmpd 2173 from I100376)，其他 19+26+…+12 个 row 是「cmpd_id | KD | RT | MS | method」纯文本。新提的 151 assay **不补 cmpd 行**（无 structure_image），是合并进已有 cmpd 1080-2173 的 KD/RT 列。但 +20 KD 远低于 +151 assay，说明密集活动表的**列对齐**还有问题（OCR 找到了 cmpd_id 文本，但 KD/RT 列内容经常缺位或贴错列）。
+
+**idx csv 路径**：`compounds_combined.new.csv`（因为原 `compounds_combined.csv` 被 VSCode 锁着，主流程加了自动 fallback；跑完后用 `_swap_combined_csv.bat` 重命名）。
+
