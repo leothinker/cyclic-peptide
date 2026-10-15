@@ -690,7 +690,31 @@ class RapidOcrTableExtractor:
         cell = self._trim_to_content(cell)
         if cell.size == 0:
             return None
+        # Activity-table cells (KD/RT/m/z/method/polarity) are short and
+        # dense; the English mobile recogniser over-segments them into
+        # one box per character (``1.554`` -> ``['1', '.', '5', '5', '4']``)
+        # while the Chinese default recogniser reads them cleanly once
+        # we strip the table borders and re-upscale. SMILES is kept on
+        # the EN recogniser since CH routinely returns empty detections
+        # for those long strings.
         result = self.rec_engine(self._upscale(cell))
+        if field_name != "smiles" and self._looks_over_segmented(result):
+            for eng in (self.engine, self.rec_engine):
+                stripped = self._strip_borders(cell)
+                if stripped.size:
+                    upscaled = self._upscale(stripped)
+                else:
+                    upscaled = self._upscale(cell)
+                if max(upscaled.shape[:2]) < 100:
+                    upscaled = cv2.resize(
+                        upscaled,
+                        (upscaled.shape[1] * 2, upscaled.shape[0] * 2),
+                        interpolation=cv2.INTER_CUBIC,
+                    )
+                candidate = eng(upscaled)
+                if candidate and (self._txts(candidate) or []):
+                    result = candidate
+                    break
         if not result:
             return None
         boxes = self._boxes(result)
@@ -785,6 +809,35 @@ class RapidOcrTableExtractor:
         if max(h, w) < 50:
             return img
         return cv2.resize(img, (w * 2, h * 2), interpolation=cv2.INTER_CUBIC)
+
+    @staticmethod
+    def _strip_borders(img: np.ndarray, pad: int = 20) -> np.ndarray:
+        """Drop the thick vertical table-border strokes on the left/right of a cell.
+
+        Activity-table cells are wrapped in a heavy black gridline. The
+        Chinese default recogniser's text detector refuses to fire when
+        those long vertical strokes dominate the image; trimming ~20 px
+        off each side keeps the digit/letter content intact and lets
+        detection succeed.
+        """
+        if img.ndim < 2 or img.shape[1] <= 2 * pad:
+            return img
+        return img[:, pad:img.shape[1] - pad]
+
+    def _looks_over_segmented(self, result, min_boxes: int = 3) -> bool:
+        """True when the recogniser returned one short box per character.
+
+        The EN mobile recogniser splits short numeric cells like ``1.554``
+        into ``['1', '.', '5', '5', '4']``. That sort of output is
+        unusable downstream; we detect it by counting boxes whose text is
+        a single printable character and ask the caller to retry with the
+        CH recogniser on a stripped cell.
+        """
+        txts = self._txts(result) or []
+        if len(txts) < min_boxes:
+            return False
+        single = sum(1 for t in txts if t and len(t.strip()) <= 1)
+        return single >= min_boxes
 
     @staticmethod
     def _trim_to_content(img: np.ndarray, pad: int = 4) -> np.ndarray:
