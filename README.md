@@ -2,101 +2,10 @@
 
 Extract cyclic-peptide SMILES and KRAS G12V GDP KD bioactivity data from
 patent characterization tables (e.g. WO2025162428). One combined CSV is the
-main deliverable: 406 cmpds x 27 columns (SMILES, DECIMER 2D re-render,
-LCMS RT / MS m/z / method / polarity, KRAS G12V GDP KD, OCR trust scores).
-
-## Quick Start
-
-```powershell
-# 1. Install dependencies
-uv sync
-
-# 2. Optional: install DECIMER for OCSR SMILES (~2 GB PyTorch)
-uv pip install --python .venv/Scripts/python.exe DECIMER
-
-# 3. Run the pipeline (reads data/raw/WO2025162428/golden_tables by default)
-$env:PYTHONIOENCODING = "utf-8"
-uv run python main.py
-
-# 4. Run the test suite
-uv run pytest
-```
-
-When DECIMER is not installed the `smiles_decimer` column stays empty;
-install the package and re-run to fill it.
-
-## Main Output
-
-- `data/processed/compounds_combined.csv` -- one row per cmpd, 27 columns:
-  cmpd_id, smiles, canonical_smiles, smiles_decimer,
-  canonical_smiles_decimer, smiles_best, smiles_best_source, smiles_agree,
-  molecular_weight, heavy_atom_count, is_valid, structure_image,
-  source_image, kd_nm, rt_min, ms_mz, lcms_method, ms_polarity,
-  assay_source_image, decimer_min_conf, decimer_low_conf_count,
-  decimer_render_path, ocr_avg_entropy, ocr_min_top1, ocr_low_conf_count,
-  data_quality_flags, data_quality.
-- `data/processed/cells/` -- cropped structure image per compound.
-- `data/processed/rendered/` -- DECIMER-canonicalised 2D re-render PNG per
-  valid structure (327 of 406 cmpds).
-
-## Project Structure
-
-```text
-cyclic-peptide/
- +- main.py                       # Pipeline entry point
- +- src/cpd/
- |   +- chem.py                   # RDKit validation + SMILES repair
- |   +- decimer.py                # Optional DECIMER OCSR wrapper
- |   +- merge.py                  # cmpd_id normalisation + dedupe
- |   +- render.py                 # RDKit Mol -> PNG renderer
- |   +- parsers/
- |       +- headers.py            # Header alias map
- |       +- table_extractor.py    # RapidOCR + OpenCV cell extractor
- +- tests/                        # pytest suite
- +- data/
- |   +- raw/WO2025162428/
- |       +- WO2025162428-PAMPH-20250807-0047.pdf
- |       +- golden_tables/        # 103 source pages used by the pipeline
- |   +- processed/
- |       +- compounds_combined.csv   # main artifact (406 x 27)
- |       +- cells/                   # 406 cropped structure PNGs
- |       +- rendered/                # 327 DECIMER re-render PNGs
- +- references/                   # Read-only upstream OCSR source clones
- +- pyproject.toml
- +- LICENSE
- +- .gitignore
- +- README.md
-```
-
-`data/processed/` is gitignored -- regenerate any artifact with `main.py`.
-`references/RapidOCR`, `references/DECIMER-Image_Transformer`,
-`references/Hiro-OCSR` are local read-only clones used while developing the
-OCSR wrappers in `src/cpd/`.
-
-## Pipeline Workflow
-
-1. **Header aliasing (`cpd.parsers.headers`)**
-   Patent authors write the same column under different names
-   (`Cmpd #` vs `Compound #`, `G12V GDP KD nM` vs `KRAS G12V GDP KD (nM)`).
-   A small dictionary collapses every variant to one canonical field.
-2. **Unified table extraction (`cpd.parsers.table_extractor`)**
-   OCR the top header band to learn the column layout, then for every
-   row OCR each text cell and crop the `structure` column to a PNG.
-   One code path handles all three layouts found in golden tables:
-   3-col SMILES, 7-col activity (with structure), and 6-col dense
-   activity (no structure).
-3. **Chemical validation (`cpd.chem`)**
-   Auto-repair common OCR artefacts (amide carbonyls, unclosed chiral
-   brackets) and validate the canonicalised SMILES with RDKit.
-4. **Optional DECIMER OCSR (`cpd.decimer`)**
-   When the DECIMER package is installed, run it on every cropped
-   structure PNG to get a SECOND SMILES string. The module returns
-   `None` and the column stays empty when DECIMER is not available.
-5. **Combined-table output (`main.py`)**
-   `main.py` runs OCR + DECIMER in a single pass and writes one
-   `compounds_combined.csv` with both SMILES streams side-by-side,
-   RDKit canonical forms, an `smiles_agree` flag, and the activity
-   columns.
+main deliverable: **406 cmpds x 33 columns** -- SMILES, DECIMER 2D re-render,
+LCMS RT / MS m/z / method / polarity, KRAS G12V GDP KD, OCR trust scores,
+macrocycle-intact diagnostic, and a post-hoc repair that recovers 86% of
+the broken DECIMER SMILES.
 
 ## Quick Start
 
@@ -112,84 +21,149 @@ uv pip install --python .venv/Scripts/python.exe DECIMER
 $env:PYTHONIOENCODING = "utf-8"
 uv run python main.py
 
-# 4. Run the test suite
+# 4. Re-use cached OCR + DECIMER results (fast; only re-renders)
+uv run python main.py --skip-ocr --skip-decimer
+
+# 5. Run the test suite
 uv run pytest
 ```
 
 When DECIMER is not installed the `smiles_decimer` column stays empty;
 install the package and re-run to fill it.
 
-## Key Outputs
+## Main Outputs
 
-- `data/processed/compounds_combined.csv` -- **one row per cmpd**,
- joining the OCR SMILES (table text) with the DECIMER SMILES (OCSR
- over the cropped structure image), plus RDKit canonical versions,
- an `smiles_agree` flag, an OCR entropy trust score, and a
- DECIMER per-token confidence score. This is the main artifact --
- a quick `pandas.read_csv("data/processed/compounds_combined.csv")`
- gives you a joined table ready for QSAR / clustering. Columns:
-
-  ```text
-  cmpd_id, smiles, canonical_smiles,
- smiles_decimer, canonical_smiles_decimer,
- smiles_best, smiles_best_source, smiles_agree,
-  molecular_weight, heavy_atom_count, is_valid,
-  structure_image, source_image,
- kd_nm, rt_min, ms_mz, lcms_method, ms_polarity, assay_source_image,
- decimer_min_conf, decimer_low_conf_count, decimer_render_path,
- ocr_avg_entropy, ocr_min_top1, ocr_low_conf_count,
- data_quality_flags, data_quality
-  ```
-
+- `data/processed/compounds_combined.csv` -- one row per cmpd, 33 columns:
+  cmpd_id, smiles, canonical_smiles, smiles_decimer,
+  canonical_smiles_decimer, smiles_best, smiles_best_source, smiles_agree,
+  repaired_smiles, is_repaired, repair_method,
+  molecular_weight, heavy_atom_count, is_valid, structure_image,
+  source_image, kd_nm, rt_min, ms_mz, lcms_method, ms_polarity,
+  assay_source_image, decimer_min_conf, decimer_low_conf_count,
+  decimer_render_path, ocr_avg_entropy, ocr_min_top1, ocr_low_conf_count,
+  data_quality_flags, data_quality,
+  decimer_largest_ring_size, decimer_macrocycle_intact, decimer_num_rings.
+  Read with `pandas.read_csv("data/processed/compounds_combined.csv")`.
 - `data/processed/cells/{src_stem}_{cmpd_id}_struct.png` -- cropped
-  structure image per compound, with a 12 px white margin so DECIMER (or
-  any other OCSR model) does not get confused by black borders.
+  structure image per compound (406 PNGs).
 - `data/processed/rendered/{cmpd_id}.png` -- DECIMER-canonicalised
-  re-render of every valid structure (CoordGen + linearised macrocycle),
-  ~327 PNGs for the WO2025162428 set.
-- `demo_*/` -- one directory per report diagram (e.g.
-  `demo_pipeline_render/grid_12.png`,
-  `demo_roundtrip/cmpd_1036_side_by_side.png`).
+  re-render of every valid structure (406 PNGs; CoordGen + linearised
+  macrocycle when intact, as-is when broken, repaired-then-rendered
+  for the 121 cmpds that were fixed by macrocycle_repair).
+- `PRESENTATION.md` -- afternoon-presentation summary of the pipeline,
+  golden-table handling, the DECIMER macrocycle research thread, and
+  the 86% repair rate.
+
+### data_quality distribution (pre-repair diagnostic)
+
+| label                | count | meaning                                              |
+|----------------------|------:|------------------------------------------------------|
+| ok                   |   239 | intact cyclic peptide (largest ring >= 12 atoms)     |
+| macrocycle_broken    |   141 | DECIMER SMILES parses but its largest ring is < 12   |
+| partial              |    26 | multi-fragment / parse edge case                     |
+
+After running the `cpd.macrocycle_repair` pass, 121 of the 141 broken
+rows get a non-empty `repaired_smiles` and a re-rendered PNG.
 
 ## Project Structure
 
 ```text
 cyclic-peptide/
- ├── pyproject.toml              # Project dependencies and configurations
- ├── main.py                     # Pipeline entry point (OCR + DECIMER -> one CSV)
- ├── src/cpd/
- │   ├── chem.py                 # RDKit validation and SMILES syntax repair
- │   ├── decimer.py              # Optional DECIMER (OCSR) wrapper; no-op when absent
- │   ├── merge.py                # cmpd_id normalisation + row dedupe
- │   ├── render.py               # RDKit Mol -> PNG renderer (CoordGen + macrocycle)
- │   └── parsers/
- │       ├── headers.py          # Header alias map (Cmpd # / Compound # / ...)
- │       └── table_extractor.py  # RapidOCR + OpenCV cell-aligned extractor
- ├── tests/                      # pytest suite (chem / merge / table / combined)
- ├── demo_*/                     # one-shot reporting scripts + their PNG outputs
- ├── MORNING_BRIEF.md            # at-a-glance status, refreshed each morning
- ├── PROGRESS_REPORT.md          # detailed progress log
- ├── REPORT_MATERIAL.md          # distilled report content
- ├── references/                 # Read-only upstream clones; we read but do not modify
- │   ├── RapidOCR/               # the OCR engine we wrap
- │   ├── DECIMER-Image_Transformer/
- │   └── Hiro-OCSR/              # patent-domain OCSR (awaiting Hugging Face access)
- └── data/
-     ├── raw/WO2025162428/       # patent images + golden_tables/*.jpg (103 source pages)
-     └── processed/              # pipeline outputs
-         ├── compounds_combined.csv  # main artifact (406 rows, 27 cols)
-         ├── decimer_cache.json      # 405/405 DECIMER predictions (cached)
-         ├── cells/                  # 406 cropped structure PNGs
-         └── rendered/               # 327 DECIMER-re-rendered PNGs
+ +- main.py                       # Pipeline entry point (OCR + DECIMER -> one CSV)
+ +- pyproject.toml                # Project metadata + dependency pins
+ +- uv.lock                       # Locked dependency graph
+ +- README.md                     # This file
+ +- PRESENTATION.md               # Afternoon-presentation summary
+ +- LICENSE
+ +- src/cpd/
+ |   +- __init__.py
+ |   +- chem.py                   # RDKit validation, repair, descriptors
+ |   +- decimer.py                # Optional DECIMER (OCSR) wrapper
+ |   +- merge.py                  # cmpd_id normalisation + row dedupe
+ |   +- render.py                 # 2D structure render + macrocycle-intact gate
+ |   +- macrocycle_repair.py      # Post-hoc repair: 86% of broken SMILES
+ |   +- parsers/
+ |       +- __init__.py
+ |       +- headers.py            # Header alias map (Cmpd # / Compound # / ...)
+ |       +- table_extractor.py    # RapidOCR + OpenCV cell extractor
+ +- tests/
+ |   +- test_chem.py
+ |   +- test_merge.py
+ |   +- test_table_pipeline.py
+ |   +- test_combined_pipeline.py
+ |   +- test_render.py            # render.macrocycle_intact / audit / draw
+ |   +- test_macrocycle_repair.py # digit-swap + terminal-bridge heuristics
+ +- data/
+ |   +- raw/WO2025162428/
+ |   |   +- WO2025162428-PAMPH-20250807-0047.pdf
+ |   |   +- golden_tables/        # 103 source pages used by the pipeline
+ |   +- processed/                # regenerated by `main.py`; gitignored
+ |       +- compounds_combined.csv
+ |       +- cells/                # 406 cropped structure PNGs
+ |       +- rendered/             # 406 re-rendered PNGs (incl. 121 repaired)
+ +- references/                   # Read-only upstream OCSR/OCR source clones
+ |   +- RapidOCR/
+ |   +- DECIMER-Image_Transformer/
+ |   +- Hiro-OCSR/
+ |   +- README.md
+ +- .gitignore
 ```
 
-`references/` is **read-only** -- we clone the upstream repos there so
-we can read their source while modifying the OCR and OCSR wrappers
-under `src/cpd/`. Do not commit local changes to them; if we need to
-patch an upstream, copy the relevant file into `src/cpd/` instead.
+## Pipeline Workflow
 
-### Package Installation
+1. **Header aliasing (`cpd.parsers.headers`)**
+   Patent authors write the same column under different names
+   (`Cmpd #` vs `Compound #`, `G12V GDP KD nM` vs `KRAS G12V GDP KD (nM)`).
+   A small dictionary collapses every variant to one canonical field.
+2. **Unified table extraction (`cpd.parsers.table_extractor`)**
+   OCR the top header band to learn the column layout, then for every
+   row OCR each text cell and crop the `structure` column to a PNG.
+   One code path handles all three layouts found in golden tables:
+   3-col SMILES, 7-col activity (with structure), and 6-col dense
+   activity (no structure). Continuation pages reuse the previous
+   image's layout when their own header is missing.
+3. **Chemical validation (`cpd.chem`)**
+   Auto-repair common OCR artefacts (amide carbonyls `C(O)N -> C(=O)N`,
+   unclosed chiral brackets, lopped-off `CC[C@H` prefixes) and validate
+   the canonicalised SMILES with RDKit.
+4. **DECIMER OCSR (`cpd.decimer`)**
+   When the DECIMER package is installed, run it on every cropped
+   structure PNG to get a SECOND SMILES string plus per-token
+   confidences. Results are cached on disk
+   (`data/processed/decimer_cache.json`) so a second run only re-does
+   new cells.
+5. **Macrocycle diagnostic + 2D re-render (`cpd.render`)**
+   `is_macrocycle_intact(smi)` returns True when the parsed molecule's
+   largest ring is at least 12 atoms -- the threshold for a real
+   cyclic-peptide backbone. The same module renders DECIMER
+   canonicals: when the macrocycle is intact it opens one amide C-N
+   bond to linearise the chain for cleaner thumbnails; when broken it
+   renders the molecule as-is. `ring_closure_audit(smi)` reports the
+   per-digit ring-closure counts for diagnostics.
+6. **Macrocycle repair (`cpd.macrocycle_repair`)** -- NEW
+   For every SMILES that trips the macrocycle gate, try two
+   graph-level heuristics (ring-closure digit swap, terminal bridge)
+   and keep the first one that produces an intact macrocycle.  In
+   WO2025162428 this recovers 121 / 141 (86%) of the broken cases.
+7. **Combined-table output (`main.py`)**
+   `main.py` runs OCR + DECIMER in a single pass and writes one
+   `compounds_combined.csv` with both SMILES streams side-by-side,
+   RDKit canonical forms, an `smiles_agree` flag, the activity
+   columns, the macrocycle diagnostic, the per-token
+   DECIMER/OCR trust scores, and the post-hoc repair result.
 
-```shell
-uv sync --extra dev
-```
+## Open Research: 14% still broken
+
+20 of 141 broken cmpds do not yield to either heuristic in
+`macrocycle_repair`. The two queued fixes are (a) multi-pass
+DECIMER with different seeds and consensus voting, and (b) cross-
+validation with the Hiro-OCSR model already cloned under
+`references/Hiro-OCSR/`. See `PRESENTATION.md` for the detailed
+status and example SMILES.
+
+## References
+
+`references/RapidOCR/`, `references/DECIMER-Image_Transformer/`, and
+`references/Hiro-OCSR/` are local read-only clones used while
+developing the OCSR / OCR wrappers in `src/cpd/`. They are not
+modified by the pipeline.
