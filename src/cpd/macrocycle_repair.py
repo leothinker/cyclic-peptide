@@ -119,6 +119,47 @@ def _graph_distance(mol: Chem.Mol, a: int, b: int) -> int:
     return -1
 
 
+    return -1
+
+
+def attempt_remove_extra_digits(smi: str) -> Optional[str]:
+    """Heuristic: drop 3rd+ occurrence of over-used digits.
+
+    A ring-closure digit must appear exactly twice. DECIMER sometimes
+    emits the same digit three or more times when it gets confused on
+    a fused bicyclic; the extra appearances prevent the remaining
+    pair from closing into the intended macrocycle. This strategy
+    removes the 3rd+ occurrence of any over-used digit and checks
+    whether the resulting SMILES now parses to a molecule with an
+    intact macrocycle.
+
+    Limitations
+    -----------
+    * Only useful when the failure mode is digit re-use. Truncated
+      SMILES, missing atoms, or wrong ring digit assignment require
+      different fixes.
+    """
+    if not smi or is_macrocycle_intact(smi):
+        return None
+    counts = Counter(re.findall(r"\d", smi))
+    for digit, n in counts.items():
+        if n <= 2:
+            continue
+        new_smi = []
+        seen = 0
+        for ch in smi:
+            if ch == digit:
+                seen += 1
+                if seen >= 3:
+                    continue
+            new_smi.append(ch)
+        candidate = "".join(new_smi)
+        mol = Chem.MolFromSmiles(candidate)
+        if mol is not None and is_macrocycle_intact(Chem.MolToSmiles(mol)):
+            return Chem.MolToSmiles(mol)
+    return None
+
+
 def attempt_terminal_bridge(smi: str) -> Optional[str]:
     """Heuristic: connect the two most-distant degree-1 atoms.
 
@@ -170,6 +211,11 @@ def attempt_terminal_bridge(smi: str) -> Optional[str]:
 def repair_macrocycle(smi: str) -> Optional[str]:
     """Try every repair strategy in order; return the first that succeeds.
 
+    Strategy order:
+    1. Re-code extra appearances of over-used digits to a fresh digit.
+    2. Remove extra appearances of over-used digits entirely.
+    3. Bridge the two most-distant terminal atoms.
+
     Returns ``None`` when no strategy repairs the macrocycle.  This
     is the public entry point callers should use.
     """
@@ -178,11 +224,15 @@ def repair_macrocycle(smi: str) -> Optional[str]:
     repaired = attempt_ring_closure_digit_swap(smi)
     if repaired is not None:
         return repaired
+    repaired = attempt_remove_extra_digits(smi)
+    if repaired is not None:
+        return repaired
     return attempt_terminal_bridge(smi)
 
 
 __all__ = [
     "attempt_ring_closure_digit_swap",
+    "attempt_remove_extra_digits",
     "attempt_terminal_bridge",
     "repair_macrocycle",
 ]

@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from cpd.macrocycle_repair import (
+    attempt_remove_extra_digits,
     attempt_ring_closure_digit_swap,
     attempt_terminal_bridge,
     repair_macrocycle,
@@ -62,3 +63,16 @@ def test_repair_handles_broken_real_world_pattern() -> None:
     # If a result IS returned, it should be intact.
     if result is not None:
         assert is_macrocycle_intact(result)
+    if result is not None:
+        assert is_macrocycle_intact(result)
+
+
+def test_remove_extra_digits_returns_none_for_intact() -> None:
+    smi = "C1CCCCCCCCCCC1"
+    assert attempt_remove_extra_digits(smi) is None
+
+
+def test_remove_extra_digits_keeps_valid_smiles_intact() -> None:
+    """A clean SMILES with all digits appearing twice stays unchanged."""
+    smi = "C1CCC1C2CCC2"  # two 3-rings sharing an edge
+    assert attempt_remove_extra_digits(smi) is None

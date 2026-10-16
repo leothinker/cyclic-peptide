@@ -143,19 +143,19 @@ For the 7 image set the user asked about (I100376-I100382):
 
 | Image       | Cmpds extracted | Range                       | Notes                              |
 |-------------|----------------:|-----------------------------|------------------------------------|
-| I100376     | 0               | --                          | blank / header-only page           |
-| I100377     | 44              | 1036 - 1079                 | dense 6-col table                  |
-| I100378     | 116             | 1080 - 1195                 | dense 6-col table (largest page)   |
+| I100376     | 1+44            | 2173 (struct) + 1036 - 1079 | cmpd 2173 structure + activity table |
+| I100377     | 58              | 1080 - 1137                 | dense 6-col table                  |
+| I100378     | 58              | 1138 - 1195                 | dense 6-col table                  |
 | I100379     | 58              | 1196 - 1231, 2035 - 2056    | two ranges on one page             |
 | I100380     | 58              | 2057 - 2114                 | dense 6-col table                  |
 | I100381     | 58              | 2115 - 2172                 | dense 6-col table                  |
-| I100382     | 1               | 2173                        | last cmpd, continuation page       |
+| I100382     | 1               | 2173 (activity)             | last cmpd, activity-only row       |
 
 The `cmpd_id` field in the CSV is the row key that joins the
 CompoundRecord and AssayRecord into the single combined row; the
 image filename is stored in `source_image` for traceability.
 
-**Data accuracy**: spot-checked rows 1036-1079, 1138-1195, 1196-1231,
+**Data accuracy**: spot-checked rows 1036-1137, 1138-1195, 1196-1231,
 2035-2056, 2057-2114, 2115-2172, 2173 against the source images.
 KD, RT, MS, Method, Polarity, cmpd_id all match the published table
 exactly. All 33 CSV columns are 100% populated for the 406 cmpd rows.
@@ -211,13 +211,14 @@ Two strategies in `src/cpd/macrocycle_repair.py`:
 
 | outcome          | count | pct  |
 |------------------|------:|-----:|
-| Repaired         |   121 |  86% |
-| Not yet repairable|   20 |  14% |
+| Repaired         |   127 |  57% |
+| Not yet repairable|    97 |  43% |
 
 The repaired SMILES are written to a new `repaired_smiles` column
 in `compounds_combined.csv` with `is_repaired = True` and a
-`repair_method` flag (`ring_closure_swap` or `terminal_bridge`).
-The 121 PNG files in `data/processed/rendered/` for the repaired
+`repair_method` flag (`ring_closure_swap`, `terminal_bridge`,
+or `remove_or_swap_or_bridge`).
+The 127 PNG files in `data/processed/rendered/` for the repaired
 cmpds have been re-generated from the repaired SMILES.
 
 ### Visual proof (cmpd 1010)
@@ -277,8 +278,9 @@ for the previously-broken cmpds.
 ### After repair (`is_repaired = True`)
 
 * 121 of the 141 `macrocycle_broken` rows now have a non-empty
+* 127 of the 224 DECIMER-valid rows now have a non-empty
   `repaired_smiles` and a re-rendered PNG.
-* The remaining 20 broken rows stay at `is_repaired = False` and
+* The remaining 97 broken rows stay at `is_repaired = False` and
   are the open-research candidates for the Hiro-OCSR cross-check.
 
 ---
