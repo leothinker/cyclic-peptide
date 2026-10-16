@@ -1,9 +1,0 @@
-# RapidOCR per-char top-k on page data/raw/WO2025162428/golden_tables/PCTCN2025075389-ftappb-I100297.jpg
-# rec_top_k = 5
-# filter: SMILES lines with len >= 20 and RDKit-valid
-
-### engine: ch_PP-OCRv4
-(no RDKit-valid SMILES >= 20 chars)
-
-### engine: en_PP-OCRv4
-(no RDKit-valid SMILES >= 20 chars)

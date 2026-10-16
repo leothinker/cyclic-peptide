@@ -699,22 +699,53 @@ class RapidOcrTableExtractor:
         # for those long strings.
         result = self.rec_engine(self._upscale(cell))
         if field_name != "smiles" and self._looks_over_segmented(result):
-            for eng in (self.engine, self.rec_engine):
-                stripped = self._strip_borders(cell)
-                if stripped.size:
-                    upscaled = self._upscale(stripped)
-                else:
-                    upscaled = self._upscale(cell)
-                if max(upscaled.shape[:2]) < 100:
-                    upscaled = cv2.resize(
-                        upscaled,
-                        (upscaled.shape[1] * 2, upscaled.shape[0] * 2),
-                        interpolation=cv2.INTER_CUBIC,
-                    )
-                candidate = eng(upscaled)
-                if candidate and (self._txts(candidate) or []):
-                    result = candidate
-                    break
+            # Multi-strategy fallback. The CH detector on dense-table
+            # cells sometimes can't find text on the strip-bordered crop
+            # (e.g. cmpd 1038 kd '5.505' returns None on strip@4x)
+            # but reads cleanly on a binarised crop, and vice versa
+            # (cmpd 1036 rt '1.555' returns None on binary@4x but
+            # works on strip@4x). Score every candidate and keep the
+            # cleanest one.
+            # ``cell`` was already cropped to its dark content above, so
+            # the heavy black gridlines are gone. A flat 20-px strip on
+            # each side over-trims tight trimmed cells (e.g. cmpd 1040
+            # ms_mz "1,558.8" -> ",558." because the leading "1" lived
+            # in the leftmost few pixels). Use 4 px on each side --
+            # only enough to swallow any remaining anti-aliased border
+            # fringe, not enough to eat into the text itself.
+            candidates = []
+            pad = 4
+            if cell.shape[1] > 2 * pad + 20:
+                src = cell[:, pad:cell.shape[1] - pad]
+            else:
+                src = cell
+            h, w = src.shape[:2]
+            # Pick an upscale factor that brings the shorter side
+            # to >= 100 px. OpenCV shape is (rows, cols) -- height is
+            # the bottleneck, so we check min() (NOT max(), which is
+            # dominated by cell width and would never trigger here).
+            scale = 1 if min(h, w) >= 100 else (2 if min(h, w) * 2 >= 100 else 4)
+            upscaled = src if scale == 1 else cv2.resize(
+                src, (w * scale, h * scale), interpolation=cv2.INTER_CUBIC,
+            )
+            # Strategy 1: CH on strip-borders upscale.
+            r = self.engine(upscaled)
+            if r and self._txts(r):
+                candidates.append(self._score_candidate(self._txts(r), r, 'CH-strip'))
+            # Strategy 2: CH on binarised upscale (force high contrast).
+            gray = cv2.cvtColor(upscaled, cv2.COLOR_BGR2GRAY)
+            _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
+            binary_bgr = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
+            r = self.engine(binary_bgr)
+            if r and self._txts(r):
+                candidates.append(self._score_candidate(self._txts(r), r, 'CH-binary'))
+            # Strategy 3: EN on strip upscale (last resort; usually junk).
+            r = self.rec_engine(upscaled)
+            if r and self._txts(r):
+                candidates.append(self._score_candidate(self._txts(r), r, 'EN-strip'))
+            if candidates:
+                candidates.sort(key=lambda c: -c[0])
+                result = candidates[0][2]
         if not result:
             return None
         boxes = self._boxes(result)
@@ -735,6 +766,29 @@ class RapidOcrTableExtractor:
         if field_name == "smiles" and self.rec_top_k > 1:
             return self._fix_smiles_with_top_k(result, parts)
         return text
+
+    def _score_candidate(self, txts, result, label):
+        """Score an OCR result for an activity cell. Higher is better.
+
+        Reject obvious over-segmented output (each box ~ 1 char) and
+        prefer all-digit results.
+        """
+        joined = "".join(t for t in txts if t)
+        if not joined:
+            return (-1.0, txts, result)
+        if len(txts) >= 3 and sum(len(t) for t in txts if t) <= len(txts) + 2:
+            # Every box is ~1 char -- over-segmented.
+            return (-1.0, txts, result)
+        score = 0.0
+        if re.fullmatch(r"[\d.,\-]+", joined):
+            score += 5.0
+        elif re.fullmatch(r"[\d.,\- <>~nNaAmMpPuU/]+", joined):
+            score += 1.0
+        else:
+            score -= 2.0
+        if '  ' in joined or joined.count(' ') >= 2:
+            score -= 3.0
+        return (score, txts, result)
 
     def _save_structure_crop(
         self,
@@ -847,20 +901,51 @@ class RapidOcrTableExtractor:
         a SMILES column with whitespace at the top makes the detector
         less reliable and the rec output noisy. Tightening to the
         bounding box first improves both steps.
+
+        Activity cells in the late images (I100376+) are wider than
+        their content: the value ``1,558.8`` sits right-aligned in a
+        ~300 px cell with ~200 px of empty whitespace on the left.
+        Plain threshold-bbox fails because the heavy black table-border
+        strokes on the left/right edges span the full cell height, so
+        every column has dark pixels and the bbox covers the whole cell.
+        To get a tight crop we treat any column whose dark pixels cover
+        >= 90% of the height as a border line and ignore it when
+        searching for the content extent.
         """
         if img.size == 0:
             return img
+        h_full, w_full = img.shape[:2]
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
-        coords = cv2.findNonZero(binary)
-        if coords is None or len(coords) == 0:
+        if binary.sum() == 0:
             return img
-        x, y, w, h = cv2.boundingRect(coords)
-        h_full, w_full = img.shape[:2]
-        x0 = max(0, x - pad)
-        y0 = max(0, y - pad)
-        x1 = min(w_full, x + w + pad)
-        y1 = min(h_full, y + h + pad)
+        # Threshold-based dark-pixel count per column / per row. The
+        # activity-table cells are wrapped in heavy black gridlines
+        # (>= 90% dark in the column) and contain a small block of text
+        # (~5-30 dark px per column at this resolution) sitting in a
+        # sea of mostly-white columns with 0-2 anti-aliased noise px.
+        # A column is "border" if it's >= 90% dark; "text" if it's
+        # clearly above noise (>= 3 px here); the rest is empty
+        # whitespace. Use min_dark=2 so thin characters like ``,``
+        # and ``.`` (which peak around 2-3 px in a single column) are
+        # still included.
+        col_dark = binary.sum(axis=0) / 255
+        is_border_col = col_dark >= 0.9 * h_full
+        text_cols = np.where((col_dark >= 2) & (~is_border_col))[0]
+        if text_cols.size == 0:
+            return img
+        x_min, x_max = int(text_cols.min()), int(text_cols.max())
+        # Per-row dark pixel count, same logic for top/bottom borders.
+        row_dark = binary.sum(axis=1) / 255
+        is_border_row = row_dark >= 0.9 * w_full
+        text_rows = np.where((row_dark >= 2) & (~is_border_row))[0]
+        if text_rows.size == 0:
+            return img
+        y_min, y_max = int(text_rows.min()), int(text_rows.max())
+        x0 = max(0, x_min - pad)
+        y0 = max(0, y_min - pad)
+        x1 = min(w_full, x_max + pad + 1)
+        y1 = min(h_full, y_max + pad + 1)
         cropped = img[y0:y1, x0:x1]
         return cropped if cropped.size else img
 
