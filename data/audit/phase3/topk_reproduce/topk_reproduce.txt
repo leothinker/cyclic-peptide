@@ -1,0 +1,38 @@
+=== top-k artefact: what it was, and what reproduces it ===
+
+The artefact was produced by the upstream DEFAULT engine on the WHOLE PAGE with NO preprocessing.
+Production instead uses PP-OCRv4 mobile English on a cropped cell, upscaled 2x, not binarised.
+
+--- artefact vs human reference ---
+
+artefact keys      : ['ch_PP-OCRv4', 'en_PP-OCRv4']
+artefact line ids   : [3, 4, 5, 6, 7, 9, 11, 18, 20, 21, 22, 23, 25]
+artefact lines 3-11: len=271 exact_match_vs_reference=True
+  -> the artefact reproduces the human-verified 1036 reference EXACTLY (0 character errors)
+
+--- full-page A/B on the two reference compounds ---
+
+1036 = human-verified reference; 1037 = agent transcription, NOT human-confirmed.
+
+engine    prep          cmpd  rows   len  open  close  edit       CER
+default   none          1036     7   271    38     38     0       0.0
+default   none          1037     7   251    39     37    38   0.13818
+default   up2           1036     7   266    44     42    31   0.11439
+default   up2           1037     7   275    38     38     0       0.0
+default   up2_th200     1036     6   233    34     35   475   1.75277
+default   up2_th200     1037     7   275    38     38     0       0.0
+baseline  none          1036     7   250    22     37    90    0.3321
+baseline  none          1037     7   245    15     32   128   0.46545
+baseline  up2           1036     7   247    18     35    87   0.32103
+baseline  up2           1037     7   250    17     36   101   0.36727
+baseline  up2_th200     1036     7   268    36     38     3   0.01107
+baseline  up2_th200     1037     7   273    38     36     2   0.00727
+
+--- best configuration per reference compound ---
+
+  1036: default/none edit=0 CER=0.0
+  1037: default/up2 edit=0 CER=0.0
+
+--- interpretation ---
+default/none reproduces the human-verified 1036 reference exactly: edit=0
+No single configuration wins on both compounds, so a corpus-scale test is required before changing the pipeline.

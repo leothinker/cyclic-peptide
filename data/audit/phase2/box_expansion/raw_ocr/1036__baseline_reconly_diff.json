@@ -1,0 +1,18 @@
+[
+  {
+    "op": "delete",
+    "ref_pos": 77,
+    "ref_text": "=",
+    "ocr_text": "",
+    "context": "(C)[C@@H]4C(=O)N(C)CC(=O)",
+    "in_carbonyl": true
+  },
+  {
+    "op": "replace",
+    "ref_pos": 115,
+    "ref_text": "=",
+    "ocr_text": "-",
+    "context": "CC(F)=C(C(F)=C5)C(F)(F)F)",
+    "in_carbonyl": false
+  }
+]

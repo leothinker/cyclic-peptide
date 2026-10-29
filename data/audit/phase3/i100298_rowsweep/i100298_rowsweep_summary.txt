@@ -1,0 +1,72 @@
+=== I100298 per-row geometry sweep ===
+
+Recogniser fixed (upstream default engine); only crop geometry,
+upscale and binarisation threshold vary.
+
+cmpd   row  best_edit   trim  scale    th  rules  exp_len  ocr_len
+1039     1          0  rules      1           19       39       39
+1039     2          0  rules      1            4       40       40
+1039     3          0  rules      1            9       40       40
+1039     4          0  rules      1            9       41       41
+1039     5          0  rules      1           12       39       39
+1039     6          0  rules      1           11       40       40
+1039     7          0  rules      1            4       36       36
+1040     1          0  rules      1           14       38       38
+1040     2          0  rules      1           14       39       39
+1040     3          0  rules      1           19       38       38
+1040     4          0  rules      1           14       40       40
+1040     5          0  rules      1            9       42       42
+1040     6          0  rules      1            9       40       40
+1040     7          0  rules      1            4       34       34
+1041     1          0  rules      1            4       38       38
+1041     2          0  rules      1           14       39       39
+1041     3          0  rules      1           19       38       38
+1041     4          0  rules      1           14       40       40
+1041     5          0  rules      1            9       42       42
+1041     6          0  rules      1            9       40       40
+1041     7          0  rules      1            4       36       36
+
+rows scored: 21
+summed best-row edit distance: 0
+
+reference-free selection: modal OCR string per printed row
+(the rule never consults the printed transcription)
+
+cmpd   row  votes   edit  agreement
+1038     1     58              39%
+1038     2     96              64%
+1038     3     88              59%
+1038     4     99              66%
+1038     5    104              69%
+1038     6     87              58%
+1038     7    102              68%
+1039     1     61      1       41%
+1039     2     94      0       63%
+1039     3     89      0       59%
+1039     4     97      0       65%
+1039     5     97      0       65%
+1039     6     90      0       60%
+1039     7    115      0       77%
+1040     1    118      0       79%
+1040     2     88      0       59%
+1040     3     70      0       47%
+1040     4    111      0       74%
+1040     5     83      0       55%
+1040     6     98      0       65%
+1040     7    128      0       85%
+1041     1     75      0       50%
+1041     2     85      0       57%
+1041     3     80      0       53%
+1041     4     99      0       66%
+1041     5    117      0       78%
+1041     6    104      0       69%
+1041     7    104      0       69%
+  1038 joined (273 chars): CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=0)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+  1039 joined (275 chars): CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=0)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+  1040 joined (271 chars): CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+  1041 joined (273 chars): CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+  total edit distance of the voted strings: 1
+
+Ranking uses character agreement with the printed transcription.
+No RDKit parseability, mass gate or DECIMER output is consulted.
+The transcription is itself awaiting human check.

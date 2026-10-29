@@ -1,0 +1,49 @@
+=== per-row verdict buckets (mass gate) ===
+smiles_best      : {'mismatch': 178}
+repaired_smiles  : {'mismatch': 119}
+
+=== smiles_best delta Da distribution ===
+delta_Da: n=178 min=-570.344 median=+1.867 max=+292.090 mean=-42.122
+  [-1000, -100) Da : 67
+  [ -100,  -50) Da : 11
+  [  -50,  -20) Da : 1
+  [  -20,   -5) Da : 3
+  [   -5,   -1) Da : 0
+  [   -1,   +1) Da : 6
+  [   +1,   +5) Da : 3
+  [   +5,  +20) Da : 25
+  [  +20,  +50) Da : 9
+  [  +50, +100) Da : 17
+  [ +100,+1000) Da : 36
+
+=== repaired_smiles delta Da distribution ===
+delta_Da: n=119 min=-495.644 median=+130.939 max=+708.550 mean=+134.424
+  [-1000, -100) Da : 2
+  [ -100,  -50) Da : 4
+  [  -50,  -20) Da : 2
+  [  -20,   -5) Da : 1
+  [   -5,   -1) Da : 0
+  [   -1,   +1) Da : 0
+  [   +1,   +5) Da : 0
+  [   +5,  +20) Da : 5
+  [  +20,  +50) Da : 11
+  [  +50, +100) Da : 21
+  [ +100,+1000) Da : 73
+
+=== smiles_best failure_hint counts ===
+  H2O loss (~18 Da)                        89
+  >200 Da off (large)                      46
+  CF3 drop (~69 Da)                        31
+  C5H10N / branched side chain (~86 Da)    5
+  CF2 / ring (~66 Da)                      5
+  CO2 / missing carbonyl (~44 Da)          2
+
+=== repaired_smiles failure_hint counts ===
+  H2O loss (~18 Da)                        79
+  >200 Da off (large)                      34
+  CF2 / ring (~66 Da)                      3
+  CO / ethylene (~28 Da)                   2
+  C5H10N / branched side chain (~86 Da)    1
+
+wrote D:\GitHub\drugdesign\cyclic-peptide\data\audit\mass_gate_diagnostic.csv
+wrote D:\GitHub\drugdesign\cyclic-peptide\data\audit\mass_gate_summary.txt

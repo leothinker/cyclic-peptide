@@ -1,0 +1,184 @@
+{
+  "page": "PCTCN2025075389-ftappb-I100298.jpg",
+  "page_size": [
+    1945,
+    2525
+  ],
+  "rules": [
+    11,
+    12,
+    191,
+    192,
+    1091,
+    1092,
+    1931,
+    1932
+  ],
+  "crop_offset_x": 1091,
+  "crop_offset_y": 11,
+  "rows": [
+    {
+      "band_top": 10,
+      "band_bottom": 43,
+      "crop_ink_span": [
+        2,
+        839
+      ],
+      "crop_ink_width": 838,
+      "page_ink_span": [
+        1093,
+        1930
+      ],
+      "page_rules_in_row": [
+        11,
+        12,
+        191,
+        192,
+        1091,
+        1092,
+        1931,
+        1932
+      ]
+    },
+    {
+      "band_top": 53,
+      "band_bottom": 86,
+      "crop_ink_span": [
+        2,
+        826
+      ],
+      "crop_ink_width": 825,
+      "page_ink_span": [
+        1093,
+        1917
+      ],
+      "page_rules_in_row": [
+        11,
+        12,
+        191,
+        192,
+        1091,
+        1092,
+        1931,
+        1932
+      ]
+    },
+    {
+      "band_top": 96,
+      "band_bottom": 129,
+      "crop_ink_span": [
+        2,
+        829
+      ],
+      "crop_ink_width": 828,
+      "page_ink_span": [
+        1093,
+        1920
+      ],
+      "page_rules_in_row": [
+        11,
+        12,
+        191,
+        192,
+        527,
+        528,
+        1091,
+        1092,
+        1931,
+        1932
+      ]
+    },
+    {
+      "band_top": 139,
+      "band_bottom": 172,
+      "crop_ink_span": [
+        2,
+        827
+      ],
+      "crop_ink_width": 826,
+      "page_ink_span": [
+        1093,
+        1918
+      ],
+      "page_rules_in_row": [
+        11,
+        12,
+        191,
+        192,
+        1091,
+        1092,
+        1931,
+        1932
+      ]
+    },
+    {
+      "band_top": 182,
+      "band_bottom": 215,
+      "crop_ink_span": [
+        2,
+        816
+      ],
+      "crop_ink_width": 815,
+      "page_ink_span": [
+        1093,
+        1907
+      ],
+      "page_rules_in_row": [
+        11,
+        12,
+        191,
+        192,
+        1091,
+        1092,
+        1931,
+        1932
+      ]
+    },
+    {
+      "band_top": 225,
+      "band_bottom": 258,
+      "crop_ink_span": [
+        3,
+        820
+      ],
+      "crop_ink_width": 818,
+      "page_ink_span": [
+        1094,
+        1911
+      ],
+      "page_rules_in_row": [
+        11,
+        12,
+        191,
+        192,
+        1091,
+        1092,
+        1931,
+        1932
+      ]
+    },
+    {
+      "band_top": 268,
+      "band_bottom": 301,
+      "crop_ink_span": [
+        2,
+        816
+      ],
+      "crop_ink_width": 815,
+      "page_ink_span": [
+        1093,
+        1907
+      ],
+      "page_rules_in_row": [
+        11,
+        12,
+        191,
+        192,
+        1091,
+        1092,
+        1931,
+        1932
+      ]
+    }
+  ]
+}

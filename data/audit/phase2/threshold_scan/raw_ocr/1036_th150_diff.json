@@ -1,0 +1,26 @@
+[
+  {
+    "op": "delete",
+    "ref_pos": 42,
+    "ref_text": "(",
+    "ocr_text": "",
+    "context": "](C2CCCCC2)C(=O)N3[C@@H](",
+    "in_carbonyl": true
+  },
+  {
+    "op": "replace",
+    "ref_pos": 77,
+    "ref_text": "=O)N(C)CC(",
+    "ocr_text": "O)N(C)CC",
+    "context": "(C)[C@@H]4C(=O)N(C)CC(=O)N[C@@H](C",
+    "in_carbonyl": true
+  },
+  {
+    "op": "delete",
+    "ref_pos": 204,
+    "ref_text": "(",
+    "ocr_text": "",
+    "context": "(C)[C@@H](CC(=O)N(C)[C@H]",
+    "in_carbonyl": true
+  }
+]

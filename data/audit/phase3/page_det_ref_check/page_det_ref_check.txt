@@ -1,0 +1,40 @@
+=== character-level check against the printed references ===
+
+edit distance and CER against the reference text.
+CER = edit / len(reference).
+
+1036 is a human-verified transcription. The others are
+agent transcriptions with known misreads, so their
+numbers are indicative only and are marked as such.
+
+cmpd   ref status          arm                       edit      cer    rows   bal  strict
+1036   human_verified      pdet_base_rec_base_1x       77  0.28413   7/7     yes     yes
+1036   human_verified      pdet_base_rec_base_2x       52  0.19188   7/7     yes     yes
+1036   human_verified      pdet_def_rec_base_1x        39  0.14391   7/7     yes     yes
+1036   human_verified      pdet_def_rec_base_2x         5  0.01845   7/7     yes     yes
+1036   human_verified      pdet_def_rec_def_1x        112  0.41328   7/7     yes     yes
+1036   human_verified      pdet_def_rec_def_2x          0  0.00000   7/7     yes     yes
+1037   agent_transcription pdet_base_rec_base_1x       66  0.24000   7/7     yes     yes
+1037   agent_transcription pdet_base_rec_base_2x       38  0.13818   7/7     yes     yes
+1037   agent_transcription pdet_def_rec_base_1x        12  0.04364   7/7     yes     yes
+1037   agent_transcription pdet_def_rec_base_2x        11  0.04000   7/7     yes     yes
+1037   agent_transcription pdet_def_rec_def_1x        474  1.72364   7/7     yes     yes
+1037   agent_transcription pdet_def_rec_def_2x          0  0.00000   7/7     yes     yes
+1038   agent_transcription pdet_base_rec_base_1x       39  0.14338   7/7     yes     yes
+1038   agent_transcription pdet_base_rec_base_2x       70  0.25735   7/7     yes     yes
+1038   agent_transcription pdet_def_rec_base_1x        49  0.18015   7/7     yes     yes
+1038   agent_transcription pdet_def_rec_base_2x        49  0.18015   7/7     yes     yes
+1038   agent_transcription pdet_def_rec_def_1x         12  0.04412   7/7     yes     yes
+1038   agent_transcription pdet_def_rec_def_2x         12  0.04412   7/7     yes     yes
+1040   agent_transcription pdet_base_rec_base_1x       66  0.24088   7/7     yes     yes
+1040   agent_transcription pdet_base_rec_base_2x       66  0.24088   7/7     yes     yes
+1040   agent_transcription pdet_def_rec_base_1x        23  0.08394   7/7     yes     yes
+1040   agent_transcription pdet_def_rec_base_2x        47  0.17153   7/7     yes     yes
+1040   agent_transcription pdet_def_rec_def_1x         51  0.18613   7/7     yes     yes
+1040   agent_transcription pdet_def_rec_def_2x         51  0.18613   7/7     yes     yes
+2173   agent_transcription pdet_base_rec_base_1x       57  0.20141   8/8     yes     yes
+2173   agent_transcription pdet_base_rec_base_2x       46  0.16254   8/8     yes     yes
+2173   agent_transcription pdet_def_rec_base_1x        24  0.08481   8/8     yes     yes
+2173   agent_transcription pdet_def_rec_base_2x        34  0.12014   8/8     yes     yes
+2173   agent_transcription pdet_def_rec_def_1x          8  0.02827   8/8     yes     yes
+2173   agent_transcription pdet_def_rec_def_2x         50  0.17668   8/8     yes     yes

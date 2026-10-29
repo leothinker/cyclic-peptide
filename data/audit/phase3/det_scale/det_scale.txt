@@ -1,0 +1,17 @@
+=== detector input geometry, several regimes ===
+
+page image            : 1939 x 1312
+smiles column x       : 1088 .. 1919
+detector config       : limit_side_len=736 limit_type=min
+
+1036 cell crop        : 831 x 625  (page rows 54..679)
+  after trim          : 831 x 625
+  after 2x upscale    : 1662 x 1250
+
+regime                                           det in  scale  edit  rows   len
+production (trim->2x, limit 736)            1664x1248    1.001    82     7   244
+same pixels, det limit_side_len=32          1664x1248    1.001    82     7   244
+cell on page canvas (native scale)          1952x1312    1.007    57     7   260
+whole page (native scale)                   1952x1312    1.007   369    23   533
+
+edit distance is against the human-verified 1036 reference (text check only).

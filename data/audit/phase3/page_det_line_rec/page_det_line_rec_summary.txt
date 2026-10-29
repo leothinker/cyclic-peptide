@@ -1,0 +1,17 @@
+=== page detection + line recognition, corpus scale ===
+
+cells : 335
+pages : 80
+errors: 0
+
+strict_pass = balanced AND rows recovered == rows on page AND length in 220-300.
+rows recovered is against the row count the audit manifest measured on the page,
+so a dropped printed row cannot be hidden by a balanced string.
+
+arm                           n   bal  rowok strict  parse  dropped  medlen
+pdet_def_rec_base_1x        335     3    287      2      1       48   262.0
+pdet_def_rec_base_2x        335     3    307      3      1       28   262.0
+pdet_base_rec_base_1x       335     1    325      1      1       10   265.0
+pdet_def_rec_def_1x         335   147    287    138     73       48   260.0
+pdet_base_rec_base_2x       335     0    325      0      0       10   262.0
+pdet_def_rec_def_2x         335   190    307    183     87       28   265.0

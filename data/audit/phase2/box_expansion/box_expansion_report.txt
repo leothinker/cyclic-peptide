@@ -1,0 +1,54 @@
+Phase 2 - right-edge detector-box expansion
+
+PRELIMINARY: single reference sample (cmpd 1036). Any improvement
+here is a statement about one string, not a dataset accuracy rate.
+
+crop / preprocess: 2x INTER_CUBIC -> threshold 200 -> PP-OCRv4 mobile en
+detected lines: 7   processed width: 1702
+
+Each crop is re-extracted from the FULL processed cell image; no
+config pads whitespace onto an already-clipped box. Expansion is
+clamped to the cell's own right boundary.
+
+config                    pad      mode   len  edits       CER  parse       dDa
+baseline_detrec             0   det+rec   270      2   0.00738    yes    3.8298
+baseline_reconly            0  rec-only   270      2   0.00738    yes    3.8298
+pad4_reconly                4  rec-only   270      2   0.00738    yes    3.8298
+pad8_reconly                8  rec-only   274     13   0.04797     no          
+pad12_reconly              12  rec-only   271     10    0.0369     no          
+recover_white8_reconly      0  rec-only   275     14  0.051661     no          
+
+baseline (det+rec): edit distance 2, CER 0.00738
+best expansion   : baseline_reconly, edit distance 2, CER 0.00738
+
+VERDICT: NO improvement - baseline retained
+
+determinism: best config repeated 3x gave edit distances [2, 2, 2] (deterministic=True)
+
+--- residual differences per config ---
+[baseline_detrec] edits=2
+   delete  @ 77 ref='=' -> ocr=''  <-- C(=O)
+   replace @115 ref='=' -> ocr='-'
+[baseline_reconly] edits=2
+   delete  @ 77 ref='=' -> ocr=''  <-- C(=O)
+   replace @115 ref='=' -> ocr='-'
+[pad4_reconly] edits=2
+   delete  @ 77 ref='=' -> ocr=''  <-- C(=O)
+   replace @115 ref='=' -> ocr='-'
+[pad8_reconly] edits=13
+   insert  @ 38 ref='' -> ocr=')'
+   delete  @ 77 ref='=' -> ocr=''  <-- C(=O)
+   replace @108 ref='=C(C(F)=' -> ocr='-C(C(F)-'
+   insert  @158 ref='' -> ocr=')'
+   insert  @198 ref='' -> ocr=')'
+   insert  @271 ref='' -> ocr=')'
+[pad12_reconly] edits=10
+   delete  @ 77 ref='=' -> ocr=''  <-- C(=O)
+   replace @108 ref='=C(C(F)=' -> ocr='-C(C(F)-'
+   insert  @271 ref='' -> ocr=')'
+[recover_white8_reconly] edits=14
+   delete  @ 77 ref='=' -> ocr=''  <-- C(=O)
+   replace @109 ref='C(C(F)=C' -> ocr='-C(C(F)-C]'
+   insert  @198 ref='' -> ocr=']'
+   insert  @239 ref='' -> ocr=']'
+   insert  @271 ref='' -> ocr=' '

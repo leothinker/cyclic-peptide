@@ -1,0 +1,336 @@
+﻿cmpd_id,group,recrop_len,recrop_open,recrop_close,recrop_balanced,csv_len,csv_balanced,page_len,page_balanced,recrop_eq_csv,recrop_eq_page,edit_recrop_csv
+1036,"recrop balanced, csv not",271,38,38,True,244,False,266,False,False,False,82
+1037,"recrop balanced, csv not",275,38,38,True,249,False,275,True,False,True,89
+1038,"recrop balanced, csv not",273,40,40,True,249,False,273,True,False,False,127
+1039,neither balanced,259,42,39,False,251,False,0,,False,False,140
+1040,neither balanced,252,37,36,False,238,False,270,False,False,False,136
+1041,neither balanced,272,38,37,False,241,False,0,,False,False,127
+1042,"recrop balanced, csv not",270,40,40,True,238,False,0,,False,False,137
+1043,"recrop balanced, csv not",273,39,39,True,255,False,0,,False,False,69
+1044,neither balanced,243,39,40,False,235,False,0,,False,False,162
+1045,"recrop balanced, csv not",269,37,37,True,242,False,0,,False,False,118
+1046,"recrop balanced, csv not",268,37,37,True,240,False,0,,False,False,114
+1047,"recrop balanced, csv not",268,37,37,True,244,False,0,,False,False,117
+1048,"recrop balanced, csv not",272,40,40,True,247,False,0,,False,False,137
+1049,"recrop balanced, csv not",264,38,38,True,236,False,0,,False,False,98
+1050,neither balanced,229,37,36,False,224,False,0,,False,False,140
+1051,"recrop balanced, csv not",265,38,38,True,232,False,0,,False,False,129
+1052,neither balanced,234,42,36,False,242,False,0,,False,False,160
+1053,"recrop balanced, csv not",259,38,38,True,231,False,0,,False,False,126
+1054,"recrop balanced, csv not",263,38,38,True,233,False,0,,False,False,134
+1055,neither balanced,264,44,45,False,238,False,0,,False,False,131
+1056,"recrop balanced, csv not",271,40,40,True,245,False,0,,False,False,117
+1057,"recrop balanced, csv not",274,41,41,True,244,False,0,,False,False,116
+1058,"recrop balanced, csv not",255,39,39,True,241,False,0,,False,False,139
+1059,"recrop balanced, csv not",268,40,40,True,243,False,0,,False,False,110
+1060,"recrop balanced, csv not",270,40,40,True,237,False,0,,False,False,117
+1061,"recrop balanced, csv not",266,39,39,True,237,False,0,,False,False,151
+1062,neither balanced,270,41,41,False,241,False,0,,False,False,133
+1063,neither balanced,247,41,39,False,244,False,0,,False,False,138
+1064,neither balanced,263,46,43,False,233,False,0,,False,False,147
+1065,"recrop balanced, csv not",275,40,40,True,240,False,0,,False,False,118
+1066,"recrop balanced, csv not",276,40,40,True,249,False,0,,False,False,115
+1067,neither balanced,263,41,45,False,248,False,0,,False,False,138
+1068,neither balanced,241,47,47,False,235,False,0,,False,False,137
+1069,"recrop balanced, csv not",266,39,39,True,237,False,0,,False,False,104
+1070,"recrop balanced, csv not",274,40,40,True,243,False,0,,False,False,124
+1071,"recrop balanced, csv not",275,40,40,True,242,False,0,,False,False,130
+1072,"recrop balanced, csv not",281,42,42,True,244,False,0,,False,False,140
+1073,neither balanced,260,43,42,False,245,False,0,,False,False,113
+1074,"recrop balanced, csv not",272,39,39,True,241,False,0,,False,False,125
+1075,neither balanced,278,42,40,False,248,False,0,,False,False,125
+1076,"recrop balanced, csv not",272,39,39,True,243,False,0,,False,False,111
+1077,"recrop balanced, csv not",273,39,39,True,242,False,0,,False,False,114
+1078,"recrop balanced, csv not",279,41,41,True,236,False,0,,False,False,144
+1079,"recrop balanced, csv not",265,39,39,True,239,False,0,,False,False,98
+1080,"recrop balanced, csv not",265,40,40,True,238,False,0,,False,False,111
+1081,"recrop balanced, csv not",264,39,39,True,230,False,0,,False,False,137
+1082,"recrop balanced, csv not",265,39,39,True,244,False,0,,False,False,121
+1083,neither balanced,270,45,43,False,245,False,0,,False,False,161
+1084,"recrop balanced, csv not",267,40,40,True,238,False,0,,False,False,121
+1085,"recrop balanced, csv not",269,40,40,True,243,False,0,,False,False,126
+1086,neither balanced,237,38,37,False,231,False,0,,False,False,131
+1087,"recrop balanced, csv not",263,39,39,True,238,False,0,,False,False,112
+1088,"recrop balanced, csv not",259,40,40,True,222,False,0,,False,False,132
+1089,"recrop balanced, csv not",263,39,39,True,230,False,0,,False,False,130
+1090,"recrop balanced, csv not",263,39,39,True,230,False,0,,False,False,120
+1091,"recrop balanced, csv not",268,40,40,True,234,False,0,,False,False,127
+1092,"recrop balanced, csv not",270,40,40,True,231,False,0,,False,False,165
+1093,"recrop balanced, csv not",272,40,40,True,238,False,0,,False,False,121
+1094,"recrop balanced, csv not",262,38,38,True,243,False,0,,False,False,101
+1095,neither balanced,230,43,38,False,236,False,0,,False,False,172
+1096,"recrop balanced, csv not",265,39,39,True,235,False,0,,False,False,117
+1097,neither balanced,248,40,39,False,240,False,0,,False,False,116
+1098,neither balanced,243,45,39,False,248,False,0,,False,False,166
+1099,"recrop balanced, csv not",278,40,40,True,246,False,0,,False,False,134
+1100,"recrop balanced, csv not",273,39,39,True,245,False,0,,False,False,117
+1101,"recrop balanced, csv not",280,40,40,True,241,False,0,,False,False,160
+1102,neither balanced,260,39,39,False,253,False,0,,False,False,111
+1103,neither balanced,193,28,29,False,238,False,0,,False,False,147
+1104,neither balanced,224,32,34,False,232,False,0,,False,False,119
+1105,neither balanced,188,27,28,False,239,False,0,,False,False,130
+1106,"recrop balanced, csv not",258,38,38,True,229,False,0,,False,False,112
+1107,"recrop balanced, csv not",270,40,40,True,235,False,0,,False,False,144
+1108,neither balanced,248,38,37,False,237,False,0,,False,False,108
+1109,neither balanced,260,39,42,False,238,False,0,,False,False,153
+1110,"recrop balanced, csv not",273,41,41,True,241,False,0,,False,False,136
+1111,neither balanced,247,41,38,False,238,False,0,,False,False,159
+1112,neither balanced,263,43,40,False,252,False,0,,False,False,137
+1113,neither balanced,261,44,42,False,235,False,0,,False,False,157
+1114,"recrop balanced, csv not",261,38,38,True,235,False,0,,False,False,104
+1115,"recrop balanced, csv not",262,38,38,True,232,False,0,,False,False,128
+1116,"recrop balanced, csv not",271,41,41,True,241,False,0,,False,False,125
+1117,"recrop balanced, csv not",267,40,40,True,237,False,0,,False,False,104
+1118,"recrop balanced, csv not",265,39,39,True,233,False,0,,False,False,125
+1119,"recrop balanced, csv not",270,38,38,True,242,False,0,,False,False,136
+1120,neither balanced,249,40,41,False,245,False,0,,False,False,130
+1121,neither balanced,272,41,41,False,246,False,0,,False,False,115
+1122,"recrop balanced, csv not",278,40,40,True,253,False,0,,False,False,134
+1123,neither balanced,243,37,39,False,236,False,0,,False,False,129
+1124,neither balanced,191,26,27,False,240,False,0,,False,False,184
+1125,neither balanced,228,32,35,False,251,False,0,,False,False,127
+1126,"recrop balanced, csv not",240,37,37,True,258,False,0,,False,False,111
+1127,neither balanced,255,40,43,False,254,False,0,,False,False,95
+1128,"recrop balanced, csv not",268,40,40,True,239,False,0,,False,False,127
+1129,"recrop balanced, csv not",271,41,41,True,236,False,0,,False,False,144
+1130,"recrop balanced, csv not",261,37,37,True,238,False,0,,False,False,82
+1131,"recrop balanced, csv not",268,39,39,True,236,False,0,,False,False,157
+1132,neither balanced,269,40,44,False,244,False,0,,False,False,170
+1133,neither balanced,251,42,40,False,247,False,0,,False,False,145
+1134,neither balanced,270,39,39,False,251,False,0,,False,False,82
+1135,"recrop balanced, csv not",266,39,39,True,237,False,0,,False,False,110
+1136,neither balanced,239,42,37,False,229,False,0,,False,False,157
+1137,"recrop balanced, csv not",258,39,39,True,225,False,0,,False,False,159
+1138,"recrop balanced, csv not",287,40,40,True,248,False,0,,False,False,140
+1139,"recrop balanced, csv not",288,40,40,True,256,False,0,,False,False,142
+1140,"recrop balanced, csv not",277,40,40,True,254,False,0,,False,False,104
+1141,"recrop balanced, csv not",286,41,41,True,250,False,0,,False,False,156
+1142,"recrop balanced, csv not",283,39,39,True,256,False,0,,False,False,116
+1143,neither balanced,270,46,41,False,250,False,0,,False,False,106
+1144,"recrop balanced, csv not",276,39,39,True,249,False,0,,False,False,118
+1145,"recrop balanced, csv not",274,40,40,True,248,False,0,,False,False,96
+1146,"recrop balanced, csv not",262,40,40,True,235,False,0,,False,False,135
+1147,"recrop balanced, csv not",262,40,40,True,235,False,0,,False,False,141
+1148,"recrop balanced, csv not",264,39,39,True,243,False,0,,False,False,126
+1149,neither balanced,248,40,39,False,237,False,0,,False,False,148
+1150,"recrop balanced, csv not",267,40,40,True,243,False,0,,False,False,139
+1151,neither balanced,239,39,40,False,237,False,0,,False,False,179
+1152,"recrop balanced, csv not",267,40,40,True,235,False,0,,False,False,148
+1153,neither balanced,212,31,32,False,246,False,0,,False,False,137
+1154,neither balanced,248,38,37,False,250,False,0,,False,False,143
+1155,neither balanced,282,39,38,False,251,False,0,,False,False,154
+1156,"recrop balanced, csv not",274,39,39,True,245,False,0,,False,False,109
+1157,neither balanced,271,47,39,False,250,False,0,,False,False,142
+1158,neither balanced,247,38,38,False,236,False,0,,False,False,153
+1159,"recrop balanced, csv not",268,40,40,True,237,False,0,,False,False,119
+1160,"recrop balanced, csv not",277,39,39,True,244,False,0,,False,False,136
+1161,"recrop balanced, csv not",263,38,38,True,229,False,0,,False,False,431
+1162,neither balanced,259,39,39,False,250,False,0,,False,False,120
+1163,"recrop balanced, csv not",258,37,37,True,235,False,0,,False,False,102
+1164,neither balanced,261,41,42,False,251,False,0,,False,False,163
+1165,neither balanced,252,39,43,False,233,False,0,,False,False,152
+1166,neither balanced,250,39,38,False,248,False,0,,False,False,154
+1167,neither balanced,171,28,29,False,233,False,0,,False,False,143
+1168,neither balanced,259,46,40,False,240,False,0,,False,False,167
+1169,neither balanced,254,42,40,False,240,False,0,,False,False,137
+1170,neither balanced,169,25,26,False,247,False,0,,False,False,159
+1171,neither balanced,245,35,37,False,252,False,0,,False,False,149
+1172,neither balanced,263,38,38,False,236,False,0,,False,False,134
+1173,"recrop balanced, csv not",265,39,39,True,238,False,0,,False,False,96
+1174,"recrop balanced, csv not",226,34,34,True,234,False,0,,False,False,133
+1175,"recrop balanced, csv not",268,39,39,True,245,False,0,,False,False,122
+1176,"recrop balanced, csv not",286,40,40,True,260,False,0,,False,False,96
+1177,"recrop balanced, csv not",274,39,39,True,250,False,0,,False,False,121
+1178,"recrop balanced, csv not",168,24,24,True,250,False,0,,False,False,178
+1179,"recrop balanced, csv not",263,38,38,True,231,False,0,,False,False,467
+1180,"recrop balanced, csv not",253,42,42,True,238,False,0,,False,False,137
+1181,"recrop balanced, csv not",271,41,41,True,242,False,0,,False,False,119
+1182,"recrop balanced, csv not",268,40,40,True,241,False,0,,False,False,97
+1183,neither balanced,226,34,35,False,235,False,0,,False,False,124
+1184,neither balanced,259,40,41,False,245,False,0,,False,False,140
+1185,neither balanced,244,38,40,False,233,False,0,,False,False,133
+1186,neither balanced,270,41,40,False,254,False,0,,False,False,159
+1187,"recrop balanced, csv not",261,38,38,True,237,False,0,,False,False,102
+1188,"recrop balanced, csv not",265,39,39,True,238,False,0,,False,False,96
+1189,"recrop balanced, csv not",260,39,39,True,232,False,0,,False,False,165
+1190,"recrop balanced, csv not",260,39,39,True,238,False,0,,False,False,144
+1191,neither balanced,234,37,38,False,229,False,0,,False,False,145
+1192,neither balanced,247,39,41,False,225,False,0,,False,False,145
+1193,"recrop balanced, csv not",264,40,40,True,239,False,0,,False,False,134
+1194,"recrop balanced, csv not",264,40,40,True,233,False,0,,False,False,159
+1195,neither balanced,243,37,37,False,255,False,0,,False,False,230
+1196,"recrop balanced, csv not",276,39,39,True,252,False,0,,False,False,100
+1197,"recrop balanced, csv not",278,38,38,True,249,False,0,,False,False,139
+1198,"recrop balanced, csv not",268,36,36,True,231,False,0,,False,False,135
+1199,"recrop balanced, csv not",264,40,40,True,231,False,0,,False,False,107
+1200,"recrop balanced, csv not",268,40,40,True,235,False,0,,False,False,125
+1201,neither balanced,249,40,42,False,237,False,0,,False,False,140
+1202,neither balanced,251,41,41,False,243,False,0,,False,False,111
+1203,neither balanced,275,42,41,False,253,False,0,,False,False,132
+1204,neither balanced,246,40,39,False,233,False,0,,False,False,420
+1205,"recrop balanced, csv not",264,39,39,True,236,False,0,,False,False,100
+1206,neither balanced,276,40,40,False,250,False,0,,False,False,158
+1207,neither balanced,249,43,41,False,232,False,0,,False,False,169
+1208,"recrop balanced, csv not",261,39,39,True,233,False,0,,False,False,145
+1209,"recrop balanced, csv not",271,38,38,True,242,False,0,,False,False,125
+1210,"recrop balanced, csv not",270,37,37,True,244,False,0,,False,False,125
+1211,"recrop balanced, csv not",266,39,39,True,244,False,0,,False,False,101
+1212,neither balanced,262,48,42,False,242,False,0,,False,False,259
+1213,neither balanced,192,29,29,False,234,False,0,,False,False,157
+1214,"recrop balanced, csv not",267,38,38,True,234,False,0,,False,False,115
+1215,neither balanced,204,30,31,False,249,False,0,,False,False,159
+1216,neither balanced,272,38,38,False,237,False,0,,False,False,139
+1217,neither balanced,246,38,34,False,232,False,0,,False,False,171
+1218,neither balanced,272,38,38,False,241,False,0,,False,False,125
+1219,neither balanced,147,19,20,False,231,False,0,,False,False,185
+1220,neither balanced,249,36,36,False,253,False,0,,False,False,121
+1221,"recrop balanced, csv not",279,39,39,True,246,False,0,,False,False,149
+1222,"recrop balanced, csv not",274,39,39,True,246,False,0,,False,False,124
+1223,neither balanced,138,21,20,False,248,False,0,,False,False,208
+1224,"recrop balanced, csv not",284,40,40,True,256,False,0,,False,False,146
+1225,neither balanced,241,35,36,False,261,False,0,,False,False,157
+1226,neither balanced,257,42,43,False,244,False,0,,False,False,148
+1227,neither balanced,254,45,38,False,251,False,0,,False,False,113
+1228,neither balanced,131,22,26,False,240,False,0,,False,False,205
+1229,"recrop balanced, csv not",279,38,38,True,249,False,0,,False,False,126
+1230,neither balanced,214,28,29,False,245,False,0,,False,False,103
+1231,"recrop balanced, csv not",280,38,38,True,248,False,0,,False,False,127
+2035,"recrop balanced, csv not",271,35,35,True,246,False,0,,False,False,430
+2036,"recrop balanced, csv not",261,35,35,True,224,False,0,,False,False,132
+2037,neither balanced,260,43,34,False,238,False,0,,False,False,122
+2038,neither balanced,358,46,47,False,353,False,0,,False,False,554
+2039,"recrop balanced, csv not",384,47,47,True,359,False,0,,False,False,651
+2040,"recrop balanced, csv not",400,49,49,True,362,False,0,,False,False,630
+2041,neither balanced,378,52,51,False,361,False,0,,False,False,646
+2042,"recrop balanced, csv not",271,36,36,True,247,False,0,,False,False,464
+2043,neither balanced,255,37,39,False,256,False,0,,False,False,445
+2044,"recrop balanced, csv not",289,37,37,True,262,False,0,,False,False,466
+2045,"recrop balanced, csv not",265,37,37,True,245,False,0,,False,False,95
+2046,neither balanced,252,34,39,False,253,False,0,,False,False,114
+2047,"recrop balanced, csv not",269,36,36,True,250,False,0,,False,False,460
+2048,"recrop balanced, csv not",269,36,36,True,253,False,0,,False,False,462
+2049,"recrop balanced, csv not",274,36,36,True,252,False,0,,False,False,468
+2050,neither balanced,253,36,38,False,257,False,0,,False,False,424
+2051,"recrop balanced, csv not",252,38,38,True,252,False,0,,False,False,107
+2052,"recrop balanced, csv not",267,37,37,True,248,False,0,,False,False,100
+2053,"recrop balanced, csv not",273,36,36,True,252,False,0,,False,False,98
+2054,"recrop balanced, csv not",272,36,36,True,255,False,0,,False,False,461
+2055,neither balanced,253,35,33,False,245,False,0,,False,False,238
+2056,neither balanced,235,33,37,False,259,False,0,,False,False,424
+2057,neither balanced,261,37,40,False,255,False,0,,False,False,461
+2058,"recrop balanced, csv not",280,38,38,True,256,False,0,,False,False,478
+2059,neither balanced,259,36,41,False,257,False,0,,False,False,454
+2060,"recrop balanced, csv not",274,37,37,True,257,False,0,,False,False,473
+2061,neither balanced,259,35,34,False,256,False,0,,False,False,448
+2062,"recrop balanced, csv not",270,39,39,True,252,False,0,,False,False,91
+2063,neither balanced,271,39,43,False,264,False,0,,False,False,468
+2064,neither balanced,341,45,49,False,336,False,0,,False,False,553
+2065,neither balanced,295,39,40,False,331,False,0,,False,False,419
+2066,neither balanced,240,34,32,False,243,False,0,,False,False,413
+2067,neither balanced,241,31,30,False,250,False,0,,False,False,420
+2068,neither balanced,257,34,33,False,251,False,0,,False,False,417
+2069,"recrop balanced, csv not",272,36,36,True,247,False,0,,False,False,446
+2070,"recrop balanced, csv not",266,37,37,True,245,False,0,,False,False,107
+2071,neither balanced,254,34,39,False,249,False,0,,False,False,439
+2072,neither balanced,260,37,41,False,257,False,0,,False,False,445
+2073,"recrop balanced, csv not",286,40,40,True,262,False,0,,False,False,486
+2074,"recrop balanced, csv not",272,39,39,True,246,False,0,,False,False,96
+2075,neither balanced,281,38,37,False,259,False,0,,False,False,480
+2076,neither balanced,286,40,39,False,262,False,0,,False,False,491
+2077,neither balanced,281,38,37,False,256,False,0,,False,False,471
+2078,"recrop balanced, csv not",278,38,38,True,259,False,0,,False,False,474
+2079,"recrop balanced, csv not",267,38,38,True,242,False,0,,False,False,97
+2080,"recrop balanced, csv not",274,37,37,True,249,False,0,,False,False,466
+2081,neither balanced,238,46,42,False,251,False,0,,False,False,114
+2082,neither balanced,265,41,39,False,250,False,0,,False,False,121
+2083,"recrop balanced, csv not",281,39,39,True,259,False,0,,False,False,475
+2084,neither balanced,267,43,40,False,252,False,0,,False,False,137
+2085,"recrop balanced, csv not",278,38,38,True,261,False,0,,False,False,471
+2086,neither balanced,252,35,34,False,258,False,0,,False,False,447
+2087,neither balanced,226,31,32,False,262,False,0,,False,False,420
+2088,"recrop balanced, csv not",278,37,37,True,255,False,0,,False,False,465
+2089,neither balanced,216,28,30,False,255,False,0,,False,False,150
+2090,neither balanced,247,33,32,False,245,False,0,,False,False,206
+2091,neither balanced,250,34,38,False,258,False,0,,False,False,96
+2092,neither balanced,255,35,40,False,246,False,0,,False,False,450
+2093,neither balanced,253,34,38,False,247,False,0,,False,False,434
+2094,neither balanced,256,36,35,False,246,False,0,,False,False,316
+2095,"recrop balanced, csv not",272,37,37,True,245,False,0,,False,False,138
+2096,neither balanced,251,36,39,False,244,False,0,,False,False,149
+2097,"recrop balanced, csv not",272,40,40,True,255,False,0,,False,False,72
+2098,"recrop balanced, csv not",280,39,39,True,254,False,0,,False,False,470
+2099,"recrop balanced, csv not",281,39,39,True,264,False,0,,False,False,72
+2100,"recrop balanced, csv not",287,41,41,True,265,False,0,,False,False,490
+2101,"recrop balanced, csv not",282,39,39,True,256,False,0,,False,False,464
+2102,"recrop balanced, csv not",288,41,41,True,263,False,0,,False,False,488
+2103,"recrop balanced, csv not",281,39,39,True,261,False,0,,False,False,92
+2104,"recrop balanced, csv not",278,38,38,True,255,False,0,,False,False,462
+2105,"recrop balanced, csv not",279,38,38,True,252,False,0,,False,False,460
+2106,"recrop balanced, csv not",274,36,36,True,251,False,0,,False,False,458
+2107,neither balanced,234,39,36,False,257,False,0,,False,False,433
+2108,neither balanced,249,36,39,False,234,False,0,,False,False,121
+2109,"recrop balanced, csv not",265,38,38,True,234,False,0,,False,False,141
+2110,"recrop balanced, csv not",263,37,37,True,246,False,0,,False,False,71
+2111,neither balanced,266,35,39,False,268,False,0,,False,False,216
+2112,"recrop balanced, csv not",259,38,38,True,225,False,0,,False,False,112
+2113,neither balanced,262,37,37,False,238,False,0,,False,False,115
+2114,neither balanced,249,37,37,False,238,False,0,,False,False,129
+2115,neither balanced,254,40,36,False,243,False,0,,False,False,122
+2116,"recrop balanced, csv not",272,36,36,True,258,False,0,,False,False,464
+2117,neither balanced,253,34,39,False,242,False,0,,False,False,440
+2118,"recrop balanced, csv not",268,38,38,True,243,False,0,,False,False,115
+2119,"recrop balanced, csv not",275,37,37,True,250,False,0,,False,False,105
+2120,neither balanced,256,35,40,False,253,False,0,,False,False,452
+2121,neither balanced,255,39,38,False,252,False,0,,False,False,143
+2122,neither balanced,282,39,38,False,252,False,0,,False,False,147
+2123,"recrop balanced, csv not",288,38,38,True,259,False,0,,False,False,128
+2124,"recrop balanced, csv not",289,38,38,True,262,False,0,,False,False,132
+2125,neither balanced,257,39,38,False,249,False,0,,False,False,165
+2126,"recrop balanced, csv not",286,37,37,True,261,False,0,,False,False,115
+2127,"recrop balanced, csv not",287,37,37,True,263,False,0,,False,False,113
+2128,neither balanced,254,34,39,False,253,False,0,,False,False,448
+2129,neither balanced,250,35,36,False,232,False,0,,False,False,167
+2130,neither balanced,243,38,37,False,232,False,0,,False,False,131
+2131,neither balanced,252,36,39,False,245,False,0,,False,False,126
+2132,"recrop balanced, csv not",268,38,38,True,239,False,0,,False,False,128
+2133,neither balanced,238,38,33,False,240,False,0,,False,False,123
+2134,neither balanced,273,50,41,False,249,False,0,,False,False,175
+2135,"recrop balanced, csv not",269,39,39,True,230,False,0,,False,False,149
+2136,neither balanced,256,43,39,False,236,False,0,,False,False,165
+2137,"recrop balanced, csv not",267,38,38,True,239,False,0,,False,False,134
+2138,neither balanced,245,37,38,False,234,False,0,,False,False,131
+2139,"recrop balanced, csv not",265,37,37,True,242,False,0,,False,False,111
+2140,"recrop balanced, csv not",258,35,35,True,236,False,0,,False,False,109
+2141,"recrop balanced, csv not",271,39,39,True,244,False,0,,False,False,103
+2142,"recrop balanced, csv not",252,34,34,True,229,False,0,,False,False,97
+2143,"recrop balanced, csv not",261,36,36,True,239,False,0,,False,False,83
+2144,"recrop balanced, csv not",263,35,35,True,240,False,0,,False,False,419
+2145,"recrop balanced, csv not",235,33,33,True,237,False,0,,False,False,401
+2146,"recrop balanced, csv not",256,32,32,True,228,False,0,,False,False,415
+2147,neither balanced,262,34,34,False,246,False,0,,False,False,56
+2148,"recrop balanced, csv not",267,38,38,True,240,False,0,,False,False,97
+2149,neither balanced,273,37,37,False,252,False,0,,False,False,113
+2150,"recrop balanced, csv not",263,36,36,True,243,False,0,,False,False,88
+2151,neither balanced,268,46,40,False,247,False,0,,False,False,124
+2152,"recrop balanced, csv not",281,38,38,True,250,False,0,,False,False,167
+2153,"recrop balanced, csv not",263,37,37,True,238,False,0,,False,False,131
+2154,"recrop balanced, csv not",257,35,35,True,226,False,0,,False,False,125
+2155,"recrop balanced, csv not",276,37,37,True,246,False,0,,False,False,139
+2156,neither balanced,235,33,32,False,238,False,0,,False,False,101
+2157,"recrop balanced, csv not",261,36,36,True,228,False,0,,False,False,151
+2158,"recrop balanced, csv not",262,36,36,True,243,False,0,,False,False,90
+2159,"recrop balanced, csv not",268,38,38,True,240,False,0,,False,False,143
+2160,"recrop balanced, csv not",280,38,38,True,253,False,0,,False,False,133
+2161,"recrop balanced, csv not",279,37,37,True,255,False,0,,False,False,108
+2162,"recrop balanced, csv not",280,37,37,True,249,False,0,,False,False,144
+2163,neither balanced,266,38,37,False,231,False,0,,False,False,149
+2164,neither balanced,199,28,26,False,234,False,0,,False,False,158
+2165,neither balanced,248,39,35,False,237,False,0,,False,False,160
+2166,"recrop balanced, csv not",268,38,38,True,241,False,0,,False,False,143
+2167,"recrop balanced, csv not",271,37,37,True,244,False,0,,False,False,107
+2168,neither balanced,260,42,37,False,246,False,0,,False,False,139
+2169,"recrop balanced, csv not",255,37,37,True,231,False,0,,False,False,110
+2170,"recrop balanced, csv not",258,37,37,True,234,False,0,,False,False,131
+2171,"recrop balanced, csv not",275,38,38,True,246,False,0,,False,False,154
+2172,"recrop balanced, csv not",265,36,36,True,240,False,0,,False,False,153
+2173,neither balanced,276,48,41,False,229,False,282,True,False,False,192

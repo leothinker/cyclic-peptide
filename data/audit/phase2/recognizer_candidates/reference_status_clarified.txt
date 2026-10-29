@@ -1,0 +1,50 @@
+Phase 2 Task 1 - reference status, three flags kept separate
+
+These three columns answer different questions and must never be
+collapsed into one another:
+
+  transcription_admissible  can this string be used as CER ground
+                            truth? (|delta| <= 5 Da)
+  text_reference_human_ver  did a person read the printed cell back
+                            character by character? (CHARACTERS only)
+  mass_gate_verdict         does the patent m/z check accept it?
+  structure_verified        has a human confirmed the chemistry?
+                            (always 'no' in this project)
+
+ cmpd  len       dDa      ppm  tol ppm  mass gate  transcr  txt-ok  struct
+ 1036  271   -0.2015    125.2     31.0   mismatch      yes     yes      no
+ 1037  275   -0.1328     82.1     30.9   mismatch      yes      no      no
+ 1038  272  -14.1767   8807.5     30.8   mismatch       no      no      no
+ 1040  274   41.8778 -26179.0     32.1   mismatch       no      no      no
+ 2173  283   13.8682  -8467.2     30.8   mismatch       no      no      no
+
+CMPD 1037 - the specific question
+
+  ms_mz in CSV          = 1618.8  (not 1592.8)
+  adduct                = [M+H]+
+  formula of reference  = C76H96F9N13O12S2
+  expected neutral mass = 1617.7927
+  observed neutral mass = 1617.6599
+  delta                 = -0.1328 Da
+  error                 = 82.1 ppm
+  tolerance             = 30.9 ppm
+  MASS GATE VERDICT     = MISMATCH
+
+  1037 was never recorded as mass-gate passing. The 'yes' in
+  the earlier 'CER usable' column is transcription_admissible,
+  a |delta| <= 5 Da criterion, and is unrelated to the verdict.
+
+  Any earlier claim of a mass-gate pass for 1037 is retracted.
+  No tolerance was changed and no CSV value was modified.
+
+PROVENANCE - kept distinct from chemistry
+
+  1036: supplied verbatim by the researcher, transcribed from I100297 and confirmed against the printed cell
+  1037: agent transcription from I100297 zoomed 1.6x bands; NOT yet confirmed by a human reader
+  1038: agent transcription from I100298 zoomed 1.6x bands; NOT yet confirmed by a human reader
+  1040: agent transcription from I100298 zoomed 1.6x bands; NOT yet confirmed by a human reader
+  2173: agent transcription from I100376 leading row, zoomed 1.6x bands; NOT yet confirmed by a human reader
+
+  A reference may be 'transcribed from the printed cell' while
+  structure_verified is still 'no'. Character-level transcription
+  and chemical verification are separate claims.

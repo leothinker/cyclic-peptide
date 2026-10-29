@@ -1,0 +1,17 @@
+=== preprocessing probe, page I100297 ===
+extraction path held fixed (page-level detection);
+only the image handed to the engine varies.
+reference = human-verified transcription.
+
+--- raw_default   image 1939x1312   36 text boxes
+    cmpd 1036: rows=7 joined=271 row_starts='CC=5C@(' edit=0 CER=0.00000
+    cmpd 1037: rows=7 joined=251 row_starts='CC4)CC=' edit=38 CER=0.13818
+
+--- up2_only   image 3878x2624   26 text boxes
+    cmpd 1036: rows=7 joined=212 row_starts='CCO5C5(' edit=120 CER=0.44280
+    cmpd 1037: rows=7 joined=219 row_starts='CC4=CCH' edit=126 CER=0.45818
+
+--- up2_th200   image 3878x2624   25 text boxes
+    cmpd 1036: rows=7 joined=268 row_starts='CCO5C@S' edit=3 CER=0.01107
+    cmpd 1037: rows=7 joined=273 row_starts='CC4=CC=' edit=2 CER=0.00727
+

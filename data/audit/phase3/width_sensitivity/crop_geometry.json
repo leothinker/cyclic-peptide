@@ -1,0 +1,502 @@
+[
+  {
+    "cmpd_id": "1038",
+    "phase2_shape": [
+      854,
+      625
+    ],
+    "pipeline_shape": [
+      834,
+      625
+    ],
+    "bands": [
+      {
+        "band": 1,
+        "phase2_span": [
+          2,
+          839
+        ],
+        "phase2_width": 838,
+        "pipeline_span": [
+          2,
+          833
+        ],
+        "pipeline_width": 832,
+        "identical": false,
+        "phase2_text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)",
+        "pipeline_text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)"
+      },
+      {
+        "band": 2,
+        "phase2_span": [
+          2,
+          826
+        ],
+        "phase2_width": 825,
+        "pipeline_span": [
+          2,
+          826
+        ],
+        "pipeline_width": 825,
+        "identical": true,
+        "phase2_text": "N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=",
+        "pipeline_text": "N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(="
+      },
+      {
+        "band": 3,
+        "phase2_span": [
+          2,
+          829
+        ],
+        "phase2_width": 828,
+        "pipeline_span": [
+          2,
+          829
+        ],
+        "pipeline_width": 828,
+        "identical": true,
+        "phase2_text": "O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4",
+        "pipeline_text": "O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4"
+      },
+      {
+        "band": 4,
+        "phase2_span": [
+          2,
+          827
+        ],
+        "phase2_width": 826,
+        "pipeline_span": [
+          2,
+          827
+        ],
+        "pipeline_width": 826,
+        "identical": true,
+        "phase2_text": ")C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC",
+        "pipeline_text": ")C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC"
+      },
+      {
+        "band": 5,
+        "phase2_span": [
+          2,
+          816
+        ],
+        "phase2_width": 815,
+        "pipeline_span": [
+          2,
+          816
+        ],
+        "pipeline_width": 815,
+        "identical": true,
+        "phase2_text": "C6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@",
+        "pipeline_text": "C6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@"
+      },
+      {
+        "band": 6,
+        "phase2_span": [
+          3,
+          820
+        ],
+        "phase2_width": 818,
+        "pipeline_span": [
+          3,
+          820
+        ],
+        "pipeline_width": 818,
+        "identical": true,
+        "phase2_text": "@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)",
+        "pipeline_text": "@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)"
+      },
+      {
+        "band": 7,
+        "phase2_span": [
+          2,
+          816
+        ],
+        "phase2_width": 815,
+        "pipeline_span": [
+          2,
+          816
+        ],
+        "pipeline_width": 815,
+        "identical": true,
+        "phase2_text": "=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C",
+        "pipeline_text": "=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1039",
+    "phase2_shape": [
+      854,
+      625
+    ],
+    "pipeline_shape": [
+      834,
+      625
+    ],
+    "bands": [
+      {
+        "band": 1,
+        "phase2_span": [
+          2,
+          839
+        ],
+        "phase2_width": 838,
+        "pipeline_span": [
+          2,
+          833
+        ],
+        "pipeline_width": 832,
+        "identical": false,
+        "phase2_text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)",
+        "pipeline_text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)"
+      },
+      {
+        "band": 2,
+        "phase2_span": [
+          2,
+          826
+        ],
+        "phase2_width": 825,
+        "pipeline_span": [
+          2,
+          826
+        ],
+        "pipeline_width": 825,
+        "identical": true,
+        "phase2_text": "N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=",
+        "pipeline_text": "N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(="
+      },
+      {
+        "band": 3,
+        "phase2_span": [
+          2,
+          829
+        ],
+        "phase2_width": 828,
+        "pipeline_span": [
+          2,
+          829
+        ],
+        "pipeline_width": 828,
+        "identical": true,
+        "phase2_text": "O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4",
+        "pipeline_text": "O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4"
+      },
+      {
+        "band": 4,
+        "phase2_span": [
+          2,
+          827
+        ],
+        "phase2_width": 826,
+        "pipeline_span": [
+          2,
+          827
+        ],
+        "pipeline_width": 826,
+        "identical": true,
+        "phase2_text": ")C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC",
+        "pipeline_text": ")C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC"
+      },
+      {
+        "band": 5,
+        "phase2_span": [
+          2,
+          816
+        ],
+        "phase2_width": 815,
+        "pipeline_span": [
+          2,
+          816
+        ],
+        "pipeline_width": 815,
+        "identical": true,
+        "phase2_text": "C6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@",
+        "pipeline_text": "C6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@"
+      },
+      {
+        "band": 6,
+        "phase2_span": [
+          3,
+          820
+        ],
+        "phase2_width": 818,
+        "pipeline_span": [
+          3,
+          820
+        ],
+        "pipeline_width": 818,
+        "identical": true,
+        "phase2_text": "@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)",
+        "pipeline_text": "@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)"
+      },
+      {
+        "band": 7,
+        "phase2_span": [
+          2,
+          815
+        ],
+        "phase2_width": 814,
+        "pipeline_span": [
+          2,
+          815
+        ],
+        "pipeline_width": 814,
+        "identical": true,
+        "phase2_text": "=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9",
+        "pipeline_text": "=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1040",
+    "phase2_shape": [
+      854,
+      619
+    ],
+    "pipeline_shape": [
+      834,
+      619
+    ],
+    "bands": [
+      {
+        "band": 1,
+        "phase2_span": [
+          2,
+          839
+        ],
+        "phase2_width": 838,
+        "pipeline_span": [
+          2,
+          833
+        ],
+        "pipeline_width": 832,
+        "identical": false,
+        "phase2_text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=",
+        "pipeline_text": "CO()CC((.(C)"
+      },
+      {
+        "band": 2,
+        "phase2_span": [
+          2,
+          833
+        ],
+        "phase2_width": 832,
+        "pipeline_span": [
+          2,
+          833
+        ],
+        "pipeline_width": 832,
+        "identical": true,
+        "phase2_text": "O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC",
+        "pipeline_text": "O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC"
+      },
+      {
+        "band": 3,
+        "phase2_span": [
+          3,
+          830
+        ],
+        "phase2_width": 828,
+        "pipeline_span": [
+          3,
+          830
+        ],
+        "pipeline_width": 828,
+        "identical": true,
+        "phase2_text": "(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)C",
+        "pipeline_text": "(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)C"
+      },
+      {
+        "band": 4,
+        "phase2_span": [
+          2,
+          830
+        ],
+        "phase2_width": 829,
+        "pipeline_span": [
+          2,
+          830
+        ],
+        "pipeline_width": 829,
+        "identical": true,
+        "phase2_text": "C)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(",
+        "pipeline_text": "C)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C("
+      },
+      {
+        "band": 5,
+        "phase2_span": [
+          2,
+          830
+        ],
+        "phase2_width": 829,
+        "pipeline_span": [
+          2,
+          830
+        ],
+        "pipeline_width": 829,
+        "identical": true,
+        "phase2_text": "=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F",
+        "pipeline_text": "=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F"
+      },
+      {
+        "band": 6,
+        "phase2_span": [
+          2,
+          826
+        ],
+        "phase2_width": 825,
+        "pipeline_span": [
+          2,
+          826
+        ],
+        "pipeline_width": 825,
+        "identical": true,
+        "phase2_text": ")=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=",
+        "pipeline_text": ")=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)="
+      },
+      {
+        "band": 7,
+        "phase2_span": [
+          2,
+          800
+        ],
+        "phase2_width": 799,
+        "pipeline_span": [
+          2,
+          800
+        ],
+        "pipeline_width": 799,
+        "identical": true,
+        "phase2_text": "C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C",
+        "pipeline_text": "C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1041",
+    "phase2_shape": [
+      854,
+      625
+    ],
+    "pipeline_shape": [
+      834,
+      625
+    ],
+    "bands": [
+      {
+        "band": 1,
+        "phase2_span": [
+          2,
+          839
+        ],
+        "phase2_width": 838,
+        "pipeline_span": [
+          2,
+          833
+        ],
+        "pipeline_width": 832,
+        "identical": false,
+        "phase2_text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C",
+        "pipeline_text": "C(l)CC(C(.C()"
+      },
+      {
+        "band": 2,
+        "phase2_span": [
+          3,
+          831
+        ],
+        "phase2_width": 829,
+        "pipeline_span": [
+          3,
+          831
+        ],
+        "pipeline_width": 829,
+        "identical": true,
+        "phase2_text": "(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](",
+        "pipeline_text": "(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H]("
+      },
+      {
+        "band": 3,
+        "phase2_span": [
+          2,
+          832
+        ],
+        "phase2_width": 831,
+        "pipeline_span": [
+          2,
+          832
+        ],
+        "pipeline_width": 831,
+        "identical": true,
+        "phase2_text": "CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C",
+        "pipeline_text": "CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C"
+      },
+      {
+        "band": 4,
+        "phase2_span": [
+          2,
+          834
+        ],
+        "phase2_width": 833,
+        "pipeline_span": [
+          2,
+          833
+        ],
+        "pipeline_width": 832,
+        "identical": false,
+        "phase2_text": ")CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)",
+        "pipeline_text": ")CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)"
+      },
+      {
+        "band": 5,
+        "phase2_span": [
+          2,
+          835
+        ],
+        "phase2_width": 834,
+        "pipeline_span": [
+          2,
+          833
+        ],
+        "pipeline_width": 832,
+        "identical": false,
+        "phase2_text": "C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C",
+        "pipeline_text": "C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C"
+      },
+      {
+        "band": 6,
+        "phase2_span": [
+          2,
+          825
+        ],
+        "phase2_width": 824,
+        "pipeline_span": [
+          2,
+          825
+        ],
+        "pipeline_width": 824,
+        "identical": true,
+        "phase2_text": "(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F",
+        "pipeline_text": "(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F"
+      },
+      {
+        "band": 7,
+        "phase2_span": [
+          2,
+          805
+        ],
+        "phase2_width": 804,
+        "pipeline_span": [
+          2,
+          805
+        ],
+        "pipeline_width": 804,
+        "identical": true,
+        "phase2_text": ")=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C",
+        "pipeline_text": ")=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C"
+      }
+    ]
+  }
+]

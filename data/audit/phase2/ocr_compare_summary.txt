@@ -1,0 +1,181 @@
+Phase 2 Task 4 - OCR configuration comparison
+cells compared : 10 (1036, 1037, 1038, 1039, 1040, 1041, 2170, 2171, 2172, 2173)
+configs        : 9
+
+IMPORTANT: a config that raises the RDKit parse rate is NOT proof of
+correct structure. Parse rate measures bracket balance, not chemistry.
+
+--- reference transcription QC ---
+A reference is admitted as CER ground truth only when its mass-gate
+delta is small enough to be a character slip (tol 5 Da). A large delta
+means the transcription itself is wrong (a whole residue is 100-200 Da),
+so that reference is reported but excluded from CER.
+
+ cmpd  len       dDa        ppm   verdict  CER usable
+ 1036  271    -0.202      125.2  mismatch         yes
+ 1037  275    -0.133       82.1  mismatch         yes
+ 1038  272   -14.177     8807.5  mismatch          NO
+ 1040  274    41.878   -26179.0  mismatch          NO
+ 2173  283    13.868    -8467.2  mismatch          NO
+
+=== cmpd 1036 ===
+reference (271 chars) verified by: supplied verbatim by the researcher, transcribed from I100297 and confirmed against the printed cell
+mass-gate note: reference FAILS the patent m/z gate (see positive_tests.csv); CER reference only, not chemical truth
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             253  0.2731     no            unknown
+baseline_en             239  0.3358     no            unknown
+binarize_en             267  0.0148     no            unknown
+binarize_up2_en         270  0.0074    yes    3.8298  mismatch
+strip20_en              241  0.3579     no            unknown
+strip20_up2_bin_en      266  0.0886     no            unknown
+strip20_up2_en          240  0.4871     no            unknown
+up2_en                  242  0.3875     no            unknown
+up4_en                  246  0.3801     no            unknown
+
+=== cmpd 1037 ===
+reference (275 chars) verified by: agent transcription from I100297 zoomed 1.6x bands; NOT yet confirmed by a human reader
+mass-gate note: reference status not yet established
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             252  1.8073     no            unknown
+baseline_en             244  0.4000     no            unknown
+binarize_en             269  0.0291     no            unknown
+binarize_up2_en         274  0.0073     no            unknown
+strip20_en              241  1.2582     no            unknown
+strip20_up2_bin_en      265  1.2255     no            unknown
+strip20_up2_en          240  1.3527     no            unknown
+up2_en                  251  0.3964     no            unknown
+up4_en                  251  0.4509     no            unknown
+
+=== cmpd 1038 ===
+reference (272 chars) verified by: agent transcription from I100298 zoomed 1.6x bands; NOT yet confirmed by a human reader
+mass-gate note: reference status not yet established
+CER EXCLUDED: transcription QC failed (|delta|=14.18 Da vs tol 5.0 Da) - this string is missing or misreading part of the printed cell
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             272     n/a     no            unknown
+baseline_en             248     n/a     no            unknown
+binarize_en             266     n/a     no            unknown
+binarize_up2_en         273     n/a     no            unknown
+strip20_en              237     n/a     no            unknown
+strip20_up2_bin_en      266     n/a     no            unknown
+strip20_up2_en          245     n/a     no            unknown
+up2_en                  250     n/a     no            unknown
+up4_en                  254     n/a     no            unknown
+
+=== cmpd 1039 ===
+reference: NONE - CER cannot be computed for this compound
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             273     n/a     no            unknown
+baseline_en             242     n/a     no            unknown
+binarize_en             270     n/a     no            unknown
+binarize_up2_en         275     n/a     no            unknown
+strip20_en              236     n/a     no            unknown
+strip20_up2_bin_en      266     n/a     no            unknown
+strip20_up2_en          246     n/a     no            unknown
+up2_en                  250     n/a     no            unknown
+up4_en                  251     n/a     no            unknown
+
+=== cmpd 1040 ===
+reference (274 chars) verified by: agent transcription from I100298 zoomed 1.6x bands; NOT yet confirmed by a human reader
+mass-gate note: reference status not yet established
+CER EXCLUDED: transcription QC failed (|delta|=41.88 Da vs tol 5.0 Da) - this string is missing or misreading part of the printed cell
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             232     n/a     no            unknown
+baseline_en             247     n/a     no            unknown
+binarize_en             267     n/a     no            unknown
+binarize_up2_en         267     n/a     no            unknown
+strip20_en              246     n/a     no            unknown
+strip20_up2_bin_en      260     n/a     no            unknown
+strip20_up2_en          238     n/a     no            unknown
+up2_en                  239     n/a     no            unknown
+up4_en                  242     n/a     no            unknown
+
+=== cmpd 1041 ===
+reference: NONE - CER cannot be computed for this compound
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             273     n/a    yes   -0.1379  mismatch
+baseline_en             232     n/a     no            unknown
+binarize_en             269     n/a     no            unknown
+binarize_up2_en         271     n/a     no            unknown
+strip20_en              232     n/a     no            unknown
+strip20_up2_bin_en      263     n/a     no            unknown
+strip20_up2_en          236     n/a     no            unknown
+up2_en                  239     n/a     no            unknown
+up4_en                  241     n/a     no            unknown
+
+=== cmpd 2170 ===
+reference: NONE - CER cannot be computed for this compound
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             258     n/a     no            unknown
+baseline_en             225     n/a     no            unknown
+binarize_en             255     n/a     no            unknown
+binarize_up2_en         255     n/a     no            unknown
+strip20_en              222     n/a     no            unknown
+strip20_up2_bin_en      250     n/a     no            unknown
+strip20_up2_en          225     n/a     no            unknown
+up2_en                  235     n/a     no            unknown
+up4_en                  232     n/a     no            unknown
+
+=== cmpd 2171 ===
+reference: NONE - CER cannot be computed for this compound
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             237     n/a     no            unknown
+baseline_en             239     n/a     no            unknown
+binarize_en             271     n/a     no            unknown
+binarize_up2_en         274     n/a     no            unknown
+strip20_en              231     n/a     no            unknown
+strip20_up2_bin_en      269     n/a     no            unknown
+strip20_up2_en          235     n/a     no            unknown
+up2_en                  245     n/a     no            unknown
+up4_en                  242     n/a     no            unknown
+
+=== cmpd 2172 ===
+reference: NONE - CER cannot be computed for this compound
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             265     n/a     no            unknown
+baseline_en             230     n/a     no            unknown
+binarize_en             257     n/a     no            unknown
+binarize_up2_en         264     n/a     no            unknown
+strip20_en              218     n/a     no            unknown
+strip20_up2_bin_en      257     n/a     no            unknown
+strip20_up2_en          235     n/a     no            unknown
+up2_en                  237     n/a     no            unknown
+up4_en                  239     n/a     no            unknown
+
+=== cmpd 2173 ===
+reference (283 chars) verified by: agent transcription from I100376 leading row, zoomed 1.6x bands; NOT yet confirmed by a human reader
+mass-gate note: reference status not yet established
+CER EXCLUDED: transcription QC failed (|delta|=13.87 Da vs tol 5.0 Da) - this string is missing or misreading part of the printed cell
+config                  len     CER  RDKit       dDa  verdict
+baseline_ch             282     n/a    yes   -0.1475  mismatch
+baseline_en             240     n/a     no            unknown
+binarize_en             279     n/a     no            unknown
+binarize_up2_en         278     n/a     no            unknown
+strip20_en              242     n/a     no            unknown
+strip20_up2_bin_en      272     n/a     no            unknown
+strip20_up2_en          247     n/a     no            unknown
+up2_en                  253     n/a     no            unknown
+up4_en                  255     n/a     no            unknown
+
+--- aggregate over configs ---
+cmpd 1036: RDKit-parse 1/9 configs, mass-gate pass 0/9 configs, CER range 0.0074-0.4871
+cmpd 1037: RDKit-parse 0/9 configs, mass-gate pass 0/9 configs, CER range 0.0073-1.8073
+cmpd 1038: RDKit-parse 0/9 configs, mass-gate pass 0/9 configs, CER range n/a
+cmpd 1039: RDKit-parse 0/9 configs, mass-gate pass 0/9 configs, CER range n/a
+cmpd 1040: RDKit-parse 0/9 configs, mass-gate pass 0/9 configs, CER range n/a
+cmpd 1041: RDKit-parse 1/9 configs, mass-gate pass 0/9 configs, CER range n/a
+cmpd 2170: RDKit-parse 0/9 configs, mass-gate pass 0/9 configs, CER range n/a
+cmpd 2171: RDKit-parse 0/9 configs, mass-gate pass 0/9 configs, CER range n/a
+cmpd 2172: RDKit-parse 0/9 configs, mass-gate pass 0/9 configs, CER range n/a
+cmpd 2173: RDKit-parse 1/9 configs, mass-gate pass 0/9 configs, CER range n/a
+
+--- per-config aggregate (all compared cells) ---
+config                  RDKit-parse  mass-gate pass
+baseline_en                  0/10            0/10  
+baseline_ch                  2/10            0/10  
+up2_en                       0/10            0/10  
+up4_en                       0/10            0/10  
+strip20_en                   0/10            0/10  
+strip20_up2_en               0/10            0/10  
+binarize_en                  0/10            0/10  
+binarize_up2_en              1/10            0/10  
+strip20_up2_bin_en           0/10            0/10  

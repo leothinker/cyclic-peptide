@@ -1,0 +1,47 @@
+page path input: (2624, 3878, 3) (page (1312, 1939, 3))
+page path rows for 1036: 7
+  P0  x[1094,1911] y[62] 'CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC'
+  P1  x[1094,1909] y[104] 'C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C('
+  P2  x[1101,1921] y[147] 'O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C'
+  P3  x[1093,1914] y[190] '5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC'
+  P4  x[1092,1923] y[234] 'CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@'
+  P5  x[1096,1921] y[279] '@H](CC=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C'
+  P6  x[1096,1708] y[318] 'SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C'
+
+cell path input: (1250, 1662, 3) (crop (625, 831, 3), trimmed (625, 831, 3))
+cell path rows for 1036: 7
+  C0  'CC[C@H]C)[C@H]1C(=O)N(C)[C@@H](C2CCCC'
+  C1  'C2)C=ON3[C@@H]CC3C=O)NC)[C@@H]4C'
+  C2  'O)N(CCC=O)N[C@@H](CCC5-CC(F)=C(C(F)=C'
+  C3  '5)C(F)(F)F)C-O)N6[C@@H]CCC6C=O)NC7CC'
+  C4  'CC7)C=O)N(C)[C@@H](C8CCCC8)C-O)N(C)[Ca'
+  C5  '@H]CC=O)N(C)C@H]CCNC-S)C9=CF)C(F)=C'
+  C6  '(SC4)C(F)=C9F)C=O)N1)C-O)N(CC'
+
+=== row-by-row: page path vs cell path ===
+** 0:
+     page: 'CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC'
+     cell: 'CC[C@H]C)[C@H]1C(=O)N(C)[C@@H](C2CCCC'
+** 1:
+     page: 'C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C('
+     cell: 'C2)C=ON3[C@@H]CC3C=O)NC)[C@@H]4C'
+** 2:
+     page: 'O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C'
+     cell: 'O)N(CCC=O)N[C@@H](CCC5-CC(F)=C(C(F)=C'
+** 3:
+     page: '5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC'
+     cell: '5)C(F)(F)F)C-O)N6[C@@H]CCC6C=O)NC7CC'
+** 4:
+     page: 'CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@'
+     cell: 'CC7)C=O)N(C)[C@@H](C8CCCC8)C-O)N(C)[Ca'
+** 5:
+     page: '@H](CC=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C'
+     cell: '@H]CC=O)N(C)C@H]CCNC-S)C9=CF)C(F)=C'
+** 6:
+     page: 'SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C'
+     cell: '(SC4)C(F)=C9F)C=O)N1)C-O)N(CC'
+
+page path: len=268 edit=3
+cell path: len=244 edit=82
+reference: len=271
+page path == reference ? False

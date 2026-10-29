@@ -1,0 +1,58 @@
+I100298 manual check sheet
+=========================
+
+1039-1041 references in phase3_i100298_sweep.TRANSCRIPTION are agent transcriptions
+from the 3x printed-row crops.  They are NOT human-checked.  The entries below are
+the spots where a decision was made and where a competing reading exists.
+
+1039 row 1: terminal C(=O) of row 1
+  confirm   : C(=O)
+  context   : ...C)[C@H]1[C(=O)]N(C)[C@@...
+  look for  : O  vs  0
+  why       : the last 'O' is a letter O, not a zero; 1039 row 1 is pixel-identical to the human-checked 1038 row 1
+
+1039 row 7: tail of 1039
+  confirm   : C(=O)N9CCCC9
+  context   : ...C(=O)N1)[C(=O)N9CCCC9]...
+  look for  : N9CCCC9  vs  N(C)C
+  why       : this is where 1039 differs from 1038: a cyclopentyl 'N9CCCC9' instead of 'N(C)C'
+
+1040 row 1: ring size on 1040 row 1
+  confirm   : NC3(CC3)
+  context   : ...C1)C(=O)[NC3(CC3)]C(=...
+  look for  : CC3  vs  CCCC3
+  why       : cyclopropyl (two C inside the ring); 1041 row 1 reads NC3(CCCC3), cyclopentyl
+
+1041 row 1: ring size on 1041 row 1
+  confirm   : NC3(CCCC3)
+  context   : ...C1)C(=O)[NC3(CCCC3)]C...
+  look for  : CCCC3  vs  CC3
+  why       : cyclopentyl (four C inside the ring); 1040 row 1 reads NC3(CC3), cyclopropyl
+
+1040 row 2: ring size on 1040 row 2
+  confirm   : C4CCCC4
+  context   : ...)[C@@H]([C4CCCC4])C(=O)N(...
+  look for  : C4CCCC4  vs  C4CCCCC4
+  why       : cyclopentyl (four C inside the ring). The earlier phase-2 transcription of 1040 read C4CCCCC4 (cyclohexyl)
+
+1041 row 2: ring size on 1041 row 2
+  confirm   : C4CCCC4
+  context   : ...)[C@@H]([C4CCCC4])C(=O)N(...
+  look for  : C4CCCC4  vs  C4CCCCC4
+  why       : cyclopentyl (four C inside the ring); identical motif to 1040 row 2
+
+1040 row 3: end of 1040 row 3
+  confirm   : [C@@H]([C@@H](C)C
+  context   : ...]5C(=O)N[[C@@H]([C@@H](C)C]...
+  look for  : …(C)CC)  vs  …(C)CCC)
+  why       : the C count before the bracket closes; the row continues on the next printed line
+
+1041 row 3: end of 1041 row 3
+  confirm   : [C@@H]([C@@H](C
+  context   : ...]5C(=O)N[[C@@H]([C@@H](C]...
+  look for  : …(C)CC)  vs  …(C)CCC)
+  why       : the C count before the bracket closes; 1041 must agree with 1040 here
+
+Files
+  data/audit/phase3/i100298_read/check_sheet.png
+  data/audit/phase3/i100298_read/strip_<cmpd>.png  (all seven rows per compound)

@@ -1,0 +1,68 @@
+=== crop-vs-page x binarise-vs-not ===
+
+The production pipeline does NOT binarise. Phase 2's 'baseline'
+(binarize_up2_en) was never the production configuration.
+
+Reference: 1036 = human-verified, 1037 = agent transcription (not human-confirmed).
+Neither is treated as chemical truth.
+
+=== page I100298 ===
+  cmpd 1038   page_up2                   rows=7 len= 251 open= 23 close= 37 edit=112
+  cmpd 1039   page_up2                   rows=7 len= 252 open= 22 close= 36 edit=
+  cmpd 1040   page_up2                   rows=7 len= 244 open= 22 close= 32 edit=106
+  cmpd 1041   page_up2                   rows=7 len= 244 open= 15 close= 33 edit=
+  cmpd 1038   page_up2_th200             rows=7 len= 271 open= 39 close= 39 edit=17
+  cmpd 1039   page_up2_th200             rows=7 len= 273 open= 37 close= 39 edit=
+  cmpd 1040   page_up2_th200             rows=7 len= 267 open= 36 close= 37 edit=8
+  cmpd 1041   page_up2_th200             rows=7 len= 270 open= 36 close= 37 edit=
+  cmpd 1038   cell_prod_trim_up2         rows=7 len= 248 open= 21 close= 35 edit=147
+  cmpd 1038   cell_prod_trim_up2_th200   rows=7 len= 270 open= 38 close= 40 edit=28
+  cmpd 1038   cell_notrim_up2            rows=7 len= 248 open= 21 close= 35 edit=147
+  cmpd 1038   cell_notrim_up2_th200      rows=7 len= 270 open= 38 close= 40 edit=28
+  cmpd 1039   cell_prod_trim_up2         rows=7 len= 250 open= 20 close= 34 edit=
+  cmpd 1039   cell_prod_trim_up2_th200   rows=7 len= 273 open= 38 close= 39 edit=
+  cmpd 1039   cell_notrim_up2            rows=7 len= 250 open= 20 close= 34 edit=
+  cmpd 1039   cell_notrim_up2_th200      rows=7 len= 273 open= 38 close= 39 edit=
+  cmpd 1040   cell_prod_trim_up2         rows=7 len= 237 open= 18 close= 30 edit=124
+  cmpd 1040   cell_prod_trim_up2_th200   rows=7 len= 267 open= 34 close= 38 edit=10
+  cmpd 1040   cell_notrim_up2            rows=7 len= 237 open= 18 close= 30 edit=124
+  cmpd 1040   cell_notrim_up2_th200      rows=7 len= 267 open= 34 close= 38 edit=10
+  cmpd 1041   cell_prod_trim_up2         rows=7 len= 241 open= 14 close= 31 edit=
+  cmpd 1041   cell_prod_trim_up2_th200   rows=7 len= 271 open= 37 close= 36 edit=
+  cmpd 1041   cell_notrim_up2            rows=7 len= 241 open= 14 close= 31 edit=
+  cmpd 1041   cell_notrim_up2_th200      rows=7 len= 271 open= 37 close= 36 edit=
+
+=== page I100300 ===
+  cmpd 1047   page_up2                   rows=7 len= 236 open= 16 close= 32 edit=
+  cmpd 1048   page_up2                   rows=7 len= 252 open= 23 close= 38 edit=
+  cmpd 1049   page_up2                   rows=7 len= 231 open= 18 close= 28 edit=
+  cmpd 1050   page_up2                   rows=7 len= 231 open= 17 close= 33 edit=
+  cmpd 1047   page_up2_th200             rows=7 len= 266 open= 35 close= 36 edit=
+  cmpd 1048   page_up2_th200             rows=7 len= 271 open= 39 close= 40 edit=
+  cmpd 1049   page_up2_th200             rows=7 len= 262 open= 37 close= 38 edit=
+  cmpd 1050   page_up2_th200             rows=7 len= 255 open= 35 close= 37 edit=
+  cmpd 1047   cell_prod_trim_up2         rows=7 len= 244 open= 18 close= 34 edit=
+  cmpd 1047   cell_prod_trim_up2_th200   rows=7 len= 267 open= 36 close= 37 edit=
+  cmpd 1047   cell_notrim_up2            rows=7 len= 244 open= 18 close= 34 edit=
+  cmpd 1047   cell_notrim_up2_th200      rows=7 len= 267 open= 36 close= 37 edit=
+  cmpd 1048   cell_prod_trim_up2         rows=7 len= 247 open= 24 close= 33 edit=
+  cmpd 1048   cell_prod_trim_up2_th200   rows=7 len= 270 open= 39 close= 39 edit=
+  cmpd 1048   cell_notrim_up2            rows=7 len= 247 open= 24 close= 33 edit=
+  cmpd 1048   cell_notrim_up2_th200      rows=7 len= 270 open= 39 close= 39 edit=
+  cmpd 1049   cell_prod_trim_up2         rows=7 len= 235 open= 21 close= 31 edit=
+  cmpd 1049   cell_prod_trim_up2_th200   rows=7 len= 262 open= 37 close= 38 edit=
+  cmpd 1049   cell_notrim_up2            rows=7 len= 235 open= 21 close= 31 edit=
+  cmpd 1049   cell_notrim_up2_th200      rows=7 len= 262 open= 37 close= 38 edit=
+  cmpd 1050   cell_prod_trim_up2         rows=7 len= 224 open= 14 close= 29 edit=
+  cmpd 1050   cell_prod_trim_up2_th200   rows=7 len= 255 open= 36 close= 37 edit=
+  cmpd 1050   cell_notrim_up2            rows=7 len= 224 open= 14 close= 29 edit=
+  cmpd 1050   cell_notrim_up2_th200      rows=7 len= 255 open= 36 close= 37 edit=
+
+--- mean edit distance over the reference compounds ---
+arm                             n  mean edit   mean CER
+cell_notrim_up2                 2     135.50    0.49650
+cell_notrim_up2_th200           2      19.00    0.06972
+cell_prod_trim_up2              2     135.50    0.49650
+cell_prod_trim_up2_th200        2      19.00    0.06972
+page_up2                        2     109.00    0.39931
+page_up2_th200                  2      12.50    0.04585

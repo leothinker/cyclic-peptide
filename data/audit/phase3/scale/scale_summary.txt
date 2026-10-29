@@ -1,0 +1,11 @@
+=== Phase 3 scale comparison ===
+
+config               n   pass  suspect   fail   parse  excess=0  med_excess
+production         335      0        0    335       0         0          12
+page_raw             2      1        0      1       1         1           0
+page_up2th200        2      0        0      2       0         0           2
+
+paren_excess = closing parentheses without an opener.
+It is the direct footprint of the row-start clipping, so a
+smaller median means less clipping damage. It needs no gold
+standard and therefore applies to every compound.

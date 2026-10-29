@@ -1,0 +1,124 @@
+=== captured 2026-10-23_10-28-06 ===
+
+--- git status --porcelain ---
+ M .gitignore
+ M PRESENTATION.md
+ M PROGRESS_REPORT.md
+ M README.md
+ M src/cpd/macrocycle_repair.py
+?? PROGRESS.md
+?? _blank_probe.txt
+?? _dump_files.py
+?? _mass_diag.out
+?? _mass_diag.py
+?? _phase2_box_evidence.py
+?? _phase2_capture.py
+?? _phase2_check_map.py
+?? _phase2_ctc_oracle.py
+?? _phase2_determinism.py
+?? _phase2_eq_glyph_test.py
+?? _phase2_eq_search.py
+?? _phase2_error_cost.py
+?? _phase2_error_zoom.py
+?? _phase2_fix_experiment.py
+?? _phase2_junction_ink.py
+?? _phase2_junction_zoom.py
+?? _phase2_leftclip_fine.py
+?? _phase2_leftclip_test.py
+?? _phase2_line1_extent.py
+?? _phase2_lines.py
+?? _phase2_pivot_fix.py
+?? _phase2_preproc_cmp.py
+?? _phase2_probe_blank.py
+?? _phase2_probe_topk.py
+?? _phase2_reconly_diag.py
+?? _phase2_ref_check.py
+?? _phase2_ref_diff.py
+?? _phase2_right_border.py
+?? _phase2_span_check.py
+?? _phase2_tail_zoom.py
+?? _phase2_validate_beam.py
+?? _phase2_writer.py
+?? _phase2_zoom.py
+?? _probe_equals_shape.py
+?? analysis/
+?? demo_1036_manual_render.png
+?? demo_1036_manual_render.py
+?? demo_1036_ocr_topk.py
+?? demo_cmpd_1036_compare.png
+?? demo_cmpd_1036_compare.py
+?? demo_cmpd_1036_deck.png
+?? demo_cmpd_1036_deck.py
+?? demo_cmpd_1036_polygonal.png
+?? demo_cmpd_1036_progress.png
+?? demo_cmpd_1036_render_styles.png
+?? demo_cmpd_1036_render_sweep.png
+?? demo_csv_vs_golden.png
+?? demo_csv_vs_golden.py
+?? demo_grid_12.png
+?? demo_grid_12.py
+?? demo_macrocycle_repair.png
+?? demo_macrocycle_repair.py
+?? demo_pipeline_render.py
+?? demo_pipeline_render/
+?? demo_rapidocr_topk/
+?? demo_roundtrip.py
+?? demo_roundtrip/
+?? phase2_box_expansion.py
+?? phase2_dilate_test.py
+?? phase2_extract_text_cells.py
+?? phase2_mass_gate_audit.py
+?? phase2_ocr_benchmark.py
+?? phase2_ocr_compare.py
+?? phase2_out.txt
+?? phase2_out2.txt
+?? phase2_out3.txt
+?? phase2_paired_with_decimer.py
+?? phase2_probe_layout.py
+?? phase2_recheck_claims.py
+?? phase2_recog_candidates.py
+?? phase2_reference_status_clarify.py
+?? phase2_threshold_scan.py
+?? report_figure.png
+?? row_crop_audit.py
+?? row_crop_audit_batch.py
+?? row_crop_audit_coord.py
+?? row_crop_audit_montage.py
+?? row_crop_audit_summary.py
+?? src/cpd/mass_constrained_search.py
+?? src/cpd/ms_validation.py
+?? src/cpd/ocr_edit_model.py
+?? src/cpd/ocr_mass_gate.py
+?? src/cpd/ocr_repair_costs.py
+?? src/cpd/ocr_rewrite.py
+?? src/cpd/parsers/beam_search.py
+?? src/cpd/parsers/grammar.py
+?? src/cpd/parsers/prefix_validator.py
+?? src/cpd/render_polygonal.py
+?? src/cpd/repair_audit.py
+?? src/cpd/repair_policy.py
+?? tests/test_new_repair_strategies.py
+?? tests/test_ocr_repair_search.py
+?? tests/test_ocr_rewrite.py
+?? tests/test_prefix_validator.py
+?? tests/test_repair_audit.py
+
+--- git log -5 ---
+b58b09c feat(repair): add remove-extra-digits strategy; restore deleted docs
+3483bce feat: macrocycle repair recovers 86% of broken DECIMER SMILES
+ed2c022 chore: clean up repo -- remove debug scripts, demo outputs, duplicate data, and unused docs
+6e16909 fix(ocr): _ocr_cell CH strip-borders fallback for activity cells
+6400e42 fix(ocr): I100376+ cmpd_id + CSV write lock auto-fallback
+
+--- tracked diff stat ---
+warning: in the working copy of '.gitignore', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'PRESENTATION.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'PROGRESS_REPORT.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+ .gitignore                   |   1 +
+ README.md                    |  67 ++++++++----
+ src/cpd/macrocycle_repair.py | 250 ++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 281 insertions(+), 37 deletions(-)
+
+--- CSV hash ---
+99F746AF20E4904EE6583C70461506783D2573AE01D7A69D127AD5F3AB927D0D

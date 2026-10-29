@@ -1,0 +1,239 @@
+=== I100298 route sweep (1038-1041) ===
+
+Recogniser: upstream RapidOCR default engine (PP-OCRv6 detector + PP-OCRv6 recogniser), fixed for every arm.
+Only crop scale and binarisation threshold vary.
+
+1038: reference supplied verbatim by the researcher.
+1039-1041: reference transcribed from the printed rows at 3x, status 'printed_transcription_awaiting_human_check'. Agreement with these strings is NOT an accuracy figure.
+
+cmpd   arm                         edit       cer   len  open  close   bal  parse  illegal
+1038   1x_none                                      259    42     43    no     no        -
+1038   2x_none                                      264    45     44    no     no        -
+1038   2x_th200                                     273    40     40   yes     no        -
+1038   2x_th180                                     273    40     40   yes     no        -
+1038   2x_th220                                     273    40     40   yes     no        -
+1038   3x_none                                      264    44     44   yes     no        -
+1038   3x_th200                                     265    44     44   yes     no        -
+1039   1x_none                       43  0.156364   266    41     42    no     no        -
+1039   2x_none                       47  0.170909   269    42     43    no     no        -
+1039   2x_th200                       1  0.003636   275    39     39   yes     no        -
+1039   2x_th180                     494  1.796364   262    44     44    no     no        ②
+1039   2x_th220                       1  0.003636   275    39     39   yes     no        -
+1039   3x_none                       41  0.149091   264    43     43   yes     no        -
+1039   3x_th200                      39  0.141818   269    43     44    no     no        -
+1040   1x_none                      126  0.464945   222    44     38    no     no       |②
+1040   2x_none                      125  0.461255   221    45     38    no     no       |②
+1040   2x_th200                      35  0.129151   261    44     41    no     no        ②
+1040   2x_th180                      36  0.132841   266    49     39    no     no        ②
+1040   2x_th220                      75  0.276753   253    53     43    no     no        ②
+1040   3x_none                      122  0.450185   210    42     37    no     no       |②
+1040   3x_th200                      38  0.140221   267    52     39    no     no        -
+1041   1x_none                        0       0.0   273    38     38   yes    yes        -
+1041   2x_none                        0       0.0   273    38     38   yes    yes        -
+1041   2x_th200                       0       0.0   273    38     38   yes    yes        -
+1041   2x_th180                       1  0.003663   273    38     37    no     no        -
+1041   2x_th220                      41  0.150183   260    40     38    no     no       |②
+1041   3x_none                        0       0.0   273    38     38   yes    yes        -
+1041   3x_th200                     482  1.765568   237    39     36    no     no       |②
+1039   page_recrop_margin0           40  0.145455   254    42     38    no     no        -
+1040   page_recrop_margin0            1   0.00369   270    38     37    no     no        -
+1041   page_recrop_margin0          481  1.761905   234    35     34    no     no        -
+1039   page_recrop_margin8            2  0.007273   275    39     39   yes     no        -
+1040   page_recrop_margin8            1   0.00369   270    38     37    no     no        -
+1041   page_recrop_margin8          481  1.761905   234    35     34    no     no        -
+1039   page_recrop_margin16          42  0.152727   256    41     36    no     no        -
+1040   page_recrop_margin16         121  0.446494   228    43     39    no     no        ②
+1041   page_recrop_margin16         481  1.761905   234    35     34    no     no        -
+1039   page_recrop_margin24          43  0.156364   254    40     36    no     no        -
+1040   page_recrop_margin24          47  0.173432   255    38     40    no     no        -
+1041   page_recrop_margin24         455  1.666667   208    35     34    no     no        -
+1039   page_pdet_base_rec_base_1x    22      0.08   270    37     39    no     no        -
+1040   page_pdet_base_rec_base_1x    51  0.188192   264    32     38    no     no        -
+1041   page_pdet_base_rec_base_1x    92  0.336996   266    32     37    no     no        -
+1039   page_pdet_base_rec_base_2x     6  0.021818   270    35     39    no     no        -
+1040   page_pdet_base_rec_base_2x    63  0.232472   258    27     37    no     no        -
+1041   page_pdet_base_rec_base_2x    48  0.175824   263    29     37    no     no        -
+1039   page_pdet_def_rec_base_1x    100  0.363636   265    34     38    no     no        -
+1040   page_pdet_def_rec_base_1x      8   0.02952   264    34     37    no     no        -
+1041   page_pdet_def_rec_base_1x     74  0.271062   263    31     36    no     no        -
+1039   page_pdet_def_rec_base_2x     28  0.101818   268    34     39    no     no        -
+1040   page_pdet_def_rec_base_2x     21  0.077491   262    32     37    no     no        -
+1041   page_pdet_def_rec_base_2x     18  0.065934   262    31     36    no     no        -
+1039   page_pdet_def_rec_def_1x      43  0.156364   257    41     37    no     no        -
+1040   page_pdet_def_rec_def_1x      47  0.173432   253    37     37   yes     no        -
+1041   page_pdet_def_rec_def_1x     492  1.802198   247    38     35    no     no        -
+1039   page_pdet_def_rec_def_2x      43  0.156364   259    42     39    no     no        -
+1040   page_pdet_def_rec_def_2x      47  0.173432   252    37     36    no     no        -
+1041   page_pdet_def_rec_def_2x       1  0.003663   272    38     37    no     no        -
+
+character differences against the printed transcription:
+  1039   1x_none                    replace ref[37:38]='O' obs[37:38]='0'
+  1039   1x_none                    replace ref[81:101]='N(C)CC(=O)N[C@@H](CC' obs[81:107]='C(C())C(C)CC)C()CCC(C()(C('
+  1039   1x_none                    replace ref[103:119]='=CC(F)=C(C(F)=C4' obs[109:110]=')'
+  1039   2x_none                    replace ref[37:38]='O' obs[37:38]='0'
+  1039   2x_none                    replace ref[80:101]=')N(C)CC(=O)N[C@@H](CC' obs[80:110]='D)C(C()))C(C()CC)C()CCC(C()(C('
+  1039   2x_none                    replace ref[103:119]='=CC(F)=C(C(F)=C4' obs[112:113]=')'
+  1039   2x_th200                   replace ref[37:38]='O' obs[37:38]='0'
+  1039   2x_th180                   replace ref[0:15]='CC[C@H](C)[C@H]' obs[0:248]='(C=)(C)[②②C()(=)[②C(C)[②COO)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=OD)(C()))((C)CC((CCC()()CCC(CC()CC(C4))C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N'
+  1039   2x_th180                   delete ref[16:262]='C(=O)N(C)[C@@H](C)C(=O)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1' obs[249:249]=''
+  1039   2x_th220                   replace ref[37:38]='O' obs[37:38]='0'
+  1039   3x_none                    replace ref[37:38]='O' obs[37:38]='0'
+  1039   3x_none                    replace ref[81:101]='N(C)CC(=O)N[C@@H](CC' obs[81:105]='(C()))C(C))C()(C(C(()(C('
+  1039   3x_none                    replace ref[103:119]='=CC(F)=C(C(F)=C4' obs[107:108]=')'
+  1039   3x_th200                   replace ref[37:38]='O' obs[37:38]='0'
+  1039   3x_th200                   replace ref[81:119]='N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4' obs[81:113]='(C())C(C))C(CC)()(CCC(()C()CC(C)'
+  1040   1x_none                    replace ref[39:74]=')N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H]' obs[39:57]='(N[②()((((()[(()(C'
+  1040   1x_none                    replace ref[115:155]='C)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(' obs[98:118]='()②)②(=)()[②②()(=)C)'
+  1040   1x_none                    replace ref[197:228]=')=C7F)C(=O)N(C)CC(=O)N[C@@H](CC' obs[160:195]='|=(C)=)[.)②C(C=)C()(O=)(C)=(C(C(F)='
+  1040   1x_none                    delete ref[230:246]='=CC(F)=C(C(F)=C8' obs[197:197]=''
+  1040   2x_none                    replace ref[39:74]=')N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H]' obs[39:58]='(N[②(()((((()[(()(C'
+  1040   2x_none                    replace ref[115:155]='C)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(' obs[99:118]='()②)(=)()[②②()(=)C)'
+  1040   2x_none                    replace ref[197:228]=')=C7F)C(=O)N(C)CC(=O)N[C@@H](CC' obs[160:194]='|=(C)=)[.)②C(=)C()(O=)(C)=(C(C(F)='
+  1040   2x_none                    delete ref[230:246]='=CC(F)=C(C(F)=C8' obs[196:196]=''
+  1040   2x_th200                   replace ref[39:74]=')N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H]' obs[39:64]='(N))[)②()()((()[@)(②()((C'
+  1040   2x_th180                   replace ref[39:74]=')N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H]' obs[39:69]='(N()[()②(C()((()((C(()[)(②()(C'
+  1040   2x_th180                   replace ref[197:198]=')' obs[192:193]='D'
+  1040   2x_th220                   replace ref[39:74]=')N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H]' obs[39:71]='(N))[()(()((()(((CC(()[)(((()((C'
+  1040   2x_th220                   replace ref[115:155]='C)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(' obs[112:137]=')(C)[②②((=)()[②)②()(=)(C)'
+  1040   3x_none                    replace ref[39:74]=')N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H]' obs[39:54]='(N()((((C))()(C'
+  1040   3x_none                    replace ref[115:155]='C)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(' obs[95:113]='()②②(=)())()(C=)C)'
+  1040   3x_none                    replace ref[197:228]=')=C7F)C(=O)N(C)CC(=O)N[C@@H](CC' obs[155:183]='|=(C)=)②.(=)()(=(C)=(C(C(F)='
+  1040   3x_none                    delete ref[230:246]='=CC(F)=C(C(F)=C8' obs[185:185]=''
+  1040   3x_th200                   replace ref[39:77]=')N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC' obs[39:73]='(N()(C()(()(((((C()[(()(C()((C(CC]'
+  1041   2x_th180                   replace ref[237:238]=')' obs[237:238]='D'
+  1041   2x_th220                   insert ref[38:38]='' obs[38:39]='|'
+  1041   2x_th220                   replace ref[115:155]=')CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)' obs[116:142]='(CC)[②)②](=)()[②②()(=)(C)('
+  1041   3x_th200                   replace ref[2:11]='O[C@H]1CN' obs[2:223]='CCCCcC((([CC(([C()](=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](C[②②D②②(O=)②②()(=))CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)|C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C'
+  1041   3x_th200                   replace ref[12:273]='[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C' obs[224:237]='=O)C(=O)N(C)C'
+  1039   page_recrop_margin0        replace ref[37:38]='O' obs[37:38]='0'
+  1039   page_recrop_margin0        replace ref[161:199]='6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@' obs[161:178]='(()(()().()(=(CC)'
+  1039   page_recrop_margin0        replace ref[239:240]='=' obs[218:219]='-'
+  1040   page_recrop_margin0        delete ref[197:198]=')' obs[197:197]=''
+  1041   page_recrop_margin0        replace ref[0:11]='CCO[C@H]1CN' obs[0:220]='(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F=C(C(F)=C8)C(F)(F)F)C'
+  1041   page_recrop_margin0        replace ref[12:273]='[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C' obs[221:234]='=O)C(=O)N(C)C'
+  1039   page_recrop_margin8        replace ref[37:38]='O' obs[37:38]='0'
+  1039   page_recrop_margin8        replace ref[190:191]='O' obs[190:191]='0'
+  1040   page_recrop_margin8        delete ref[197:198]=')' obs[197:197]=''
+  1041   page_recrop_margin8        replace ref[0:11]='CCO[C@H]1CN' obs[0:220]='(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F=C(C(F)=C8)C(F)(F)F)C'
+  1041   page_recrop_margin8        replace ref[12:273]='[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C' obs[221:234]='=O)C(=O)N(C)C'
+  1039   page_recrop_margin16       replace ref[37:38]='O' obs[37:38]='0'
+  1039   page_recrop_margin16       replace ref[119:154]=')C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)N' obs[119:141]='(C)C(=().).C(=(()(CC(C'
+  1039   page_recrop_margin16       delete ref[156:162]='(CCCC6' obs[143:143]=''
+  1040   page_recrop_margin16       replace ref[39:74]=')N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H]' obs[39:56]='(N[)C()(((C(((()('
+  1040   page_recrop_margin16       replace ref[117:170]='C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CS' obs[99:156]='()[②C(C=)()②)②()C(C=)(C)O)N(CCC(C=C))C)(C)C)CC)C()(C(CF=='
+  1040   page_recrop_margin16       delete ref[172:201]='=C(F)C(F)=C(C(=S)NCC5)C(F)=C7' obs[158:158]=''
+  1041   page_recrop_margin16       replace ref[0:11]='CCO[C@H]1CN' obs[0:220]='(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F=C(C(F)=C8)C(F)(F)F)C'
+  1041   page_recrop_margin16       replace ref[12:273]='[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C' obs[221:234]='=O)C(=O)N(C)C'
+  1039   page_recrop_margin24       replace ref[37:38]='O' obs[37:38]='0'
+  1039   page_recrop_margin24       replace ref[119:154]=')C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)N' obs[119:139]='(C)C(=()..C(=)(()(CC'
+  1039   page_recrop_margin24       delete ref[156:162]='(CCCC6' obs[141:141]=''
+  1039   page_recrop_margin24       replace ref[190:191]='O' obs[169:170]='0'
+  1040   page_recrop_margin24       replace ref[197:228]=')=C7F)C(=O)N(C)CC(=O)N[C@@H](CC' obs[197:228]='=C)C=C)[))(=)(C)(=)(C()=C(C(F)='
+  1040   page_recrop_margin24       delete ref[230:246]='=CC(F)=C(C(F)=C8' obs[230:230]=''
+  1041   page_recrop_margin24       replace ref[0:11]='CCO[C@H]1CN' obs[0:194]='(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](C.(=)()()((C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F=C(C(F)=C8)C(F)(F)F)C'
+  1041   page_recrop_margin24       replace ref[12:273]='[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C' obs[195:208]='=O)C(=O)N(C)C'
+  1039   page_pdet_base_rec_base_1x replace ref[25:37]='[C@@H](C)C(=' obs[25:36]='C@@H](C)C(-'
+  1039   page_pdet_base_rec_base_1x delete ref[77:78]='(' obs[76:76]=''
+  1039   page_pdet_base_rec_base_1x replace ref[124:132]='(F)F)C(=' obs[122:128]='F)F)C('
+  1039   page_pdet_base_rec_base_1x delete ref[239:240]='=' obs[235:235]=''
+  1040   page_pdet_base_rec_base_1x delete ref[36:37]='(' obs[36:36]=''
+  1040   page_pdet_base_rec_base_1x replace ref[60:78]='(=O)N(C)[C@@H](CC(' obs[59:75]='=O)N(C)[C@@H](CC'
+  1040   page_pdet_base_rec_base_1x delete ref[104:105]='(' obs[101:101]=''
+  1040   page_pdet_base_rec_base_1x delete ref[148:149]='(' obs[144:144]=''
+  1040   page_pdet_base_rec_base_1x delete ref[155:156]='=' obs[150:150]=''
+  1040   page_pdet_base_rec_base_1x replace ref[204:206]='(=' obs[198:199]='-'
+  1040   page_pdet_base_rec_base_1x replace ref[230:244]='=CC(F)=C(C(F)=' obs[223:237]='-CC(F)=C(C(F)-'
+  1040   page_pdet_base_rec_base_1x replace ref[258:271]='=O)C(=O)N(C)C' obs[251:264]='-O)C(-O)N(C)C'
+  1041   page_pdet_base_rec_base_1x replace ref[38:53]='(=O)N(C)[C@@H](' obs[38:51]='=O)N(C)[C@@H]'
+  1041   page_pdet_base_rec_base_1x delete ref[76:77]='(' obs[74:74]=''
+  1041   page_pdet_base_rec_base_1x replace ref[106:140]='([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=' obs[103:135]='[C@@H]C)CC)C(=O)N(C)[C@@H](C)C(-'
+  1041   page_pdet_base_rec_base_1x replace ref[174:189]='=C(F)C(F)=C(C(=' obs[169:184]='-C(F)C(F)-C(C(-'
+  1041   page_pdet_base_rec_base_1x replace ref[200:201]='=' obs[195:196]='-'
+  1041   page_pdet_base_rec_base_1x replace ref[207:218]='=O)N(C)CC(=' obs[202:213]='-O)N(C)CC(-'
+  1041   page_pdet_base_rec_base_1x replace ref[232:238]='=CC(F)' obs[227:232]='-CC(F'
+  1041   page_pdet_base_rec_base_1x replace ref[264:273]='(=O)N(C)C' obs[258:266]='=O)N(C)C'
+  1039   page_pdet_base_rec_base_2x delete ref[65:66]='(' obs[65:65]=''
+  1039   page_pdet_base_rec_base_2x delete ref[77:78]='(' obs[76:76]=''
+  1039   page_pdet_base_rec_base_2x delete ref[130:131]='(' obs[128:128]=''
+  1039   page_pdet_base_rec_base_2x delete ref[149:150]='(' obs[146:146]=''
+  1039   page_pdet_base_rec_base_2x replace ref[225:226]='=' obs[221:222]='-'
+  1039   page_pdet_base_rec_base_2x delete ref[239:240]='=' obs[235:235]=''
+  1040   page_pdet_base_rec_base_2x delete ref[18:19]='(' obs[18:18]=''
+  1040   page_pdet_base_rec_base_2x delete ref[23:24]='(' obs[22:22]=''
+  1040   page_pdet_base_rec_base_2x delete ref[30:31]='(' obs[28:28]=''
+  1040   page_pdet_base_rec_base_2x delete ref[36:37]='(' obs[33:33]=''
+  1040   page_pdet_base_rec_base_2x delete ref[77:78]='(' obs[73:73]=''
+  1040   page_pdet_base_rec_base_2x replace ref[93:138]='(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=' obs[88:129]='=O)N[C@@H][C@@H](C)CC)C=O)N(C)[C@@H](C)C-'
+  1040   page_pdet_base_rec_base_2x delete ref[155:156]='=' obs[146:146]=''
+  1040   page_pdet_base_rec_base_2x delete ref[197:198]=')' obs[187:187]=''
+  1040   page_pdet_base_rec_base_2x replace ref[204:215]='(=O)N(C)CC(' obs[193:202]='=O)N(C)CC'
+  1041   page_pdet_base_rec_base_2x delete ref[23:24]='(' obs[23:23]=''
+  1041   page_pdet_base_rec_base_2x delete ref[38:39]='(' obs[37:37]=''
+  1041   page_pdet_base_rec_base_2x delete ref[76:77]='(' obs[74:74]=''
+  1041   page_pdet_base_rec_base_2x replace ref[113:139]='(C)CC)C(=O)N(C)[C@@H](C)C(' obs[110:134]='C)CC)C(=O)N(C)[C@@H](C)C'
+  1041   page_pdet_base_rec_base_2x replace ref[187:189]='(=' obs[182:183]='-'
+  1041   page_pdet_base_rec_base_2x replace ref[216:218]='(=' obs[210:211]='-'
+  1041   page_pdet_base_rec_base_2x delete ref[237:238]=')' obs[230:230]=''
+  1041   page_pdet_base_rec_base_2x delete ref[253:254]='(' obs[245:245]=''
+  1041   page_pdet_base_rec_base_2x replace ref[260:273]='=O)C(=O)N(C)C' obs[251:263]='-O)C-O)N(C)C'
+  1039   page_pdet_def_rec_base_1x  replace ref[54:66]='=O)N(CCC(F)(' obs[54:65]='-O)N(CCC(F)'
+  1039   page_pdet_def_rec_base_1x  replace ref[77:89]='(=O)N(C)CC(=' obs[76:85]='=O)N(C)CC'
+  1039   page_pdet_def_rec_base_1x  replace ref[103:117]='=CC(F)=C(C(F)=' obs[99:113]='-CC(F)-C(C(F)-'
+  1039   page_pdet_def_rec_base_1x  replace ref[119:132]=')C(F)(F)F)C(=' obs[115:125]='C(F)F)F)C('
+  1039   page_pdet_def_rec_base_1x  delete ref[172:173]='[' obs[165:165]=''
+  1039   page_pdet_def_rec_base_1x  replace ref[188:226]='(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=' obs[180:217]='=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(-'
+  1039   page_pdet_def_rec_base_1x  replace ref[230:240]='=C(F)C(F)=' obs[221:230]='-C(F)C(F)'
+  1040   page_pdet_def_rec_base_1x  delete ref[36:37]='(' obs[36:36]=''
+  1040   page_pdet_def_rec_base_1x  delete ref[77:78]='(' obs[76:76]=''
+  1040   page_pdet_def_rec_base_1x  delete ref[104:105]='(' obs[102:102]=''
+  1040   page_pdet_def_rec_base_1x  delete ref[155:156]='=' obs[152:152]=''
+  1040   page_pdet_def_rec_base_1x  delete ref[197:199]=')=' obs[193:193]=''
+  1040   page_pdet_def_rec_base_1x  delete ref[214:215]='(' obs[208:208]=''
+  1040   page_pdet_def_rec_base_1x  replace ref[230:231]='=' obs[223:224]='-'
+  1041   page_pdet_def_rec_base_1x  replace ref[24:25]='=' obs[24:25]='-'
+  1041   page_pdet_def_rec_base_1x  replace ref[38:53]='(=O)N(C)[C@@H](' obs[38:51]='=O)N(C)[C@@H]'
+  1041   page_pdet_def_rec_base_1x  replace ref[62:77]='(=O)N(C)[C@@H](' obs[60:73]='=O)N(C)[C@@H]'
+  1041   page_pdet_def_rec_base_1x  replace ref[106:140]='([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=' obs[102:133]='[C@@H]CCC)C(=O)N(C)[C@@H](C)C(-'
+  1041   page_pdet_def_rec_base_1x  delete ref[150:151]='(' obs[143:143]=''
+  1041   page_pdet_def_rec_base_1x  replace ref[188:189]='=' obs[180:181]='-'
+  1041   page_pdet_def_rec_base_1x  replace ref[232:239]='=CC(F)=' obs[224:229]='-CC(F'
+  1039   page_pdet_def_rec_base_2x  delete ref[35:36]='(' obs[35:35]=''
+  1039   page_pdet_def_rec_base_2x  replace ref[53:66]='(=O)N(CCC(F)(' obs[52:63]='=O)N(CCC(F)'
+  1039   page_pdet_def_rec_base_2x  delete ref[77:78]='(' obs[74:74]=''
+  1039   page_pdet_def_rec_base_2x  delete ref[131:132]='=' obs[127:127]=''
+  1039   page_pdet_def_rec_base_2x  delete ref[142:143]='(' obs[137:137]=''
+  1039   page_pdet_def_rec_base_2x  replace ref[225:226]='=' obs[219:220]='-'
+  1039   page_pdet_def_rec_base_2x  replace ref[230:240]='=C(F)C(F)=' obs[224:233]='-C(F)C(F)'
+  1040   page_pdet_def_rec_base_2x  delete ref[23:24]='(' obs[23:23]=''
+  1040   page_pdet_def_rec_base_2x  delete ref[77:78]='(' obs[76:76]=''
+  1040   page_pdet_def_rec_base_2x  delete ref[93:94]='(' obs[91:91]=''
+  1040   page_pdet_def_rec_base_2x  delete ref[155:156]='=' obs[152:152]=''
+  1040   page_pdet_def_rec_base_2x  replace ref[186:187]='=' obs[182:183]='-'
+  1040   page_pdet_def_rec_base_2x  replace ref[195:199]='(F)=' obs[191:192]='F'
+  1040   page_pdet_def_rec_base_2x  replace ref[204:215]='(=O)N(C)CC(' obs[197:206]='=O)N(C)CC'
+  1040   page_pdet_def_rec_base_2x  replace ref[230:231]='=' obs[221:222]='-'
+  1041   page_pdet_def_rec_base_2x  delete ref[23:24]='(' obs[23:23]=''
+  1041   page_pdet_def_rec_base_2x  delete ref[38:39]='(' obs[37:37]=''
+  1041   page_pdet_def_rec_base_2x  delete ref[76:77]='(' obs[74:74]=''
+  1041   page_pdet_def_rec_base_2x  replace ref[106:116]='([C@@H](C)' obs[103:110]='[C@@H]C'
+  1041   page_pdet_def_rec_base_2x  delete ref[150:151]='(' obs[144:144]=''
+  1041   page_pdet_def_rec_base_2x  delete ref[216:218]='(=' obs[209:209]=''
+  1041   page_pdet_def_rec_base_2x  delete ref[237:239]=')=' obs[228:228]=''
+  1039   page_pdet_def_rec_def_1x   replace ref[37:38]='O' obs[37:38]='0'
+  1039   page_pdet_def_rec_def_1x   replace ref[119:154]=')C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)N' obs[119:142]='(C)C()=().).C(=(()(CC(C'
+  1039   page_pdet_def_rec_def_1x   delete ref[156:162]='(CCCC6' obs[144:144]=''
+  1039   page_pdet_def_rec_def_1x   replace ref[239:240]='=' obs[221:222]='-'
+  1040   page_pdet_def_rec_def_1x   replace ref[197:228]=')=C7F)C(=O)N(C)CC(=O)N[C@@H](CC' obs[197:226]='C)=)C)CC(C=(C)C(C=(C)=C(C(F)='
+  1040   page_pdet_def_rec_def_1x   delete ref[230:246]='=CC(F)=C(C(F)=C8' obs[228:228]=''
+  1041   page_pdet_def_rec_def_1x   replace ref[2:11]='O[C@H]1CN' obs[2:233]='(CC((..cC)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F=C(C(F)=C8)C(F)(F)F)C'
+  1041   page_pdet_def_rec_def_1x   replace ref[12:273]='[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C' obs[234:247]='=O)C(=O)N(C)C'
+  1039   page_pdet_def_rec_def_2x   replace ref[37:38]='O' obs[37:38]='0'
+  1039   page_pdet_def_rec_def_2x   replace ref[119:154]=')C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)N' obs[119:144]='(C)C())().).(C(=)(()(CC(C'
+  1039   page_pdet_def_rec_def_2x   delete ref[156:162]='(CCCC6' obs[146:146]=''
+  1039   page_pdet_def_rec_def_2x   replace ref[239:240]='=' obs[223:224]='-'
+  1040   page_pdet_def_rec_def_2x   replace ref[197:228]=')=C7F)C(=O)N(C)CC(=O)N[C@@H](CC' obs[197:225]='=C)=).C(O=()C(O=(CE)=C(C(F)='
+  1040   page_pdet_def_rec_def_2x   delete ref[230:246]='=CC(F)=C(C(F)=C8' obs[227:227]=''
+  1041   page_pdet_def_rec_def_2x   delete ref[237:238]=')' obs[237:237]=''
+
+No candidate was selected by RDKit parseability, the mass gate, or DECIMER output.
+Text level only; chemical structure is not verified.

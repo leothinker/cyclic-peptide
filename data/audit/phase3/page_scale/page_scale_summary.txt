@@ -1,0 +1,14 @@
+=== corpus-scale page-level configuration comparison ===
+
+cells : 335
+pages : 80
+errors: 0
+
+paren_excess = unmatched ')' over the joined string.
+A correct SMILES string has 0. A positive value means
+opening parentheses were lost.
+
+arm                       n   ex0  ex>0  median   bal  parse  rows=7  medlen
+default/none            335   232    56     0.0   214    158     255   265.0
+default/up2             335   246    47     0.0   223    143     271   266.0
+baseline/up2_th200      335    57   263     2.0    43     27     301   269.0

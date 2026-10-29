@@ -1,0 +1,15 @@
+=== I100298 O-versus-0 glyph test ===
+
+Method: compare the disputed glyph pixel-for-pixel against an
+unambiguous O in the same row and against printed digits on the
+same page.  Similarity is the fraction of agreeing pixels.
+
+disputed glyph (1039 row 1, character before the final ')'): width 25 px
+reference O (same row, first C(=O)):       width 31 px
+same position in 1038 row 1:                width 25 px
+
+similarity to the reference O : 0.625
+similarity to the 1038 glyph  : 1.000
+similarity of the complete rows: 1.000
+
+Row 1 of 1039 is pixel-identical to row 1 of 1038, and 1038's reference was verified verbatim by the researcher (273 characters, edit distance 0 against the printed page).  The disputed character is therefore the same character in both rows, and 1038's reference says it is an O.  The recogniser's 'C(=0)' is an OCR error, not a transcription error.

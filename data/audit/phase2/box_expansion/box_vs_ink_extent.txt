@@ -1,0 +1,19 @@
+Detector-box right edge vs real text-ink extent (processed coords)
+processed image: 1702x1250   full-height rules: [0, 1, 2, 3, 4, 1679, 1680, 1681, 1682, 1683, 1684]
+
+deficit = ink_x2 - box_x2. A POSITIVE deficit would mean the box
+clipped a glyph. Negative means the box already extends past the ink.
+
+line  box_x1  box_x2  ink_x1  ink_x2  deficit      verdict
+   0       9    1645       5    1640       -5 box past ink
+   1      11    1642       5    1636       -6 box past ink
+   2      41    1667       5    1666       -1 box past ink
+   3      10    1647       6    1644       -3 box past ink
+   4       8    1675       5    1674       -1 box past ink
+   5      13    1671       6    1666       -5 box past ink
+   6      12    1234       6    1232       -2 box past ink
+
+Conclusion: every detector box already extends 1-6 px beyond its line's
+last inked column. No glyph is clipped by the box, so widening the box
+cannot recover a character - it only appends white margin, which
+degrades PP-OCR's aspect-ratio prior.

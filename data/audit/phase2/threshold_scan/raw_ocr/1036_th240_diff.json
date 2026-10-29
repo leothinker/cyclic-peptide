@@ -1,0 +1,42 @@
+[
+  {
+    "op": "replace",
+    "ref_pos": 8,
+    "ref_text": "C)",
+    "ocr_text": "G",
+    "context": "CC[C@H](C)[C@H]1C(=O)N",
+    "in_carbonyl": false
+  },
+  {
+    "op": "replace",
+    "ref_pos": 17,
+    "ref_text": "(",
+    "ocr_text": "-ON(C[C@@H]C2CCCCC2)C(-O)N3[C@@H](CC3)C(-O)N(C)[C@@H]4C(O)N(C)CC-ON[C@@H](CCC5-CC(F)-C(C(F)-C5)C(F)(F)F)C(-O)N6[C@@H](CCC6)C-O)NC7(CCCC7)C(-O)N(C)[C@@H](C8CCCC8)C-O)N(C)[C@@H](CC-O)N(C)[C@H](CCNC-S)C9-C(F)C(F)-C.LSC4)C(F)",
+    "context": "H](C)[C@H]1C(=O)N(C)[C@@H",
+    "in_carbonyl": true
+  },
+  {
+    "op": "replace",
+    "ref_pos": 19,
+    "ref_text": "O)N(C)[C@@H](C2CCCCC2",
+    "ocr_text": "C9F",
+    "context": "(C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@",
+    "in_carbonyl": true
+  },
+  {
+    "op": "replace",
+    "ref_pos": 47,
+    "ref_text": "3[C@@H](CC3",
+    "ocr_text": "1",
+    "context": "CCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C",
+    "in_carbonyl": false
+  },
+  {
+    "op": "replace",
+    "ref_pos": 68,
+    "ref_text": "[C@@H]4C(=O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CCCC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C",
+    "ocr_text": "C",
+    "context": "C3)C(=O)N(C)[C@@H]4C(=O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CCCC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C",
+    "in_carbonyl": true
+  }
+]

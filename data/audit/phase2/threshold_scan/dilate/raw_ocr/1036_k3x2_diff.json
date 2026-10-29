@@ -1,0 +1,50 @@
+[
+  {
+    "op": "delete",
+    "ref_pos": 17,
+    "ref_text": "(",
+    "ocr_text": "",
+    "context": "H](C)[C@H]1C(=O)N(C)[C@@H",
+    "in_carbonyl": true
+  },
+  {
+    "op": "delete",
+    "ref_pos": 77,
+    "ref_text": "=",
+    "ocr_text": "",
+    "context": "(C)[C@@H]4C(=O)N(C)CC(=O)",
+    "in_carbonyl": true
+  },
+  {
+    "op": "replace",
+    "ref_pos": 102,
+    "ref_text": "=CC(F)=C(C(F)=",
+    "ocr_text": "-CC(F)=C(C(F)-",
+    "context": "N[C@@H](CCC5=CC(F)=C(C(F)=C5)C(F)(F)F)",
+    "in_carbonyl": false
+  },
+  {
+    "op": "replace",
+    "ref_pos": 198,
+    "ref_text": "@",
+    "ocr_text": "a",
+    "context": "C(=O)N(C)[C@@H](CC(=O)N(C",
+    "in_carbonyl": false
+  },
+  {
+    "op": "delete",
+    "ref_pos": 239,
+    "ref_text": "(",
+    "ocr_text": "",
+    "context": "9=C(F)C(F)=C(SC4)C(F)=C9F",
+    "in_carbonyl": false
+  },
+  {
+    "op": "insert",
+    "ref_pos": 271,
+    "ref_text": "",
+    "ocr_text": ")",
+    "context": "1)C(=O)N(C)C",
+    "in_carbonyl": false
+  }
+]

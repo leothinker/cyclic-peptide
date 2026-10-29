@@ -1,0 +1,145 @@
+========================================================================
+TASK A - coordinate reconciliation, cmpd 1036
+========================================================================
+
+1. SOURCE IMAGE
+   page path         : data\raw\WO2025162428\golden_tables\PCTCN2025075389-ftappb-I100297.jpg
+   page size         : 1939 x 1312 (WxH)
+   cell crop path    : data\audit\phase2\cells_text\I100297_1036_text.png
+   cell crop size    : 851 x 625
+   bbox, page coords : x1=1088 y1=54 x2=1939 y2=679
+   crop == page[bbox] byte for byte : True
+   -> 1:1 slice, no resampling, no rotation.
+
+2. COORDINATE CHAIN
+   processed size    : 1702 x 1250
+   scale factor      : 2x  (851 * 2 = 1702)
+   mapping           : proc_x = (page_x - bbox_x1) * 2
+                       proc_y = (page_y - bbox_y1) * 2
+   Detector boxes are 4-point polygons from the RapidOCR
+   TextDetector on the PROCESSED image, used unrotated for the
+   box-to-rect conversion. get_rotate_crop_image() runs only when
+   a crop is fed to the recogniser, never for the geometry here.
+
+3. VERDICT ON THE CONFLICT
+   Both experiments ran on the SAME processed image, used the SAME
+   detector boxes (verified line by line below) and measured in the
+   SAME coordinate system. No scale or offset error is involved.
+   The disagreement comes entirely from the INK DEFINITION.
+
+   OLD  scans the full row width, then drops any column whose ink
+        density exceeds 50 percent of the band height. Its ink_x1
+        therefore lands on the anti-aliased edge of the cell's own
+        border rule rather than on a glyph. It was a right-edge
+        study that also printed a left column it never meant to
+        interpret.
+   NEW  excludes rule columns (+-2 px) but is LIMITED to
+        box_x1-30 .. box_x2+30. When real ink reaches the window
+        edge the measurement is CENSORED and is not a true bound.
+
+   rule columns, processed x : [0, 1, 2, 3, 4, 1679, 1680, 1681, 1682, 1683, 1684]
+   excluded after +-2px dilation : [0, 1, 2, 3, 4, 5, 6, 1677, 1678, 1679, 1680, 1681, 1682, 1683, 1684, 1685, 1686]
+
+========================================================================
+4. LINE BY LINE, BOTH DEFINITIONS
+========================================================================
+
+line  box_x1  box_x2  OLDink1  OLDink2  ROWink1  NEWink1  censor  overhang
+--------------------------------------------------------------------------
+   0       9    1645        5     1640        7        7      no         2
+   1      11    1642        5     1636        7        7      no         4
+   2      41    1667        5     1666        7       11     yes        34
+   3      10    1647        6     1644        7        7      no         3
+   4       8    1675        5     1674        7        7      no         1
+   5      13    1671        6     1666        7        7      no         6
+   6      12    1234        6     1232        7        7      no         5
+
+OLD ink_x1 reproduces box_vs_ink_extent.txt exactly.
+NEW ink_x1 reproduces 1036_line_box_geometry.csv exactly.
+ROWink1 is the third, UNCENSORED definition added by this audit:
+full row width, rule columns removed explicitly, no search window.
+
+========================================================================
+5. LINE 2, THE ROW IN DISPUTE
+========================================================================
+   detector box x           : [41, 1667]
+   OLD full row ink         : [5, 1666]
+   ROW full width, no rules : [7, 1666]
+   NEW boxed window ink     : [11, 1666]
+   NEW window left edge     : 11
+   NEW measurement censored : yes
+   ink left of box, OLD defn: 36 px
+   ink left of box, ROW defn: 34 px  <-- exact
+
+   RESOLUTION
+   - The OLD left number counts the cell's own border rule, so it
+     overstates the clipped width. It is not a glyph measurement.
+   - The NEW left number is 30 px on line 2 against 0-5 px on every
+     other line, which is why line 2 stands out at all.
+   - LIMITATION THAT MATTERS: on line 2 the NEW number sits
+     exactly on its own search window edge, so it is a CENSORED
+     lower bound and the true overhang may be larger. The
+     previous report stated 30 px as if it were exact.
+   - The old experiment never examined the left edge at all. Its
+     deficit column is ink_x2 minus box_x2, a RIGHT edge statistic,
+     and its conclusion was scoped to that side. So there is no
+     genuine contradiction between the two reports to resolve.
+
+   NOT CLAIMED HERE
+   This script measures GEOMETRY ONLY. That a printed '=' is lost
+   on line 2 is supported elsewhere, by the visual zoom in
+   recognizer_candidates/ and by the CTC likelihood, but overhang
+   alone does not establish which character, if any, was cut.
+
+========================================================================
+6. GLYPH OR GRID RULE?  (decides whether overhang means a lost char)
+========================================================================
+
+An overhang of a few pixels is ordinary detector slack. An overhang
+equal to a whole glyph is a lost character. The two must not be
+counted together, so the ink left of the box is characterised here.
+
+line  overhang  ink_cols  ink_rows                      shape                reading
+------------------------------------------------------------------------------------
+   0         2         2        30        30 rows over 2 cols glyph edge, detector slack
+   1         4         4        36        36 rows over 4 cols glyph edge, detector slack
+   2        34        34         8     8 strokes over 34 cols   whole glyph excluded
+   3         3         3        15        15 rows over 3 cols glyph edge, detector slack
+   4         1         1        26        26 rows over 1 cols glyph edge, detector slack
+   5         6         6        44        44 rows over 6 cols glyph edge, detector slack
+   6         5         5        46        46 rows over 5 cols glyph edge, detector slack
+
+Reading of line 2 specifically
+  The ink at x=6..42 is not a table rule. A rule would be one long
+  stroke; this is TWO strokes four pixels thick, eight pixels
+  apart, spanning the same 37 columns - the shape of '='. It sits
+  vertically inside line 2's own box, so it belongs to line 2, and
+  it stops at x=42, two columns before the following 'O' begins at
+  x=45. That is exactly the leading '=' of the printed 'C(=O)'.
+
+  The detector box starts at x=41, so the glyph is excluded almost
+  entirely: the recognised line 2 text begins 'O)N(C)...'.
+
+  By contrast the 1-6 px overhang on the other six lines is the left
+  edge of a 'C' sitting marginally outside its box, with the glyph
+  still fully present. See probe_line0_leftmost_ink.png for the
+  contrast. Those rows are NOT flagged as character loss.
+
+========================================================================
+7. TWO DIFFERENT THINGS CALLED 'LEFT PADDING'
+========================================================================
+
+  1036_pad_compare_all.png adds WHITE margin to the left of the
+  unchanged box interior. The '=' stays absent, because it was
+  never inside the box. This shows what the recogniser would get
+  if the box were merely given more surrounding whitespace.
+
+  1036_left_extension.csv, from the previous round, reports that
+  pad_left of 16/30/36 px made line 2 read '-O)N(C)CC(=O)' instead
+  of 'O)N(C)CC(=O)'. That is a DIFFERENT operation: it re-cut the
+  row from the parent image starting further left, so the '='
+  pixels genuinely entered the crop and were then misread as '-'.
+
+  The two are not in conflict and must not be quoted against each
+  other. White padding cannot restore a glyph; re-cropping can put
+  the glyph back but the recogniser still calls it '-'.

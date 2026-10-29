@@ -1,0 +1,16 @@
+﻿cmpd_id,metric,value
+1036,reference_length_chars,271
+1036,ocr_length_chars,244
+1036,edit_ops,82
+1036,character_error_rate,0.3026
+1036,ms_mz,1610.9
+1036,ms_polarity,[M+H]+
+1036,reference_formula,C75H100F9N13O12S2
+1036,reference_observed_mass,1609.6912
+1036,reference_delta_da,-0.2015
+1036,reference_error_ppm,125.2
+1036,reference_tolerance_ppm,31.0
+1036,reference_verdict,mismatch
+1036,ocr_rdkit_parse,no
+1036,ocr_verdict,unknown
+1036,ocr_observed_mass,

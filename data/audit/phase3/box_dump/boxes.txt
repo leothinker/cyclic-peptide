@@ -1,0 +1,38 @@
+--- page: 25 boxes, image (2624, 3878, 3) ---
+  box   0 x[   32.0,  166.0] y[   14.5,   50.5] score=0.999 'Cmpd #'
+  box   1 x[  559.0,  718.0] y[   14.5,   49.5] score=0.970 'Strueture'
+  box   2 x[ 1436.5, 1578.0] y[   16.5,   46.5] score=0.999 'SMILES'
+  box   3 x[ 1093.5, 1910.5] y[   62.0,   97.5] score=0.973 'CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC'
+  box   4 x[ 1093.5, 1908.5] y[  104.0,  140.5] score=0.965 'C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C('
+  box   5 x[ 1101.0, 1921.0] y[  147.0,  184.5] score=0.986 'O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C'
+  box   6 x[ 1092.5, 1913.5] y[  190.0,  227.0] score=0.979 '5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC'
+  box   7 x[ 1091.5, 1923.0] y[  234.0,  270.0] score=0.976 'CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@'
+  box   8 x[  904.0,  940.0] y[  252.5,  276.0] score=0.998 'HN'
+  box   9 x[ 1095.5, 1921.0] y[  279.0,  311.0] score=0.977 '@H](CC=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C'
+  box  10 x[  820.5,  861.5] y[  297.5,  320.0] score=0.996 'HN'
+  box  11 x[ 1095.5, 1708.0] y[  318.0,  358.0] score=0.972 'SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C'
+  box  12 x[   57.5,  140.5] y[  348.5,  386.5] score=1.000 '1036'
+  box  13 x[  476.5,  501.0] y[  415.5,  431.0] score=0.428 'HC'
+  box  14 x[ 1091.5, 1924.0] y[  686.0,  725.0] score=0.973 'CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](CC2=CC='
+  box  15 x[ 1092.5, 1920.0] y[  731.0,  767.0] score=0.985 'CC=C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]'
+  box  16 x[ 1092.5, 1918.0] y[  774.0,  810.0] score=0.976 '4C(=O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F'
+  box  17 x[ 1096.5, 1920.0] y[  819.0,  854.0] score=0.989 '=C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7('
+  box  18 x[ 1091.5, 1917.0] y[  859.0,  899.0] score=0.981 'CCCC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)['
+  box  19 x[ 1094.5, 1919.0] y[  904.5,  940.0] score=0.963 'C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F'
+  box  20 x[  817.0,  855.0] y[  943.0,  969.0] score=0.990 'HN'
+  box  21 x[ 1098.5, 1766.0] y[  944.5,  984.5] score=0.997 '=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C'
+  box  22 x[   57.5,  140.5] y[  973.0, 1011.0] score=1.000 '1037'
+  box  23 x[  480.5,  517.0] y[ 1041.5, 1064.0] score=0.994 'HN'
+  box  24 x[  270.5,  286.0] y[ 1218.0, 1236.5] score=0.935 'F'
+
+--- cell: 7 boxes, image (1250, 1662, 3) ---
+  box   0 x[    3.5,  822.0] y[    6.5,   45.0] score=0.901 'CC[C@H]C)[C@H]1C(=O)N(C)[C@@H](C2CCCC'
+  box   1 x[    5.5,  819.5] y[   51.0,   87.0] score=0.892 'C2)C=ON3[C@@H]CC3C=O)NC)[C@@H]4C'
+  box   2 x[   20.5,  828.0] y[   94.0,  129.5] score=0.844 'O)N(CCC=O)N[C@@H](CCC5-CC(F)=C(C(F)=C'
+  box   3 x[    4.5,  823.0] y[  135.5,  174.0] score=0.899 '5)C(F)(F)F)C-O)N6[C@@H]CCC6C=O)NC7CC'
+  box   4 x[    4.0,  828.5] y[  180.0,  216.0] score=0.876 'CC7)C=O)N(C)[C@@H](C8CCCC8)C-O)N(C)[Ca'
+  box   5 x[    6.0,  828.0] y[  223.5,  258.5] score=0.869 '@H]CC=O)N(C)C@H]CCNC-S)C9=CF)C(F)=C'
+  box   6 x[    6.0,  617.5] y[  265.5,  302.5] score=0.847 '(SC4)C(F)=C9F)C=O)N1)C-O)N(CC'
+
+note: cell boxes are in 2x crop coordinates, so divide by 2 to compare with the page boxes
+crop origin on the page: x=1088 y=54

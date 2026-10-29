@@ -1,0 +1,8 @@
+﻿line,greedy_len,reference_len,reference_ctc_feasible,reference_reachable_at_all,reference_beam_rank,logp_reference,logp_greedy
+0,38,38,True,True,1,-1.9217,-1.9217
+1,39,39,True,True,1,-0.8329,-0.8329
+2,39,40,True,False,,-15.7822,-3.0707
+3,41,41,True,True,2,-1.503,-1.503
+4,40,40,True,True,1,-1.4614,-1.4614
+5,41,41,True,True,1,-1.7233,-1.7233
+6,32,32,True,True,2,-1.3703,-1.3703

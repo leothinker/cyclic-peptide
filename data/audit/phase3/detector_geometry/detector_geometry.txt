@@ -1,0 +1,14 @@
+page I100297 (1312, 1939, 3)  prep=up2_th200
+vertical rule columns on the page: [8, 9, 188, 189, 1088]...[189, 1088, 1089, 1928, 1929] (8 columns)
+
+=== page path: detection on the whole 2x binarised page ===
+lines measured: 14
+lines whose box starts RIGHT of the first ink: 0
+
+=== cell path: detection on the same 2x binarised 1036 crop ===
+lines measured: 7
+lines whose box starts RIGHT of the first ink: 0
+
+=== summary ===
+page path: 0/14 lines clip their first glyph
+cell path: 0/7 lines clip their first glyph

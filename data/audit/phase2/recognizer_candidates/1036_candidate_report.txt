@@ -1,0 +1,79 @@
+Phase 2 - recogniser candidate decoding (cmpd 1036)
+
+PRELIMINARY: single reference sample. Nothing here is a dataset
+accuracy rate. Reference transcription status and mass-gate verdict
+are reported separately and must not be conflated.
+
+WHAT THE INSTALLED RECOGNISER EXPOSES
+  - rec.session(x) -> (T, C) softmax probabilities (row sums 1.000000)
+  - no logits, no beam search, no prefix scores in the package
+  - patched Rec.top_k / Global.return_top_k gives per-KEPT-timestep
+    alternatives only; a character greedy CTC dropped is unreachable
+    through that API because the timestep is filtered out upstream
+  - CTC decode is greedy argmax + dedup, rec_batch_num=6, and each
+    batch pads to ITS OWN max width ratio, not a fixed 320px
+
+BASELINE (fixed preprocessing: 2x INTER_CUBIC -> threshold 200 -> PP-OCRv4 mobile en)
+  length 270  edit distance 2  CER 0.00738  RDKit yes  dDa 3.8298  gate mismatch
+
+LINE BOX GEOMETRY (why a character is or is not recoverable)
+  line  box x            ink x                 clip L    clip R
+  0     [9,1645]         [8,1640]                   1        -5
+  1     [11,1642]        [8,1636]                   3        -6
+  2     [41,1667]        [11,1666]                 30        -1
+  3     [10,1647]        [8,1644]                   2        -3
+  4     [8,1675]         [8,1674]                   0        -1
+  5     [13,1671]        [8,1666]                   5        -5
+  6     [12,1234]        [8,1232]                   4        -2
+
+TOP CANDIDATES, RANKED BY CTC LOG-LIKELIHOOD ONLY
+  The reference string and the mass gate are NOT used to rank or
+  select. They appear only as post-hoc scores.
+
+  rank  logP         len   edits  CER        parse          dDa
+  1     -10.8893     272   4      0.01476    no                
+  2     -10.8989     272   11     0.04059    no                
+  3     -11.0255     273   5      0.01845    no                
+  4     -11.0352     273   12     0.04428    no                
+  5     -11.1090     273   5      0.01845    no                
+  6     -11.1186     273   12     0.04428    no                
+  7     -11.1649     272   3      0.01107    no                
+  8     -11.2410     272   5      0.01845    no                
+  9     -11.2507     272   12     0.04428    no                
+  10    -11.2909     273   5      0.01845    no                
+  11    -11.3005     273   12     0.04428    no                
+  12    -11.3012     273   4      0.01476    no                
+  13    -11.3354     271   3      0.01107    no                
+  14    -11.3450     271   10     0.0369     no                
+  15    -11.3773     273   6      0.02214    no                
+  16    -11.3846     273   4      0.01476    no                
+  17    -11.3869     273   13     0.04797    no                
+  18    -11.4003     272   17     0.062731   no                
+  19    -11.4093     272   5      0.01845    no                
+  20    -11.4189     272   12     0.04428    no                
+  21    -11.4272     274   6      0.02214    no                
+  22    -11.4368     274   13     0.04797    no                
+  23    -11.4371     271   3      0.01107    no                
+  24    -11.4410     272   14     0.051661   no                
+  25    -11.4468     271   10     0.0369     no                
+
+REFERENCE REACHABILITY FROM THE POSTERIOR (diagnostic)
+  Beam search over the FULL 97-way distribution at every timestep,
+  so this asks whether the truth is representable at all.
+
+  line 0   greedy 38  ch, reference span 38  ch, feasible=True  in_beam=True  rank=1    logP_ref=-1.9217     logP_greedy=-1.9217
+  line 1   greedy 39  ch, reference span 39  ch, feasible=True  in_beam=True  rank=1    logP_ref=-0.8329     logP_greedy=-0.8329
+  line 2   greedy 39  ch, reference span 40  ch, feasible=True  in_beam=False rank=     logP_ref=-15.7822    logP_greedy=-3.0707
+  line 3   greedy 41  ch, reference span 41  ch, feasible=True  in_beam=True  rank=2    logP_ref=-1.503      logP_greedy=-1.503
+  line 4   greedy 40  ch, reference span 40  ch, feasible=True  in_beam=True  rank=1    logP_ref=-1.4614     logP_greedy=-1.4614
+  line 5   greedy 41  ch, reference span 41  ch, feasible=True  in_beam=True  rank=1    logP_ref=-1.7233     logP_greedy=-1.7233
+  line 6   greedy 32  ch, reference span 32  ch, feasible=True  in_beam=True  rank=2    logP_ref=-1.3703     logP_greedy=-1.3703
+
+DETERMINISM
+  3 fresh engines gave identical recognised text and identical
+  top-3 beams: True
+
+SCOPE
+  One compound, one reference. A change here is a statement about
+  one string. It is not evidence about the other 334 printed cells,
+  and CER is not chemical-structure verification.

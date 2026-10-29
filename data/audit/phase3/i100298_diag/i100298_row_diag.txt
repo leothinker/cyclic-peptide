@@ -1,0 +1,93 @@
+=== I100298 per-row diagnosis ===
+
+Recogniser: upstream default engine, recognition only, 1x crop.
+
+cmpd   row  rule_x  h_ratio  rule?  raw_len  trim_len
+1038     1       0      1.0    yes       39        39
+1038     2       0      1.0    yes       40        40
+1038     3       0      1.0    yes       26        40
+1038     4       0      1.0    yes       41        41
+1038     5       0      1.0    yes       39        21
+1038     6       0      1.0    yes       40        40
+1038     7       0      1.0    yes       34        34
+1039     1       0      1.0    yes       39        39
+1039     2       0      1.0    yes       40        40
+1039     3       0      1.0    yes       31        40
+1039     4       0      1.0    yes       41        41
+1039     5       0      1.0    yes       39        21
+1039     6       0      1.0    yes       40        40
+1039     7       0      1.0    yes       36        36
+1040     1       0      1.0    yes       38        38
+1040     2       0      1.0    yes       22        24
+1040     3       0      1.0    yes       38        38
+1040     4       0      1.0    yes       20        40
+1040     5       0      1.0    yes       43        42
+1040     6       0      1.0    yes       27        40
+1040     7       0      1.0    yes       34        34
+1041     1       0      1.0    yes       38        38
+1041     2       0      1.0    yes       39        39
+1041     3       0      1.0    yes       38        19
+1041     4       0      1.0    yes       40        40
+1041     5       0      1.0    yes       42        42
+1041     6       0      1.0    yes       40        40
+1041     7       0      1.0    yes       36        36
+
+raw row text:
+  1038 row1: CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=0)
+  1038 row2: N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=
+  1038 row3: O)C(C())(C))()CC(C()(C(C4)
+  1038 row4: )C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC
+  1038 row5: C6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@
+  1038 row6: @H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)
+  1038 row7: =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+  1039 row1: CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=0)
+  1039 row2: N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=
+  1039 row3: O)C(C())C(C)CC)C()CCC(C()(C(C4)
+  1039 row4: )C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC
+  1039 row5: C6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@
+  1039 row6: @H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)
+  1039 row7: =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+  1040 row1: CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=
+  1040 row2: O(N[②()((((()[(()(C(CC
+  1040 row3: (=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)C
+  1040 row4: ()②)②(=)()[②②()(=)C)
+  1040 row5: =O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F|
+  1040 row6: =(C)=)[.)②C(C=)C()(O=)(C)=(
+  1040 row7: C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+  1041 row1: CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C
+  1041 row2: (=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](
+  1041 row3: CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C
+  1041 row4: )CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)
+  1041 row5: C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C
+  1041 row6: (F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F
+  1041 row7: )=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+
+row text after removing the vertical table rule:
+  1038 row1: CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)
+  1038 row2: N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=
+  1038 row3: O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4
+  1038 row4: )C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC
+  1038 row5: C(()C(C=()))()(=)(C))
+  1038 row6: @H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)
+  1038 row7: =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+  1039 row1: CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)
+  1039 row2: N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=
+  1039 row3: O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4
+  1039 row4: )C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC
+  1039 row5: C(()CC(C()())()()(C))
+  1039 row6: @H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)
+  1039 row7: =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+  1040 row1: CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=
+  1040 row2: O(N)()(()(((C([((C()((CC
+  1040 row3: (=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)C
+  1040 row4: C)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(
+  1040 row5: =O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F
+  1040 row6: )=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=
+  1040 row7: C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+  1041 row1: CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C
+  1041 row2: (=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](
+  1041 row3: C)[②②②②(=)②②()(=)C)
+  1041 row4: )CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)
+  1041 row5: C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C
+  1041 row6: (F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F
+  1041 row7: )=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C

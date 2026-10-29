@@ -1,0 +1,23 @@
+=== is the narrow column the reason a line is lost? ===
+
+1036, default engine, the same cell content read with the
+read region widened to the left and to the right.
+
+variant                       rows   len  edit      CER  note
+col[left-0,right+0]              7   240   111  0.40959  x=1088..1919 width=831
+col[left-30,right+0]             7   211   155  0.57196  x=1058..1919 width=861
+col[left-60,right+0]             7   233   474  1.74908  x=1028..1919 width=891
+col[left-0,right+30]             7   253    74  0.27306  x=1088..1939 width=851
+col[left-0,right+60]             7   253    74  0.27306  x=1088..1939 width=851
+col[left-60,right+60]            7   247   488  1.80074  x=1028..1939 width=911
+col[left-120,right+120]          8   274     3  0.01107  x=968..1939 width=971
+col[left-250,right+250]          9   266    33  0.12177  x=838..1939 width=1101
+cell_on_page_canvas              7   270     1  0.00369  same pixels, page-sized canvas
+cell_scaled_1.5x                 7   253    42  0.15498  INTER_CUBIC 1.5x, no threshold
+cell_scaled_2.0x                 7   186   166  0.61255  INTER_CUBIC 2.0x, no threshold
+cell_scaled_3.0x                 7   204   151  0.55720  INTER_CUBIC 3.0x, no threshold
+
+--- reading the table ---
+best variant: cell_on_page_canvas edit=1
+If widening the read region recovers the line, the detector was clipping it horizontally and the fix is a wider read region, not a different model.
+If only the page canvas works, the detector needs the surrounding table context, and the production answer is to recognise the page and attribute the lines afterwards.

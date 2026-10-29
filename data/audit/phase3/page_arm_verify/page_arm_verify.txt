@@ -1,0 +1,43 @@
+=== stricter screen for the page-level arms ===
+
+Why this is needed: on 1036 the 'default/up2' arm produced
+a tail of  ...C9=C(F)C(F)=C)S(C)(()=)((()=))(()=()()()
+which is neighbouring-column noise that happens to have
+balanced parentheses. Balanced therefore proves little on
+its own, and the corpus-scale 'balanced' counts must be
+read together with the row count and the length.
+
+--- what each arm's numbers actually mean ---
+
+arm                       n   bal  rows=7  bal&rows=7  medlen  short<220
+baseline/up2_th200      335    43     301          40     269          0
+default/none            335   214     255         179     265         27
+default/up2             335   223     271         197     266         16
+
+--- reading the table ---
+'bal&rows=7' counts cells whose parentheses balance AND
+whose full row count was recovered. A cell that lost a row
+can still balance; that is why the two conditions are
+reported together.
+
+--- per-compound comparison, the two leading arms ---
+
+baseline/up2_th200 balanced AND rows=7 : 40
+
+--- the honest comparison ---
+Neither arm is established as the production replacement.
+The page-level arms were not run against a gold reference
+at corpus scale, and the one compound where the reference
+exists shows the page arm losing characters (edit 31 for
+default/up2 on 1036) while gaining a contaminated tail.
+The cell-level arms keep the crop, which bounds what can be
+picked up, and that is why they remain the safer direction.
+
+--- 'usable' cells per arm ---
+balanced AND rows=7 AND length in 220-300
+  baseline/up2_th200     40/335
+  default/none           179/335
+  default/up2            197/335
+
+This is the most conservative number the data supports.
+It is still a TEXT-level result. No structure is verified.

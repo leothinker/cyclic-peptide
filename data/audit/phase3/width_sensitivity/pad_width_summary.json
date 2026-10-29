@@ -1,0 +1,510 @@
+[
+  {
+    "cmpd_id": "1038",
+    "band": 1,
+    "n_widths": 23,
+    "modal_text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)",
+    "modal_count": 23,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1038",
+    "band": 2,
+    "n_widths": 36,
+    "modal_text": "N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=",
+    "modal_count": 36,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1038",
+    "band": 3,
+    "n_widths": 33,
+    "modal_text": "O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4",
+    "modal_count": 28,
+    "distinct_outputs": 5,
+    "outlier_widths": [
+      832,
+      833,
+      834,
+      856,
+      857
+    ],
+    "outliers": [
+      {
+        "padded_width": 832,
+        "text": "O(N=(C))C)))②CC(C(C)E("
+      },
+      {
+        "padded_width": 833,
+        "text": "O(N=(CO)C))C(C(C)E(4"
+      },
+      {
+        "padded_width": 834,
+        "text": "O(N=(C)CC))②C(C(CC(4"
+      },
+      {
+        "padded_width": 856,
+        "text": "ON(C)C)②C(CC(4"
+      },
+      {
+        "padded_width": 857,
+        "text": "ON(C)C)②C(CC(4"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1038",
+    "band": 4,
+    "n_widths": 35,
+    "modal_text": ")C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC",
+    "modal_count": 32,
+    "distinct_outputs": 4,
+    "outlier_widths": [
+      853,
+      854,
+      855
+    ],
+    "outliers": [
+      {
+        "padded_width": 853,
+        "text": "C()C()(C)②)②)C(=(()(C"
+      },
+      {
+        "padded_width": 854,
+        "text": "C()C()()②)②C(=((C)(C"
+      },
+      {
+        "padded_width": 855,
+        "text": "C()C(=)()②②C(=((C)(C"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1038",
+    "band": 5,
+    "n_widths": 41,
+    "modal_text": "C6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@",
+    "modal_count": 41,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1038",
+    "band": 6,
+    "n_widths": 41,
+    "modal_text": "@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)",
+    "modal_count": 36,
+    "distinct_outputs": 6,
+    "outlier_widths": [
+      833,
+      848,
+      849,
+      858,
+      859
+    ],
+    "outliers": [
+      {
+        "padded_width": 833,
+        "text": "(H)(C=(S))②②()()C)"
+      },
+      {
+        "padded_width": 848,
+        "text": "(HI)(C)=(S)))()C()C))"
+      },
+      {
+        "padded_width": 849,
+        "text": "(HI)(C=C(S))()C()C)"
+      },
+      {
+        "padded_width": 858,
+        "text": "(H)(C)=C(S))()()C))"
+      },
+      {
+        "padded_width": 859,
+        "text": "(HI)((C=C(S))()C()C.)"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1038",
+    "band": 7,
+    "n_widths": 41,
+    "modal_text": "=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C",
+    "modal_count": 41,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1039",
+    "band": 1,
+    "n_widths": 23,
+    "modal_text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)",
+    "modal_count": 21,
+    "distinct_outputs": 3,
+    "outlier_widths": [
+      840,
+      844
+    ],
+    "outliers": [
+      {
+        "padded_width": 840,
+        "text": "C(C(C)CC)((C)CO)"
+      },
+      {
+        "padded_width": 844,
+        "text": "(C()(()②CO)"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1039",
+    "band": 2,
+    "n_widths": 36,
+    "modal_text": "N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=",
+    "modal_count": 36,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1039",
+    "band": 3,
+    "n_widths": 33,
+    "modal_text": "O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4",
+    "modal_count": 30,
+    "distinct_outputs": 4,
+    "outlier_widths": [
+      833,
+      834,
+      856
+    ],
+    "outliers": [
+      {
+        "padded_width": 833,
+        "text": "D(N=(C)C))C(C(C)E(4"
+      },
+      {
+        "padded_width": 834,
+        "text": "O(N=(C)CC))②C(CCCC(4"
+      },
+      {
+        "padded_width": 856,
+        "text": "ON(C)CCC)②C(CC(4"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1039",
+    "band": 4,
+    "n_widths": 35,
+    "modal_text": ")C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCC",
+    "modal_count": 32,
+    "distinct_outputs": 4,
+    "outlier_widths": [
+      853,
+      854,
+      855
+    ],
+    "outliers": [
+      {
+        "padded_width": 853,
+        "text": "C()C((C)②)②C(=((C)(CC"
+      },
+      {
+        "padded_width": 854,
+        "text": "C()(()②②C(=((C)(C"
+      },
+      {
+        "padded_width": 855,
+        "text": "C)C(=)()②C(=((C)(C"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1039",
+    "band": 5,
+    "n_widths": 41,
+    "modal_text": "C6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@",
+    "modal_count": 41,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1039",
+    "band": 6,
+    "n_widths": 41,
+    "modal_text": "@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)",
+    "modal_count": 34,
+    "distinct_outputs": 8,
+    "outlier_widths": [
+      832,
+      833,
+      834,
+      848,
+      849,
+      858,
+      859
+    ],
+    "outliers": [
+      {
+        "padded_width": 832,
+        "text": "(H)(C=C(S))②②()(=))C"
+      },
+      {
+        "padded_width": 833,
+        "text": "(H)(C=(S))②②()(O=))C)"
+      },
+      {
+        "padded_width": 834,
+        "text": "(H)(C=C(S))②②()C(O=))C)"
+      },
+      {
+        "padded_width": 848,
+        "text": "(HI)()=C(S))②)②()C())C)"
+      },
+      {
+        "padded_width": 849,
+        "text": "(H)(C=C(S))②()C(=))C)"
+      },
+      {
+        "padded_width": 858,
+        "text": "(H)()=C(S=))②)②()())C)"
+      },
+      {
+        "padded_width": 859,
+        "text": "(H)((C=C(S))②()C(=))C.)"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1039",
+    "band": 7,
+    "n_widths": 41,
+    "modal_text": "=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9",
+    "modal_count": 41,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1040",
+    "band": 1,
+    "n_widths": 23,
+    "modal_text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=",
+    "modal_count": 23,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1040",
+    "band": 2,
+    "n_widths": 29,
+    "modal_text": "O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC",
+    "modal_count": 28,
+    "distinct_outputs": 2,
+    "outlier_widths": [
+      842
+    ],
+    "outliers": [
+      {
+        "padded_width": 842,
+        "text": "ON)②C()(()②()(C."
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1040",
+    "band": 3,
+    "n_widths": 33,
+    "modal_text": "(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)C",
+    "modal_count": 32,
+    "distinct_outputs": 2,
+    "outlier_widths": [
+      855
+    ],
+    "outliers": [
+      {
+        "padded_width": 855,
+        "text": "(=O)N(C)[C@@H]5C(=O)N[C@@H][C@@H](C)C"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1040",
+    "band": 4,
+    "n_widths": 32,
+    "modal_text": "C)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(",
+    "modal_count": 31,
+    "distinct_outputs": 2,
+    "outlier_widths": [
+      857
+    ],
+    "outliers": [
+      {
+        "padded_width": 857,
+        "text": "(C()②②((C)②②()()C)"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1040",
+    "band": 5,
+    "n_widths": 32,
+    "modal_text": "=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F",
+    "modal_count": 32,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1040",
+    "band": 6,
+    "n_widths": 36,
+    "modal_text": ")=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=",
+    "modal_count": 36,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1040",
+    "band": 7,
+    "n_widths": 41,
+    "modal_text": "C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C",
+    "modal_count": 41,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1041",
+    "band": 1,
+    "n_widths": 23,
+    "modal_text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C",
+    "modal_count": 21,
+    "distinct_outputs": 3,
+    "outlier_widths": [
+      852,
+      853
+    ],
+    "outliers": [
+      {
+        "padded_width": 852,
+        "text": "COoCC(C(C3C"
+      },
+      {
+        "padded_width": 853,
+        "text": "Co)CC(C()C3C"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1041",
+    "band": 2,
+    "n_widths": 32,
+    "modal_text": "(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](",
+    "modal_count": 32,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1041",
+    "band": 3,
+    "n_widths": 30,
+    "modal_text": "CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C",
+    "modal_count": 26,
+    "distinct_outputs": 5,
+    "outlier_widths": [
+      837,
+      838,
+      850,
+      858
+    ],
+    "outliers": [
+      {
+        "padded_width": 837,
+        "text": "C②ODO②C(O)O②②C(O)(O)C"
+      },
+      {
+        "padded_width": 838,
+        "text": "C②②D②②(O)②②C(O)(O)(C"
+      },
+      {
+        "padded_width": 850,
+        "text": "CD②(OS②②C()(OC"
+      },
+      {
+        "padded_width": 858,
+        "text": "CC(=O)N(C)[C@@H]5C(=O)N[C@@H][C@@H](C"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1041",
+    "band": 4,
+    "n_widths": 28,
+    "modal_text": ")CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)",
+    "modal_count": 26,
+    "distinct_outputs": 3,
+    "outlier_widths": [
+      843,
+      844
+    ],
+    "outliers": [
+      {
+        "padded_width": 843,
+        "text": "(()②()()②②()()C("
+      },
+      {
+        "padded_width": 844,
+        "text": "(C(O)②()()②()()C("
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1041",
+    "band": 5,
+    "n_widths": 27,
+    "modal_text": "C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C",
+    "modal_count": 26,
+    "distinct_outputs": 2,
+    "outlier_widths": [
+      840
+    ],
+    "outliers": [
+      {
+        "padded_width": 840,
+        "text": "CO(C()C)(C)CS)()CC)C"
+      }
+    ]
+  },
+  {
+    "cmpd_id": "1041",
+    "band": 6,
+    "n_widths": 37,
+    "modal_text": "(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F",
+    "modal_count": 37,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  },
+  {
+    "cmpd_id": "1041",
+    "band": 7,
+    "n_widths": 41,
+    "modal_text": ")=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C",
+    "modal_count": 41,
+    "distinct_outputs": 1,
+    "outlier_widths": [],
+    "outliers": []
+  }
+]

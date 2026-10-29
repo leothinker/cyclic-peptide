@@ -1,0 +1,28 @@
+=== Phase 1 corrected (audit review note) ===
+Bucket totals must equal candidate totals:
+  smiles_best      : 406 rows = 228 no_candidate + 178 mismatch
+  repaired_smiles  : 406 rows = 287 no_candidate + 119 mismatch
+
+Note: previous report quoted the SIGNED median of smiles_best delta_da (~+1.87 Da). The absolute-value median tells us how far off the molecule is, so the headline figure is now:
+
+--- |delta_da| summary ---
+  smiles_best: n=178 min=0.082 median=129.083 max=570.344 mean=132.456
+    quantiles: p25=43.81, p50=129.08, p75=207.05, p90=251.13, p95=265.68, p99=377.60
+  repaired_smiles: n=119 min=11.814 median=139.718 max=708.550 mean=156.510
+    quantiles: p25=71.38, p50=139.72, p75=210.06, p90=279.04, p95=357.14, p99=491.99
+
+--- "|delta_da| < 1 Da" count (real near-misses) ---
+  smiles_best      : 6
+  repaired_smiles  : 0
+
+--- count inside the patent-precise ppm tolerance ---
+  smiles_best      : 0
+  repaired_smiles  : 0
+
+--- 5 cmpd_ids closest to tolerance boundary ---
+ cmpd_id  abs_ppm  tolerance_ppm_num  ppm_gap  abs_delta
+    1146     50.9               31.1     19.8      0.082
+    1147    113.1               31.1     82.0      0.182
+    1011    148.9               33.0    115.9      0.226
+    1005    159.4               33.0    126.4      0.241
+    1008    395.7               32.4    363.3      0.610

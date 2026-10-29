@@ -1,0 +1,34 @@
+[
+  {
+    "op": "delete",
+    "ref_pos": 77,
+    "ref_text": "=",
+    "ocr_text": "",
+    "context": "(C)[C@@H]4C(=O)N(C)CC(=O)",
+    "in_carbonyl": true
+  },
+  {
+    "op": "delete",
+    "ref_pos": 204,
+    "ref_text": "(",
+    "ocr_text": "",
+    "context": "(C)[C@@H](CC(=O)N(C)[C@H]",
+    "in_carbonyl": true
+  },
+  {
+    "op": "delete",
+    "ref_pos": 239,
+    "ref_text": "(",
+    "ocr_text": "",
+    "context": "9=C(F)C(F)=C(SC4)C(F)=C9F",
+    "in_carbonyl": false
+  },
+  {
+    "op": "insert",
+    "ref_pos": 271,
+    "ref_text": "",
+    "ocr_text": ")",
+    "context": "1)C(=O)N(C)C",
+    "in_carbonyl": false
+  }
+]

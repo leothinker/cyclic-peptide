@@ -1,0 +1,109 @@
+========================================================================
+PHASE 2 - ROW / CROP GEOMETRY AUDIT, summary
+========================================================================
+
+SCOPE
+  cells in manifest.csv          : 336
+  data cells (cmpd_id present)   : 335
+  header bands (no cmpd_id)      : 1
+  detection / read failures      : 0
+  distinct source pages          : 80
+
+Every record traces to one page image and one cell bbox:
+  source_image + bbox_x1..bbox_y2 + crop_path + proc_w/proc_h.
+
+------------------------------------------------------------------------
+HEADLINE
+------------------------------------------------------------------------
+  cells with >=1 excluded glyph : 187 / 335 (55.8%)
+  excluded-glyph events total  : 215
+  cells with no such finding   : 148
+
+  CONFIRMED  events read by eye : 14 cells (14 events)
+  SUSPECTED  same signature, not individually reviewed     : 173 cells (201 events)
+  AMBIGUOUS  ink not attributable to a glyph : 0
+
+  No cell was called confirmed on pixel counts. CONFIRMED means a
+  panel was opened and the glyph was seen outside the box and seen
+  to be absent from the recogniser input. SUSPECTED means the
+  numeric signature is identical to the confirmed ones but nobody
+  has looked at that particular cell yet.
+
+------------------------------------------------------------------------
+THE FINDING
+------------------------------------------------------------------------
+  In every one of the events the excluded ink is a wide, short
+  mark sitting immediately LEFT of the detector box, at the start of
+  a wrapped printed line. It is the leading '=' of expressions such
+  as C(=O), and the detector box begins just after it.
+
+  side   left = 215   right = 0
+  inked rows per event  : {'8': 215}
+  inked cols per event  : [(24, 1), (28, 5), (29, 13), (30, 18), (31, 40), (32, 65), (33, 42), (34, 22), (35, 8), (36, 1)]
+
+  The height is 8 inked rows in every single event, i.e. two strokes
+  of four rows: that is the shape of '='. The width spread 24-36 px
+  is print and scan variation on the same glyph.
+
+  This is a systematic detector-stage defect, not a per-cell
+  accident: it recurs wherever the printed line wraps next to an
+  '='.
+
+------------------------------------------------------------------------
+WHAT WAS DELIBERATELY NOT COUNTED AS A DEFECT
+------------------------------------------------------------------------
+  148 clean cells have a left overhang of 3-10 px.
+  That ink is the left edge of an ordinary glyph such as 'C'
+  sitting a few px outside its box. It is narrow and tall, the
+  glyph is still complete, and the recogniser still reads it.
+  It is NOT character loss and is not counted as such.
+
+  contact_top is 'yes' on 335/335 cells.
+  That is the cell's own top border rule, one printed pixel of
+  horizontal rule at the very top of every crop. It is grid
+  contamination, not a clipped glyph, and carries no signal.
+
+  contact_left is 'yes' on 1 cell (cmpd 2173).
+  Inspected: the corner pixel of that cell's top border rule, not
+  a cut glyph. See probe_2173_left_edge.png.
+
+------------------------------------------------------------------------
+DISTINCTION FROM AN OCR ERROR
+------------------------------------------------------------------------
+  This audit measures geometry only. It never re-ran the recogniser
+  and never scored CER, so it makes no claim about how many
+  characters were misread overall.
+  What it establishes is narrower and firmer: for the affected
+  cells a character is physically absent from the pixels handed to
+  the recogniser. No recogniser, and no amount of candidate
+  rescoring, can recover a glyph that was never in its input.
+
+------------------------------------------------------------------------
+VISUALLY REVIEWED THIS ROUND
+------------------------------------------------------------------------
+  cmpd  1036  montage
+  cmpd  1038  montage
+  cmpd  1049  montage
+  cmpd  1054  montage
+  cmpd  1055  montage
+  cmpd  1069  montage
+  cmpd  1079  montage
+  cmpd  1083  montage
+  cmpd  1087  montage
+  cmpd  1091  montage
+  cmpd  1095  montage
+  cmpd  1099  montage
+  cmpd  2118  probe_extremes
+  cmpd  2140  probe_extremes
+
+------------------------------------------------------------------------
+REPRODUCE
+------------------------------------------------------------------------
+  .venv\Scripts\python.exe row_crop_audit_coord.py     (Task A)
+  .venv\Scripts\python.exe row_crop_audit_batch.py     (Task B, ~13 min)
+  .venv\Scripts\python.exe row_crop_audit_montage.py   (evidence panels)
+  .venv\Scripts\python.exe row_crop_audit_summary.py   (this file)
+
+  Supporting modules: row_crop_audit.py (geometry primitives)
+  Inputs are read only. No official CSV, no file under src/cpd/
+  and no existing experiment output was modified by this round.

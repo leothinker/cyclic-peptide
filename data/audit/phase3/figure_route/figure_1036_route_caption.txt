@@ -1,0 +1,11 @@
+Figure: 1036 printed SMILES, three recognition routes.
+
+production (cell crop, 2x, no binarisation): edit 82
++ threshold 200 (cell crop)                  : edit 9
+page route (page detect + line crop)         : edit 0
+
+The same comparison on 1037 (second human-verified
+reference): production edit 89, + threshold 200 edit 6,
+page route edit 0.
+
+Text recognition evidence only; the chemical structure is not verified by this figure.

@@ -1,0 +1,103 @@
+PCTCN2025075389-ftappb-I100280	shape=(2128, 1909)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100281	shape=(2495, 1913)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100282	shape=(2557, 1913)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100283	shape=(2571, 1913)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100284	shape=(2573, 1913)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100285	shape=(2495, 1913)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100286	shape=(2594, 1909)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100287	shape=(150, 1920)	ncols=7	layout=activity	rows=1	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100288	shape=(2640, 1924)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100289	shape=(2640, 1924)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100290	shape=(2640, 1924)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100291	shape=(2640, 1924)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100292	shape=(2640, 1924)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100293	shape=(2722, 1924)	ncols=7	layout=activity	rows=5	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100294	shape=(2113, 1920)	ncols=7	layout=activity	rows=4	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100295	shape=(643, 1922)	ncols=7	layout=activity	rows=2	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100296	shape=(1003, 1923)	ncols=7	layout=activity	rows=2	first_row=['cmpd_id', 'structure', 'rt_min', 'ms_mz', 'lcms_method', 'ms_polarity', 'kd_nm']
+PCTCN2025075389-ftappb-I100297	shape=(1312, 1939)	ncols=3	layout=smiles	rows=3	first_row=None
+PCTCN2025075389-ftappb-I100298	shape=(2525, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100299	shape=(2902, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100300	shape=(2435, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100301	shape=(2425, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100302	shape=(2432, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100303	shape=(2432, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100304	shape=(2471, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100305	shape=(2402, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100306	shape=(2382, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100307	shape=(2419, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100308	shape=(2494, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100309	shape=(2469, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100310	shape=(2525, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100311	shape=(2500, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100312	shape=(2469, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100313	shape=(2515, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100314	shape=(2791, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100315	shape=(2507, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100316	shape=(2471, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100317	shape=(2479, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100318	shape=(2502, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100319	shape=(2609, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100320	shape=(2565, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100321	shape=(2559, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100322	shape=(2403, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100323	shape=(2465, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100324	shape=(2432, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100325	shape=(2459, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100326	shape=(2513, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100327	shape=(2433, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100328	shape=(2409, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100329	shape=(2501, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100330	shape=(2773, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100331	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100332	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100333	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100334	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100335	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100336	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100337	shape=(2652, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100338	shape=(2646, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100339	shape=(2652, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100340	shape=(2621, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100341	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100342	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100343	shape=(2403, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100344	shape=(2391, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100345	shape=(2419, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100346	shape=(2375, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100347	shape=(2419, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100348	shape=(2834, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100349	shape=(2862, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100350	shape=(2769, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100351	shape=(2459, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100352	shape=(2471, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100353	shape=(2422, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100354	shape=(2388, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100355	shape=(2870, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100356	shape=(2438, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100357	shape=(2395, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100358	shape=(2449, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100359	shape=(2483, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100360	shape=(2474, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100361	shape=(2523, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100362	shape=(2398, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100363	shape=(2518, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100364	shape=(2518, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100365	shape=(2408, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100366	shape=(2518, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100367	shape=(2357, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100368	shape=(2397, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100369	shape=(2528, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100370	shape=(2511, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100371	shape=(2510, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100372	shape=(2531, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100373	shape=(2523, 1945)	ncols=3	layout=smiles	rows=4	first_row=None
+PCTCN2025075389-ftappb-I100374	shape=(2659, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100375	shape=(2596, 1945)	ncols=3	layout=smiles	rows=5	first_row=None
+PCTCN2025075389-ftappb-I100376	shape=(2936, 1945)	ncols=6	layout=dense	rows=47	first_row=['cmpd_id', 'structure', 'smiles']
+PCTCN2025075389-ftappb-I100377	shape=(2925, 1897)	ncols=6	layout=dense	rows=58	first_row=None
+PCTCN2025075389-ftappb-I100378	shape=(2925, 1897)	ncols=6	layout=dense	rows=58	first_row=None
+PCTCN2025075389-ftappb-I100379	shape=(2925, 1897)	ncols=6	layout=dense	rows=58	first_row=None
+PCTCN2025075389-ftappb-I100380	shape=(2925, 1897)	ncols=6	layout=dense	rows=58	first_row=None
+PCTCN2025075389-ftappb-I100381	shape=(2933, 1897)	ncols=6	layout=dense	rows=58	first_row=None
+PCTCN2025075389-ftappb-I100382	shape=(70, 1893)	ncols=17	layout=None	rows=1	first_row=None

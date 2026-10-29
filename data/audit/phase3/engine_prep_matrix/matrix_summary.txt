@@ -1,0 +1,32 @@
+=== engine x preprocessing matrix (page level, pairing fixed) ===
+
+The earlier probe changed model and preprocessing together.
+This matrix changes one axis at a time.
+
+I100297 cmpd 1036 baseline none      rows=7/7 len=250/271 edit=90 CER=0.33210 starts='CCO5CaS'
+I100297 cmpd 1037 baseline none      rows=7/7 len=245/275 edit=128 CER=0.46545 starts='CC4FCC-'
+I100297 cmpd 1036 baseline up2       rows=7/7 len=247/271 edit=87 CER=0.32103 starts='CCO5C@('
+I100297 cmpd 1037 baseline up2       rows=7/7 len=250/275 edit=101 CER=0.36727 starts='CC4=CC='
+I100297 cmpd 1036 baseline up2_th200 rows=7/7 len=268/271 edit=3 CER=0.01107 starts='CCO5C@S'
+I100297 cmpd 1037 baseline up2_th200 rows=7/7 len=273/275 edit=2 CER=0.00727 starts='CC4=CC='
+I100297 cmpd 1036 default  none      rows=7/7 len=271/271 edit=0 CER=0.00000 starts='CC=5C@('
+I100297 cmpd 1037 default  none      rows=7/7 len=251/275 edit=38 CER=0.13818 starts='CC4)CC='
+I100297 cmpd 1036 default  up2       rows=7/7 len=266/271 edit=31 CER=0.11439 starts='CC=5C@)'
+I100297 cmpd 1037 default  up2       rows=7/7 len=275/275 edit=0 CER=0.00000 starts='CC4)CC)'
+I100297 cmpd 1036 default  up2_th200 rows=6/7 len=233/271 edit=475 CER=1.75277 starts='C=5C@('
+I100297 cmpd 1037 default  up2_th200 rows=7/7 len=275/275 edit=0 CER=0.00000 starts='CC4)CC)'
+
+--- edit distance summary, references only ---
+page       cmpd   model     prep       rows     edit   CER      
+I100297    1036   baseline  none       7/7      90     0.3321   
+I100297    1037   baseline  none       7/7      128    0.46545  
+I100297    1036   baseline  up2        7/7      87     0.32103  
+I100297    1037   baseline  up2        7/7      101    0.36727  
+I100297    1036   baseline  up2_th200  7/7      3      0.01107  
+I100297    1037   baseline  up2_th200  7/7      2      0.00727  
+I100297    1036   default   none       7/7      0      0.0      
+I100297    1037   default   none       7/7      38     0.13818  
+I100297    1036   default   up2        7/7      31     0.11439  
+I100297    1037   default   up2        7/7      0      0.0      
+I100297    1036   default   up2_th200  6/7      475    1.75277  
+I100297    1037   default   up2_th200  7/7      0      0.0      

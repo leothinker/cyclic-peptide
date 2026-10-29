@@ -1,0 +1,15 @@
+=== four routes against two human-verified references ===
+
+cmpd   route                 edit      cer   len   ref  open  close
+1036   production              82  0.30258   244   271    18     33
+1036   + threshold 200          9  0.03321   270   271    38     38
+1036   whole page              31  0.11439   266   271    44     42
+1036   page + line rec          0  0.00000   271   271    38     38
+1037   production              89  0.32364   249   275    22     33
+1037   + threshold 200          6  0.02182   275   275    37     38
+1037   whole page               0  0.00000   275   275    38     38
+1037   page + line rec          0  0.00000   275   275    38     38
+
+1036 and 1037 are both human-verified transcriptions of the
+printed cells. Text level only: the chemical structure is
+not verified and the mass gate is not consulted.

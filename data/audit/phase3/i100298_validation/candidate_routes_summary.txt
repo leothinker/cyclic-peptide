@@ -1,0 +1,13 @@
+=== I100298 review candidates ===
+
+1038 is the only candidate in this group with a researcher-supplied reference.
+1039-1041 are OCR candidates pending human review.
+
+cmpd   route                     ref status            edit       cer   len  open  close
+1038   page_detect_line_rec_2x   researcher_supplied      0       0.0   273    40     40
+1039   page_line_margin8         awaiting_human_check                   275    39     39
+1040   page_line_margin8         awaiting_human_check                   270    38     37
+1041   targeted_line_2x_th200    awaiting_human_check                   273    38     38
+
+Routes for 1039-1041 were selected from previously generated outputs without using RDKit parseability, mass, or DECIMER; they remain provisional and route-dependent.
+Text level only; chemical structures are not verified.

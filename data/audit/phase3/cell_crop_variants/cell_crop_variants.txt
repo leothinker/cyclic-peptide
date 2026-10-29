@@ -1,0 +1,22 @@
+=== cell crop variants, default engine, same pixels ===
+
+1036 = human-verified reference. 1037 = agent transcription, not human-confirmed.
+A white margin is a TEST of whether the image border is theproblem, not a proposed fix.
+
+variant            cmpd  rows   len  open  close  edit      CER
+cell_trimmed       1036     7   240    45     42   111  0.40959
+cell_untrimmed     1036     7   240    45     42   111  0.40959
+cell_padded        1036     7   259    42     42    43  0.15867
+cell_untrim_pad    1036     7   259    42     42    43  0.15867
+cell_trimmed       1037     7   274    38     38     1  0.00364
+cell_untrimmed     1037     7   274    38     38     1  0.00364
+cell_padded        1037     7   275    38     38     0      0.0
+cell_untrim_pad    1037     7   275    38     38     0      0.0
+
+--- the page path, for comparison ---
+page               1036     7   271    38     38     0      0.0
+page               1037     7   251    39     37    38  0.13818
+
+--- reading the table ---
+If 'cell_trimmed' fails while 'cell_padded' succeeds, thetrim cut real ink and the border was the issue.
+If both fail while 'page' succeeds, the crop itself isfundamentally harder for the detector than the page, and theanswer is to recognise the page and attribute the linesafterwards, rather than to keep tuning the cell crop.

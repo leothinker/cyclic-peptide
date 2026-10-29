@@ -1,0 +1,38 @@
+=== I100298 right-edge clipping test ===
+
+Rows are re-cropped from the ORIGINAL PAGE IMAGE with the cell's
+right boundary moved outwards.  The row, the recogniser and the
+preprocessing are unchanged.
+
+cmpd    margin  last_row_edit   len  open  close  last row
+1038         0                  259    42     43  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+1038         8                  259    42     43  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+1038        16                  259    42     43  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+1038        24                  259    42     43  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+1038        32                  259    42     43  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+1038        48                  259    42     43  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+1039         0              0   266    41     42  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+1039         8              0   266    41     42  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+1039        16              0   266    41     42  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+1039        24              0   266    41     42  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+1039        32              0   266    41     42  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+1039        48              0   266    41     42  =C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+1040         0              0   222    44     38  C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1040         8              0   222    44     38  C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1040        16              0   222    44     38  C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1040        24              0   222    44     38  C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1040        32              0   222    44     38  C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1040        48              0   222    44     38  C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1041         0              0   273    38     38  )=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1041         8              0   273    38     38  )=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1041        16              0   273    38     38  )=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1041        24              0   273    38     38  )=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1041        32              0   273    38     38  )=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+1041        48              0   273    38     38  )=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+
+The last-row edit distance compares the final printed row with
+the printed transcription.  1038 has no transcription entry, so
+its cell is reported for geometry only.
+
+No candidate was selected by RDKit parseability, the mass gate,
+or DECIMER output.

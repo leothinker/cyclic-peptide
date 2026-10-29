@@ -1,0 +1,7 @@
+﻿variant,cmpd_id,rows,joined_len,ref_len,edit,cer,row_starts
+raw_default,1036,7,271,271,0,0.0,CC=5C@(
+raw_default,1037,7,251,275,38,0.13818,CC4)CC=
+up2_only,1036,7,212,271,120,0.4428,CCO5C5(
+up2_only,1037,7,219,275,126,0.45818,CC4=CCH
+up2_th200,1036,7,268,271,3,0.01107,CCO5C@S
+up2_th200,1037,7,273,275,2,0.00727,CC4=CC=

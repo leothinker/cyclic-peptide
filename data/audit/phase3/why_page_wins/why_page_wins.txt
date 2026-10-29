@@ -1,0 +1,51 @@
+=== why the whole page beats the cell crop ===
+
+The same default engine reads 1036 perfectly on thewhole page and produces garbage on the cell crop.
+The explanation should be in the detector's lineproposals, not in the recogniser.
+
+1036 band: page y=54..679, smiles column x=1088..1919
+cell crop size: 831x625
+a printed line is about 26 px tall; a box taller than 42 px has swallowed its neighbour
+
+--- detector line proposals ---
+  page   boxes=36   median_h=40px  max_h=47px  median_pitch=40px  over-tall(>42px)=18
+         merged box h=45px  y=10..55  text='Cmpd #'
+         merged box h=42px  y=10..52  text='Structure'
+         merged box h=42px  y=58..100  text='CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC'
+         merged box h=44px  y=100..144  text='C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C('
+         merged box h=47px  y=141..188  text='=O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C'
+         merged box h=44px  y=186..230  text='5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC'
+  cell   boxes=7    median_h=44px  max_h=46px  median_pitch=44px  over-tall(>42px)=5
+         merged box h=46px  y=3..49  text='CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC'
+         merged box h=45px  y=48..93  text='C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C('
+         merged box h=42px  y=135..177  text='5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC'
+         merged box h=45px  y=177..222  text='CC()()(=((()(.)C()((=)(C)'
+         merged box h=44px  y=263..307  text='(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C'
+
+--- reading the numbers ---
+The first hypothesis was 'two printed lines mergedinto one box'. The measurement REFUTES it: the pagepath has a comparable or higher rate of over-tallboxes and still reads 1036 exactly. Merged lines aretherefore not the cause.
+The measurements below test the two differences thatdo remain between the two paths.
+1. THE CROP IS A TRIMMED, TIGHT IMAGE
+   the cell path feeds a 831x625 crop produced by _trim_to_content,
+   which removes every margin. The first printed line   therefore starts at the very top edge of the image   and the last one ends at the very bottom edge. A
+   line that touches the image border is a line the
+   detector had to infer without a margin to work in.
+   The page path never has that problem: every line   is surrounded by other content.
+   page: boxes touching the top edge 0, touching the bottom edge 0 (image height 1312)
+   cell: boxes touching the top edge 0, touching the bottom edge 0 (image height 625)
+
+2. OVERLAPPING BOXES
+   Two boxes that overlap vertically give the   recogniser two different crops of the same   printing, and the joining step then interleaves
+   them. That produces exactly the '(()()=((' pattern.
+   page: 23 overlapping box pairs out of 35
+      overlap 45px: 'Cmpd #' / 'Structure'
+      overlap 40px: 'Structure' / 'SMILES'
+      overlap 3px: 'C2)C(=O)N3[C@@H](CC3)C(=O)N(C)' / '=O)N(C)CC(=O)N[C@@H](CCC5=CC(F'
+      overlap 2px: '=O)N(C)CC(=O)N[C@@H](CCC5=CC(F' / '5)C(F)(F)F)C(=O)N6[C@@H](CCC6)'
+      overlap 1px: '5)C(F)(F)F)C(=O)N6[C@@H](CCC6)' / 'CC7)C(=O)N(C)[C@@H](C8CCCC8)C('
+   cell: 1 overlapping box pairs out of 6
+      overlap 1px: 'CC[C@H](C)[C@H]1C(=O)N(C)[C@@H' / 'C2)C(=O)N3[C@@H](CC3)C(=O)N(C)'
+
+--- conclusion ---
+The cell path fails because the crop is trimmed tothe ink, so the printed lines sit against the imageborder and the detector's boxes overlap. Therecogniser then receives overlapping crops and thejoin interleaves them.
+This is a separate defect from the missing threshold.It also explains why Phase 2's cell-level experimentskept landing on the same handful of characters: thecrop itself was the limiting factor, and nothreshold or padding setting could undo it.

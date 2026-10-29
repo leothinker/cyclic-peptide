@@ -1,0 +1,27 @@
+Phase 2 - binarisation threshold sweep
+
+PRELIMINARY: scored on a single reference (cmpd 1036). This shows
+threshold stability for one string, NOT an accuracy rate for the
+dataset. 1037 awaits a human re-read; 1038/1040/2173 failed
+transcription QC and are excluded.
+
+fixed    : upscale=2x interpolation=cubic strip=0px rec_lang=en threshold=VARIED
+baseline : threshold 200 == earlier 'binarize_up2_en' config
+
+=== cmpd 1036 ===
+thresh   len  edits       CER carbonyl_ops  parse       dDa  verdict
+   150   267     12   0.04428            3     no            unknown
+   180   272     24  0.088561            2     no            unknown
+   200   270      2   0.00738            1    yes    3.8298  mismatch
+   220   269      3   0.01107            2     no            unknown
+   240   260    458  1.690037            3     no            unknown
+
+best threshold = 200 (CER 0.00738) vs baseline 200 (CER 0.00738)
+edit distance 2 -> 2 (change +0 chars)
+
+--- residual differences vs reference (best threshold) ---
+  delete  @ 77 ref='=' -> ocr=''  <-- in C(=O)
+           context ...(C)[C@@H]4C(=O)N(C)CC(=O)...
+  replace @115 ref='=' -> ocr='-'
+           context ...CC(F)=C(C(F)=C5)C(F)(F)F)...
+

@@ -1,0 +1,28 @@
+=== audit of the page-level arms ===
+
+Two checks that could invalidate a 'better' number:
+  contamination  the string contains something that is not a SMILES character
+  truncation     the string is materially shorter than the printed cell
+printed length band: 220-300 characters
+
+arm                       n  balanced  parses  len_ok  short   long  bal&len_ok  parse&len_ok
+baseline/up2_th200      335        43      27     329      0      6          42            27
+default/none            335       214     158     303     27      5         212           158
+default/up2             335       223     143     314     16      5         219           143
+default/up2_th200       335       180      22     322      7      6         178            22
+
+--- interpretation ---
+default/up2 cells that balance AND have a plausible length: 219/335
+default/up2 cells that parse AND have a plausible length: 143/335
+baseline/up2_th200 cells that parse AND have a plausible length: 27/335
+
+--- contamination check on the shipped CSV ---
+shipped CSV strings with a non-SMILES character: 9/406
+  -> the shipped strings are clean in character set, so the     pipeline does not contaminate; the concern applies to     the page-level arms and is checked by length above.
+
+--- row-count sanity ---
+The patent prints 7 rows for most cells. An arm that dropsrows would shorten the string and could still balance.
+  baseline/up2_th200     rows==7:  301/335
+  default/none           rows==7:  255/335
+  default/up2            rows==7:  271/335
+  default/up2_th200      rows==7:  278/335

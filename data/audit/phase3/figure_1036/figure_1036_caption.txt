@@ -1,0 +1,4 @@
+Figure: 1036 printed SMILES, production vs threshold-200 binarisation
+production : edit 82, CER 0.30258, open parens 18 / close 33
+binarised  : edit 9, CER 0.03321, open parens 38 / close 38
+Text recognition evidence only; the chemical structure is not verified by this figure.

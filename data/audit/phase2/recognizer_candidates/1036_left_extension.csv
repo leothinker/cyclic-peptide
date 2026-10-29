@@ -1,0 +1,9 @@
+﻿pad_left_px,line2_head,leading_equals_recovered,joined_len,edit_distance,cer,has_minus_error
+0,O)N(C)CC(=O),False,270,2,0.00738,True
+8,O)N(C)CC(=O),False,270,15,0.055351,True
+16,-O)N(C)CC(=O,False,271,2,0.00738,True
+24,-O)N(C)CC(=O,False,271,15,0.055351,True
+30,-O)N(C)CC(=O,False,271,2,0.00738,True
+36,-O)N(C)CC(=O,False,271,2,0.00738,True
+48,O)N(C)CC=O)N,False,269,11,0.04059,True
+64,O)N(C)CC=O)N,False,269,11,0.04059,True

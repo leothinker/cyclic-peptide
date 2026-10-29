@@ -1,0 +1,162 @@
+[
+  {
+    "cmpd_id": "1038",
+    "arm": "baseline",
+    "reference_status": "researcher_supplied_held_out",
+    "ref_len": 272,
+    "ocr_len": 273,
+    "edit": 1,
+    "cer": 0.003676,
+    "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C"
+  },
+  {
+    "cmpd_id": "1038",
+    "arm": "height48",
+    "reference_status": "researcher_supplied_held_out",
+    "ref_len": 272,
+    "ocr_len": 273,
+    "edit": 3,
+    "cer": 0.011029,
+    "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=0)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)−C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C"
+  },
+  {
+    "cmpd_id": "1038",
+    "arm": "height48_q8",
+    "reference_status": "researcher_supplied_held_out",
+    "ref_len": 272,
+    "ocr_len": 273,
+    "edit": 4,
+    "cer": 0.014706,
+    "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=0)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)−C(SC3)C(F)=C8F)C(=O)N1)C(=0)N(C)C"
+  },
+  {
+    "cmpd_id": "1038",
+    "arm": "chunked",
+    "reference_status": "researcher_supplied_held_out",
+    "ref_len": 272,
+    "ocr_len": 262,
+    "edit": 26,
+    "cer": 0.095588,
+    "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@I1](C)C(=0)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C(@@H](CCC4=CC(F)C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=D)C(CC6)C(=O)N(C)[C@()C(C)C)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)−C(SC3)C(F)=C8F)C((=0)N1)C(=0)N(C)C"
+  },
+  {
+    "cmpd_id": "1039",
+    "arm": "baseline",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 274,
+    "ocr_len": 275,
+    "edit": 1,
+    "cer": 0.00365,
+    "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9"
+  },
+  {
+    "cmpd_id": "1039",
+    "arm": "height48",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 274,
+    "ocr_len": 275,
+    "edit": 2,
+    "cer": 0.007299,
+    "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=0)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9"
+  },
+  {
+    "cmpd_id": "1039",
+    "arm": "height48_q8",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 274,
+    "ocr_len": 275,
+    "edit": 2,
+    "cer": 0.007299,
+    "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=0)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9"
+  },
+  {
+    "cmpd_id": "1039",
+    "arm": "chunked",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 274,
+    "ocr_len": 262,
+    "edit": 38,
+    "cer": 0.138686,
+    "text": "CC[C@H](C)[C@H]1C(=O)N(C)[C@@I1](C)C(=0)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C(@@H](CCC4=CC(F)C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=D(C(CC6)C(=O)N(C)[C@()C()C)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)-C(SC3)C(F)=C8F)CO6N(O=)O(IN(O=)CCC9"
+  },
+  {
+    "cmpd_id": "1040",
+    "arm": "baseline",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 271,
+    "ocr_len": 271,
+    "edit": 0,
+    "cer": 0.0,
+    "text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C"
+  },
+  {
+    "cmpd_id": "1040",
+    "arm": "height48",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 271,
+    "ocr_len": 271,
+    "edit": 0,
+    "cer": 0.0,
+    "text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C"
+  },
+  {
+    "cmpd_id": "1040",
+    "arm": "height48_q8",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 271,
+    "ocr_len": 271,
+    "edit": 0,
+    "cer": 0.0,
+    "text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C"
+  },
+  {
+    "cmpd_id": "1040",
+    "arm": "chunked",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 271,
+    "ocr_len": 269,
+    "edit": 21,
+    "cer": 0.077491,
+    "text": "CCO[C@H]1CN2[C@@H](C1)C(=0)NC3(CC3)C(=O)N(C)[C@@H](C4CCCC4)C(=0)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H][C@@H](C)CC)C(=O)N(C)[C@@②(]N(O=)(C)C②H](CC6)C(−O)N(C)[C@H](CSCC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)C(C(=0)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=0)C(=0)N(C)C"
+  },
+  {
+    "cmpd_id": "1041",
+    "arm": "baseline",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 273,
+    "ocr_len": 273,
+    "edit": 0,
+    "cer": 0.0,
+    "text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C"
+  },
+  {
+    "cmpd_id": "1041",
+    "arm": "height48",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 273,
+    "ocr_len": 273,
+    "edit": 0,
+    "cer": 0.0,
+    "text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C"
+  },
+  {
+    "cmpd_id": "1041",
+    "arm": "height48_q8",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 273,
+    "ocr_len": 273,
+    "edit": 1,
+    "cer": 0.003663,
+    "text": "CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=0)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C"
+  },
+  {
+    "cmpd_id": "1041",
+    "arm": "chunked",
+    "reference_status": "phase3_transcription_awaiting_human_check",
+    "ref_len": 273,
+    "ocr_len": 272,
+    "edit": 9,
+    "cer": 0.032967,
+    "text": "CCO[C@H]1CN2[C@@H](C1)C(=0)NC3(CCCC3)C(=O)N(C)[C@@H](4CCCC4)C(=0)N(C)[C@@H](CC(=O)N(C)[C@@I1]5C(=O)N[C@@H][C@@H](C)CC)C(=0)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=0)C(=0)N(C)C"
+  }
+]

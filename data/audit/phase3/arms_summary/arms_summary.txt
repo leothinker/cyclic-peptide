@@ -1,0 +1,22 @@
+=== all Phase 3 arms, one table ===
+
+experiment               arm                           n   bal  rowok  strict  parse  medlen  stray  edit1036
+cell crop                cell/default/up2            335   169    316     159     55     263     53       166
+cell crop                cell/default/none           335   157    321     151     55     263     82       111
+cell crop                cell/default/up2_th200      335   122    305     114     17     260     96       117
+cell crop                cell/baseline/up2_th200     335    54    333      52     34     269      6         9
+cell crop                                            335     0    335       0      0       0      0          
+whole page               default/up2                 335   223    301     212    143     266      0          
+whole page               default/none                335   214    284     198    158     265      0          
+whole page               baseline/up2_th200          335    43    325      40     27     269      0          
+page detect + line rec   pdet_def_rec_def_2x         335   190    307     183     87     265     24         0
+page detect + line rec   pdet_def_rec_def_1x         335   147    287     138     73     260     49       112
+page detect + line rec   pdet_def_rec_base_2x        335     3    307       3      1     262      1         5
+page detect + line rec   pdet_def_rec_base_1x        335     3    287       2      1     262      5        39
+page detect + line rec   pdet_base_rec_base_1x       335     1    325       1      1     265     18        77
+page detect + line rec   pdet_base_rec_base_2x       335     0    325       0      0     262      9        52
+
+strict  = balanced AND rows recovered AND length 220-300
+edit1036 = character errors against the human-verified 1036 text (L3, text only)
+stray = cells containing a character that cannot occur in a SMILES string
+This table is text level. No structure is verified.

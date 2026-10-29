@@ -1,0 +1,50 @@
+=== 1036: character accuracy, production vs +binarise ===
+Reference: human-verified transcription of the printed cell in I100297.This is a TEXT check. It does not verify the chemical structure and does not affect the mass gate.
+1036 band index   : 1 (page rows y=54..679)
+reference length  : 271
+production length : 244
+binarised length  : 270
+
+production  edit=82   CER=0.30258 open=18 close=33 rows=7
+binarised   edit=9    CER=0.03321 open=38 close=38 rows=7
+
+--- character-level diff, production ---
+differing blocks: 15, differing chars: 82
+  ref[7:8]='(' -> got[7:7]=''
+  ref[42:46]='(=O)' -> got[41:43]='=O'
+  ref[54:55]='(' -> got[51:51]=''
+  ref[58:66]=')C(=O)N(' -> got[54:59]='C=O)N'
+  ref[76:87]='(=O)N(C)CC(' -> got[69:76]='O)N(CCC'
+  ref[102:103]='=' -> got[91:92]='-'
+  ref[129:131]='(=' -> got[118:119]='-'
+  ref[141:142]='(' -> got[129:129]=''
+  ref[146:149]=')C(' -> got[133:134]='C'
+  ref[155:156]='(' -> got[140:140]=''
+  ref[163:164]='(' -> got[147:147]=''
+  ref[187:224]='(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=' -> got[170:201]='-O)N(C)[Ca@H]CC=O)N(C)C@H]CCNC-'
+  ref[230:231]='(' -> got[207:207]=''
+  ref[254:255]='(' -> got[230:230]=''
+  ref[262:271]='(=O)N(C)C' -> got[237:244]='-O)N(CC'
+
+--- character-level diff, binarised ---
+differing blocks: 2, differing chars: 9
+  ref[77:78]='=' -> got[77:77]=''
+  ref[108:116]='=C(C(F)=' -> got[107:115]='-C(C(F)-'
+
+--- recognised rows ---
+production rows:
+  0: CC[C@H]C)[C@H]1C(=O)N(C)[C@@H](C2CCCC
+  1: C2)C=ON3[C@@H]CC3C=O)NC)[C@@H]4C
+  2: O)N(CCC=O)N[C@@H](CCC5-CC(F)=C(C(F)=C
+  3: 5)C(F)(F)F)C-O)N6[C@@H]CCC6C=O)NC7CC
+  4: CC7)C=O)N(C)[C@@H](C8CCCC8)C-O)N(C)[Ca
+  5: @H]CC=O)N(C)C@H]CCNC-S)C9=CF)C(F)=C
+  6: (SC4)C(F)=C9F)C=O)N1)C-O)N(CC
+binarised rows:
+  0: CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC
+  1: C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(
+  2: O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C
+  3: 5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC
+  4: CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@
+  5: @H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C
+  6: (SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C

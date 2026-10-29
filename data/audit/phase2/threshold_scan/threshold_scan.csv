@@ -1,0 +1,6 @@
+﻿cmpd_id,threshold,upscale,strip_px,rec_lang,source_image,crop_path,reference_len,raw_len,edit_distance,cer,n_diff_ops,n_ops_in_carbonyl,rdkit_parse,ms_mz,ms_polarity,mass_gate_verdict,mass_delta_da,mass_error_ppm,raw_ocr_file,diff_file
+1036,150,2,0,en,PCTCN2025075389-ftappb-I100297.jpg,cells_text/I100297_1036_text.png,271,267,12,0.04428,3,3,no,1610.9,[M+H]+,unknown,,,raw_ocr/1036_th150.txt,raw_ocr/1036_th150_diff.json
+1036,180,2,0,en,PCTCN2025075389-ftappb-I100297.jpg,cells_text/I100297_1036_text.png,271,272,24,0.088561,5,2,no,1610.9,[M+H]+,unknown,,,raw_ocr/1036_th180.txt,raw_ocr/1036_th180_diff.json
+1036,200,2,0,en,PCTCN2025075389-ftappb-I100297.jpg,cells_text/I100297_1036_text.png,271,270,2,0.00738,2,1,yes,1610.9,[M+H]+,mismatch,3.8298,-2373.3,raw_ocr/1036_th200.txt,raw_ocr/1036_th200_diff.json
+1036,220,2,0,en,PCTCN2025075389-ftappb-I100297.jpg,cells_text/I100297_1036_text.png,271,269,3,0.01107,3,2,no,1610.9,[M+H]+,unknown,,,raw_ocr/1036_th220.txt,raw_ocr/1036_th220_diff.json
+1036,240,2,0,en,PCTCN2025075389-ftappb-I100297.jpg,cells_text/I100297_1036_text.png,271,260,458,1.690037,5,3,no,1610.9,[M+H]+,unknown,,,raw_ocr/1036_th240.txt,raw_ocr/1036_th240_diff.json

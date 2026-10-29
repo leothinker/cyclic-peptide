@@ -1,0 +1,16 @@
+=== structure-column contamination removed ===
+
+cells  : 2
+pages  : 1
+errors : 0
+
+arm                   n   bal  rowok  strict  parse  edit1036
+centre                2     1      2       1      1        31
+boxclip               2     1      0       0      0       136
+boxclip_recrop        2     0      0       0      0       121
+
+centre        : a row counts when its centre is inside the column
+boxclip       : the whole box must be inside the column
+boxclip_recrop: as boxclip, every row is cropped out and recognised alone
+
+Text level. No structure is verified.

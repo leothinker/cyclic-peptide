@@ -1,0 +1,22 @@
+Phase 2 - morphological dilation on top of the best threshold
+
+PRELIMINARY: single reference (cmpd 1036). Not a dataset accuracy.
+pinned    : threshold=200 upscale=2x strip=0 rec_lang=en
+variable  : dilation kernel only (1x1 == no dilation == sweep best)
+
+=== cmpd 1036 ===
+ kernel   len  edits       CER  parse       dDa  verdict
+    1x1   270      2   0.00738    yes    3.8298  mismatch
+    2x2   269      4   0.01476     no            unknown
+    3x1   268     11   0.04059     no            unknown
+    3x2   269     19  0.070111     no            unknown
+
+best kernel 1x1 (CER 0.00738, edits 2) vs no dilation (CER 0.00738, edits 2)
+dilation did NOT help: the residual errors are not fixed by thickening strokes
+
+--- residual differences (1x1) ---
+  delete  @ 77 ref='=' -> ocr=''  <-- in C(=O)
+           context ...(C)[C@@H]4C(=O)N(C)CC(=O)...
+  replace @115 ref='=' -> ocr='-'
+           context ...CC(F)=C(C(F)=C5)C(F)(F)F)...
+

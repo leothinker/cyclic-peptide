@@ -1,0 +1,7 @@
+﻿cmpd_id,config,description,pad_right_px,pad_source_px,white_margin_px,ink_pad_px,mode,reference_len,raw_len,edit_distance,cer,n_diff_ops,n_ops_in_carbonyl,rdkit_parse,ms_mz,ms_polarity,mass_gate_verdict,mass_delta_da,raw_ocr_file,diff_file
+1036,baseline_detrec,"detector boxes, det+rec (unchanged)",0,0.0,0,0,det+rec,271,270,2,0.00738,2,1,yes,1610.9,[M+H]+,mismatch,3.8298,raw_ocr/1036__baseline_detrec.txt,raw_ocr/1036__baseline_detrec_diff.json
+1036,baseline_reconly,"detector boxes, rec-only",0,0.0,0,0,rec-only,271,270,2,0.00738,2,1,yes,1610.9,[M+H]+,mismatch,3.8298,raw_ocr/1036__baseline_reconly.txt,raw_ocr/1036__baseline_reconly_diff.json
+1036,pad4_reconly,"box right +4px, rec-only",4,2.0,0,0,rec-only,271,270,2,0.00738,2,1,yes,1610.9,[M+H]+,mismatch,3.8298,raw_ocr/1036__pad4_reconly.txt,raw_ocr/1036__pad4_reconly_diff.json
+1036,pad8_reconly,"box right +8px, rec-only",8,4.0,0,0,rec-only,271,274,13,0.04797,6,1,no,1610.9,[M+H]+,unknown,,raw_ocr/1036__pad8_reconly.txt,raw_ocr/1036__pad8_reconly_diff.json
+1036,pad12_reconly,"box right +12px, rec-only",12,6.0,0,0,rec-only,271,271,10,0.0369,3,1,no,1610.9,[M+H]+,unknown,,raw_ocr/1036__pad12_reconly.txt,raw_ocr/1036__pad12_reconly_diff.json
+1036,recover_white8_reconly,"extend box to full ink (+4px), then 8px white margin, rec-only",0,0.0,8,4,rec-only,271,275,14,0.051661,5,1,no,1610.9,[M+H]+,unknown,,raw_ocr/1036__recover_white8_reconly.txt,raw_ocr/1036__recover_white8_reconly_diff.json

@@ -1,0 +1,30 @@
+=== systemic fingerprint across independent sources ===
+cells: 335
+paren_excess = unmatched ')' in the joined printed SMILES.A correct SMILES string has 0; a positive value meansopening parentheses were lost during recognition.
+source                        n  excess>0   median    mean  balanced   parsesproduction (fresh run)      335       335       12   11.80         0        0
+shipped CSV                 335       335       12   11.90         0        0
+production + binarise       335       249        1    1.75        54       34
+
+--- agreement between the fresh production run and the shipped CSV ---
+  character-for-character identical : 228/335 (68.1%)
+  identical paren_excess            : 279/335 (83.3%)
+  correlation of paren_excess        : 0.9861
+  length difference: median 0, 329/335 differ by <= 2 characters
+  -> where the strings differ, they differ by a couple of     characters at the crop edge, but the DEFECT is the     same in both. The diagnosis does not depend on the     strings being identical.
+--- what the binarised arm changes ---
+  fewer unmatched ')' : 328/335 (97.9%)
+  more unmatched ')'  : 5/335
+  balanced now        : 54/335 (production: 0/335)
+  RDKit-parses now    : 34/335 (production: 0/335)
+
+--- remaining errors after binarisation ---
+  cells with balanced parentheses : 62
+  of those, still not RDKit-parsable: 28
+  -> a second, separate error class remains. Balanced     brackets are necessary, not sufficient: '=' read as     '-' or dropped still breaks the parse. That class is     what the phase-2 '=' investigations were chasing, and     it is NOT solved by binarisation.
+--- evidence levels, kept separate ---
+  level 1  printed text is balanced      : measured
+           production 0/335, binarised 54/335
+  level 2  RDKit can parse the string    : measured
+           production 0/335, binarised 34/335
+  level 3  the structure is chemically  : NOT measured here
+           correct. No claim is made about it.

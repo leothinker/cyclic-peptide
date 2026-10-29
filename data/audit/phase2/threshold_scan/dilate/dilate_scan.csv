@@ -1,0 +1,5 @@
+﻿cmpd_id,threshold,dilate_kernel,reference_len,raw_len,edit_distance,cer,n_diff_ops,n_ops_in_carbonyl,rdkit_parse,ms_mz,ms_polarity,mass_gate_verdict,mass_delta_da,raw_ocr_file,diff_file
+1036,200,1x1,271,270,2,0.00738,2,1,yes,1610.9,[M+H]+,mismatch,3.8298,raw_ocr/1036_k1x1.txt,raw_ocr/1036_k1x1_diff.json
+1036,200,2x2,271,269,4,0.01476,4,2,no,1610.9,[M+H]+,unknown,,raw_ocr/1036_k2x2.txt,raw_ocr/1036_k2x2_diff.json
+1036,200,3x1,271,268,11,0.04059,5,1,no,1610.9,[M+H]+,unknown,,raw_ocr/1036_k3x1.txt,raw_ocr/1036_k3x1_diff.json
+1036,200,3x2,271,269,19,0.070111,6,2,no,1610.9,[M+H]+,unknown,,raw_ocr/1036_k3x2.txt,raw_ocr/1036_k3x2_diff.json

@@ -1,0 +1,16 @@
+=== widening the left edge of every detected row crop ===
+
+cells  : 335
+pages  : 80
+errors : 0
+
+ margin   bal  rowok  strict  parse  cross  edit1036  edit1037
+      0   180    301     172     82    335        31         0
+      8   190    301     181     80    335        57         0
+     16   180    301     172     78    335        37         0
+     24   146    301     136     65    335         0        34
+
+cross = number of row crops whose widened left edge
+reaches past the production SMILES column boundary.
+
+Text level. No structure is verified.

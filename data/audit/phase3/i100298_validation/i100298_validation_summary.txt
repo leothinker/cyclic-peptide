@@ -1,0 +1,24 @@
+=== I100298 targeted validation (1038-1041) ===
+
+Model: upstream RapidOCR default engine (PP-OCRv6 detector + PP-OCRv6 recogniser).
+Input: original-resolution text crop, seven printed rows segmented from ink projection, each row recognised independently.
+
+1038 reference status: researcher-supplied verbatim.
+1039-1041 reference status: awaiting human check; outputs are candidates only.
+
+cmpd   arm               edit       cer   len   rows  open  close   bal  parse
+1038   line_1x_none        38  0.139194   259    7/7    42     43    no     no
+1038   line_2x_none        43  0.157509   264    7/7    45     44    no     no
+1038   line_2x_th200        1  0.003663   273    7/7    40     40   yes     no
+1039   line_1x_none                       266    7/7    41     42    no     no
+1039   line_2x_none                       269    7/7    42     43    no     no
+1039   line_2x_th200                      275    7/7    39     39   yes     no
+1040   line_1x_none                       222    7/7    44     38    no     no
+1040   line_2x_none                       221    7/7    45     38    no     no
+1040   line_2x_th200                      261    7/7    44     41    no     no
+1041   line_1x_none                       273    7/7    38     38   yes    yes
+1041   line_2x_none                       273    7/7    38     38   yes    yes
+1041   line_2x_th200                      273    7/7    38     38   yes    yes
+
+No candidate is selected by mass-gate, DECIMER, or RDKit parseability.
+Text level only; chemical structure is not verified.

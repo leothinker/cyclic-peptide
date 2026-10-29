@@ -1,0 +1,6 @@
+﻿cmpd_id,reference_len,ms_mz,ms_polarity,formula,expected_mass,observed_mass,delta_da,error_ppm,tolerance_ppm,mass_gate_verdict,transcription_admissible,text_reference_human_verified,rdkit_parses,structure_verified,reference_provenance
+1036,271,1610.9,[M+H]+,C75H100F9N13O12S2,1609.8927,1609.6912,-0.2015,125.2,31.0,mismatch,yes,yes,yes,no,"supplied verbatim by the researcher, transcribed from I100297 and confirmed against the printed cell"
+1037,275,1618.8,[M+H]+,C76H96F9N13O12S2,1617.7927,1617.6599,-0.1328,82.1,30.9,mismatch,yes,no,yes,no,agent transcription from I100297 zoomed 1.6x bands; NOT yet confirmed by a human reader
+1038,272,1624.8,[M+H]+,C71H91F12N13O12S2,1623.7927,1609.616,-14.1767,8807.5,30.8,mismatch,no,no,yes,no,agent transcription from I100298 zoomed 1.6x bands; NOT yet confirmed by a human reader
+1040,274,1558.8,[M+H]+,C73H98F9N13O13S2,1557.7927,1599.6705,41.8778,-26179.0,32.1,mismatch,no,no,yes,no,agent transcription from I100298 zoomed 1.6x bands; NOT yet confirmed by a human reader
+2173,283,1625.0,[M+H]+,C81H114F7N15O13,1623.9927,1637.8609,13.8682,-8467.2,30.8,mismatch,no,no,yes,no,"agent transcription from I100376 leading row, zoomed 1.6x bands; NOT yet confirmed by a human reader"

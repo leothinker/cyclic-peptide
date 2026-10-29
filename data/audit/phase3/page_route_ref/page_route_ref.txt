@@ -1,0 +1,14 @@
+=== whole-page route, character accuracy on the reference set ===
+
+arm: default/up2  (whole page, 2x upscale, default engine, rows attributed inside the production SMILES column)
+
+cmpd   ref status           edit      cer   len   ref    rows   bal  parse
+1036   human_verified         31  0.11439   266   271   7/7      no     no
+1037   agent_transcription     0  0.00000   275   275   7/7     yes    yes
+1038   agent_transcription    13  0.04779   273   272   7/7     yes     no
+1040   agent_transcription     5  0.01825   270   274   7/7      no     no
+2173   agent_transcription     8  0.02827   282   283   8/8     yes    yes
+
+Only 1036 carries a human-verified reference; the other
+rows are agent transcriptions and are indicative only.
+Text level. No structure is verified.

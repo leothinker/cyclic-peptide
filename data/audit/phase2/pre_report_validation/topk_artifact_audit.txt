@@ -1,0 +1,55 @@
+=== orphaned topk artifact audit ===
+
+1. ENGINE INDEPENDENCE
+   engines present          : ['ch_PP-OCRv4', 'en_PP-OCRv4']
+   texts identical          : True
+   per-char top3 identical  : True
+   stray 'engine' keys      : [(21, 'ch_PP-OCRv4')]
+   => the two sections are byte-identical; they cannot be
+      two independent recognition runs. Treat whichever
+      engine label is present as UNVERIFIED.
+
+2. RECONSTRUCTION vs HUMAN-VERIFIED REFERENCE
+
+   cmpd 1036: rows=7 joined=271 ref=271
+   edit_distance = 0   CER = 0.00000
+   page lines present : [3, 4, 5, 6, 7, 9, 11]
+   page lines absent  : [8, 10]
+
+   cmpd 1037: rows=6 joined=235 ref=275
+   edit_distance = 40   CER = 0.14545
+   page lines present : [18, 20, 21, 22, 23, 25]
+   page lines absent  : [19, 24]
+     delete   ref[39:78]='CC=C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]' got=''
+     delete   ref[240:241]=')' got=''
+
+   production baseline, cmpd 1036 (pad 0): len=270 edit=2 CER=0.00738
+
+3. WHICH CHARACTERS GET CLIPPED AT ROW START
+   cmpd 1036: row-by-row alignment vs reference is only
+   meaningful while the row count matches; 1037 is missing a
+   whole row so every offset after it is shifted and any
+   per-row diff here would be an artefact, not evidence.
+
+4. INTERNAL CONSISTENCY OF THE PER-CHAR top3 FIELD
+   a trustworthy row must satisfy top3[0].char == text[i]
+   pageline  3: 38/38 positions agree
+   pageline  4: 39/39 positions agree
+   pageline  5: 40/40 positions agree
+   pageline  6: 41/41 positions agree
+   pageline  7: 40/40 positions agree
+   pageline  9: 41/41 positions agree
+   pageline 11: 32/32 positions agree
+   pageline 18: 38/39 positions agree  <-- 1 MISMATCHED
+      pos0 chosen='C' but top3[0]='È'; rows starting with that char: []
+   pageline 20: 29/40 positions agree  <-- 11 MISMATCHED
+      pos0 chosen='4' but top3[0]='C'; rows starting with that char: ['CC[C@H](', 'C2)C(=O)', 'CC7)C(=O', 'C@@H](CC']
+   pageline 21: 4/42 positions agree  <-- 38 MISMATCHED
+      pos0 chosen=')' but top3[0]='4'; rows starting with that char: []
+   pageline 22: 3/40 positions agree  <-- 37 MISMATCHED
+      pos0 chosen='C' but top3[0]=')'; rows starting with that char: []
+   pageline 23: 12/40 positions agree  <-- 28 MISMATCHED
+      pos0 chosen='C' but top3[0]='C'; rows starting with that char: ['CC[C@H](', 'C2)C(=O)', 'CC7)C(=O', '4C(=O)N(']
+   pageline 25: 31/34 positions agree  <-- 3 MISMATCHED
+      pos0 chosen='=' but top3[0]='H'; rows starting with that char: []
+   rows with inconsistent top3: [18, 20, 21, 22, 23, 25]

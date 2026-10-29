@@ -1,0 +1,20 @@
+=== determinism of the page route ===
+
+arm    : pdet_def_rec_def_2x
+pages  : I100297, I100298, I100300
+repeats: 3
+
+A run is identical when every compound on the page has
+the same recognised text as the first run.
+
+--- I100297: 2 compounds
+
+--- I100298: 4 compounds
+
+--- I100300: 4 compounds
+
+compound-runs compared : 20
+non-identical          : 0
+worst edit distance    : 0
+
+VERDICT: deterministic

@@ -1,0 +1,24 @@
+=== cell crop x recogniser, corpus scale ===
+
+cells 1340, pages 80, errors 0
+All arms share the identical cell crop, so only the
+recogniser and the preprocessing differ.
+
+strict = balanced AND rows match the printed count AND length in 220-300
+
+arm                             n   bal  rowsOK  strict  parses  illegal  medlen
+cell/default/none             335   157     321     151      55       82     263
+cell/default/up2              335   169     316     159      55       53     263
+cell/default/up2_th200        335   122     305     114      17       96     260
+cell/baseline/up2_th200       335    54     333      52      34        6     269
+
+--- per-arm, the two reference compounds ---
+Only 1036 and 1037 have a text reference. The rest is reference-free.
+  cell/default/none            1036 len=240  rows=7/7 balanced=False parses=False
+  cell/default/none            1037 len=274  rows=7/7 balanced=False parses=False
+  cell/default/up2             1036 len=186  rows=7/7 balanced=False parses=False
+  cell/default/up2             1037 len=275  rows=7/7 balanced=True  parses=True
+  cell/default/up2_th200       1036 len=231  rows=7/7 balanced=False parses=False
+  cell/default/up2_th200       1037 len=275  rows=7/7 balanced=True  parses=True
+  cell/baseline/up2_th200      1036 len=270  rows=7/7 balanced=True  parses=True
+  cell/baseline/up2_th200      1037 len=275  rows=7/7 balanced=False parses=False

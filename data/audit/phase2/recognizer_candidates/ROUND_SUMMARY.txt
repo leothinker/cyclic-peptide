@@ -1,0 +1,195 @@
+========================================================================
+Phase 2, round "recogniser candidates"  --  Tasks 1-3, final summary
+========================================================================
+
+TL;DR
+  Task 1  1037 does NOT pass the mass gate. The earlier "yes" was a
+          transcription-QC column, not a verdict. Retracted.
+  Task 2  The recogniser exposes per-timestep probabilities. It does NOT
+          expose beam search or logits, and its top_k API structurally
+          cannot return a character that greedy CTC dropped.
+  Task 3  NEGATIVE RESULT. Candidate decoding cannot recover either '='.
+          Root cause of the deleted '=' is a 30 px LEFT crop of line 2's
+          detector box. The glyph was never presented to the recogniser.
+
+Baseline was reproduced exactly: CER 0.00738, edit distance 2,
+RDKit parses, mass gate mismatch. Nothing below changed the baseline.
+
+
+------------------------------------------------------------------------
+TASK 1 - 1037 reference status
+------------------------------------------------------------------------
+  cmpd   len      dDa      ppm   tol ppm   mass gate   transcr  txt-ok  struct
+  1036   271  -0.2015    125.2     31.0   mismatch      yes     yes      no
+  1037   275  -0.1328     82.1     30.9   mismatch      yes      no      no
+  1038   272 -14.1767   8807.5     30.8   mismatch       no      no      no
+  1040   274  41.8778 -26179.0     32.1   mismatch       no      no      no
+  2173   283  13.8682  -8467.2     30.8   mismatch       no      no      no
+
+  1037 detail:
+    ms_mz in CSV          = 1618.8   (the "1592.8" in the request is not
+                                       the value in the CSV)
+    adduct                = [M+H]+
+    formula of reference  = C76H96F9N13O12S2
+    expected neutral mass = 1617.7927
+    observed neutral mass = 1617.6599
+    delta                 = -0.1328 Da
+    error                 = 82.1 ppm
+    tolerance             = 30.9 ppm
+    VERDICT               = mismatch
+
+  The request was right to challenge this. 82.1 ppm cannot pass a 30.9 ppm
+  tolerance; the two numbers are consistent with each other and both say
+  "reject".
+
+  WHY THE CONTRADICTION APPEARED
+  ocr_compare_summary.txt carries a column headed "CER usable" whose value
+  is "yes" for 1036 and 1037 on the very same row that prints
+  verdict=mismatch. That column is transcription_admissible, a
+  |delta| <= 5 Da test that only asks "can this string serve as CER ground
+  truth". A 0.13 Da offset is fine for that purpose and hopeless for a
+  31 ppm mass gate. The two columns answer different questions.
+
+  Any earlier statement that 1037 passed the mass gate is withdrawn.
+  No tolerance was loosened and no CSV value was touched.
+
+  FOUR FLAGS, NOT ONE
+    transcription_admissible      usable as CER ground truth?   |d| <= 5 Da
+    text_reference_human_verified  a person read the cell back?  characters
+    mass_gate_verdict             does the patent m/z accept it?
+    structure_verified            has chemistry been confirmed?  always no
+
+  1036 is the ONLY reference a human read back character by character, and
+  the user supplied it verbatim. That is a claim about CHARACTERS. Its
+  mass gate verdict is still "mismatch" (125.2 ppm) and its chemistry is
+  still unverified. Character transcription is not structure verification.
+
+
+------------------------------------------------------------------------
+TASK 2 - what the installed recogniser actually exposes
+------------------------------------------------------------------------
+  Measured against the installed RapidOCR / PP-OCRv4 build, not assumed.
+
+  AVAILABLE
+    rec.session(x) returns (T, C) softmax probabilities. Row sums were
+    measured at 1.000000, so these are probabilities, not raw logits.
+    That is enough to score any candidate string exactly, which is what
+    Task 3 relies on.
+
+  NOT AVAILABLE
+    No logits, no prefix scores, no beam search anywhere in the package.
+    CTC decoding is greedy argmax plus deduplication, nothing more.
+
+  A REAL LIMITATION WORTH NAMING
+    The patched Rec.top_k / Global.return_top_k path does produce
+    alternatives per timestep, but only for timesteps the greedy path
+    KEPT (non-blank and not a CTC duplicate). A character that greedy CTC
+    dropped has already been filtered out upstream, so that API cannot
+    return it. Its top_k is therefore not a rescue mechanism for the
+    exact failure mode we are chasing.
+
+  A TRAP WORTH RECORDING
+    rec_batch_num is 6 and each batch pads to ITS OWN maximum width ratio,
+    not to a fixed 320 px. For 1036 the two batches came out at 1153 px
+    and 1182 px, giving 144 and 148 timesteps per line. An earlier probe
+    that assumed 40 timesteps per line was wrong and its numbers were
+    discarded.
+
+
+------------------------------------------------------------------------
+TASK 3 - candidate experiment on 1036  (NEGATIVE)
+------------------------------------------------------------------------
+  Preprocessing fixed as instructed: 2x INTER_CUBIC -> threshold 200 ->
+  PP-OCRv4 mobile English.
+
+  Baseline: length 270, edit distance 2, CER 0.00738, RDKit parses,
+            mass delta +3.8298, verdict mismatch.
+
+  All 7 detected lines were re-scored against the reference spans. The
+  spans tile the reference exactly (verified by assertion).
+
+    line  greedy == reference span?
+      0    yes
+      1    yes
+      2    NO  - greedy 39 ch, reference span 40 ch
+      3    yes
+      4    yes
+      5    yes
+      6    yes
+
+  Both errors are on printed line 2 and nowhere else:
+    delete:  reference '=' at ref[0:1]   -> recognised nothing
+    replace: reference '=' at ref[38:39] -> recognised '-'
+
+  Exact CTC log-likelihoods (scorer validated against brute-force
+  enumeration of all alignments, 300/300 random cases plus hand cases):
+
+    greedy                                  -3.0707
+    reference span                         -15.7822
+    insert '=' at the head                 -15.5065   (delta -12.44)
+    replace '-' with '=' at the tail         -3.3463   (delta  -0.28)
+
+  Reading of those numbers:
+    - Restoring the missing head '=' costs 12.44 nats. The recogniser is
+      not "unsure" about it, it has no evidence for it at all.
+    - The tail '-' vs '=' is a genuine close call worth 0.28 nats, but even
+      the corrected string still loses by 0.28, so no re-ranking flips it.
+    - Per-line exhaustive search over all edit-distance-1 neighbours:
+      line 2's greedy string ranks FIRST. 0 of 2801 neighbours beat it.
+    - Pure CTC ranking never recovers the reference on any line.
+
+  WHY, GEOMETRICALLY
+  The detector box for line 2 spans x = [41, 1667]. The ink in that row
+  starts at x = 11. The box therefore cuts 30 px off the LEFT of the row.
+  Every other line is clipped 0-5 px on the left; line 2 alone loses 30.
+
+  row1_left_vs_row2_left_x9.png shows the printed row 2 genuinely begins
+  with "=O)N(C)(..." - the '=' IS on the page. The crop never contained it.
+
+  Independent left-extension test (1036_left_extension.csv): padding the
+  left by 16/30/36 px restores the character POSITION, but the recogniser
+  then reads '-' rather than '=', so the edit count stays at 2. No
+  improvement. Baseline retained.
+
+  This is the same class of hypothesis as the box RIGHT-edge expansion
+  already falsified, but on the opposite side, and here the cause is
+  positively identified rather than merely ruled out.
+
+  SCORING HYGIENE
+  A hand-rolled CTC prefix beam search was written first and disagreed
+  with brute force. It was DISCARDED as a scorer. The exact forward
+  recursion used here was verified 300/300 against exhaustive alignment
+  enumeration, and its vectorised form matched the scalar form to 1.8e-5.
+  Any earlier beam-search numbers in this project are not trustworthy.
+
+  SELECTION HYGIENE
+  Candidates were ranked by CTC log-likelihood alone. The reference string
+  and the mass gate were not used to rank or select anything; they appear
+  only as post-hoc scores. Determinism confirmed: 3 fresh engines gave
+  identical text and identical top-3 beams.
+
+
+------------------------------------------------------------------------
+SCOPE - what this round does and does not establish
+------------------------------------------------------------------------
+  DOES establish, for one compound:
+    - candidate decoding over the full posterior cannot fix either '='
+    - the deleted '=' is a crop defect, not a recogniser or search defect
+    - 1037's mass-gate verdict is "mismatch" and was never a pass
+
+  DOES NOT establish:
+    - anything about the other 334 printed cells
+    - any dataset accuracy rate, improvement, or regression
+    - that printed SMILES have been recovered; only 1 of 5 references has
+      been read back by a human
+    - that any structure in the CSV is chemically correct
+
+  Generalisation to a second sample was NOT attempted, because the stated
+  precondition was a reproducible correction on 1036 and there was none.
+  The evidence points at the text-cell crop pipeline, not at the
+  recogniser, so the next thing worth testing is line-box extraction
+  across many cells, not more candidate search on one cell.
+
+  Files: all new artefacts are in this directory. No official CSV column,
+  no file under src/cpd/, and no git history was modified by this round.
+  compounds_combined.csv verified unchanged by SHA256 before and after.

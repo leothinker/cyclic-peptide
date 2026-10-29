@@ -1,0 +1,35 @@
+=== I100298 final route validation ===
+
+Route: trim vertical table rules, 2x upscale (INTER_CUBIC), no binarisation,
+        14/15 px vertical padding around each ink band.
+Recogniser: upstream RapidOCR default engine (PP-OCRv6 detector + PP-OCRv6 recogniser).
+
+One configuration is used for every row of every compound.
+1038 was excluded from the configuration search, so its row is a
+held-out generalisation check.
+
+cmpd   status                                      edit       cer   len  open  close   bal  parse   det
+1038   researcher_supplied_held_out                   0       0.0   273    40     40   yes    yes   yes
+1039   printed_transcription_awaiting_human_check     0       0.0   275    39     39   yes    yes   yes
+1040   printed_transcription_awaiting_human_check     0       0.0   271    38     38   yes    yes   yes
+1041   printed_transcription_awaiting_human_check     0       0.0   273    38     38   yes    yes   yes
+
+per-row edit distances:
+  1038: ||||||
+  1039: 0|0|0|0|0|0|0
+  1040: 0|0|0|0|0|0|0
+  1041: 0|0|0|0|0|0|0
+
+recovered strings:
+  1038: CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N(C)C
+  1039: CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C)C(=O)N2[C@@H](CC2)C(=O)N(CCC(F)(F)F)[C@H]3C(=O)N(C)CC(=O)N[C@@H](CCC4=CC(F)=C(C(F)=C4)C(F)(F)F)C(=O)N5[C@@H](CCC5)C(=O)NC6(CCCC6)C(=O)N(C)[C@@H](C7CCCC7)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H](CCNC(=S)C8=C(F)C(F)=C(SC3)C(F)=C8F)C(=O)N1)C(=O)N9CCCC9
+  1040: CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+  1041: CCO[C@H]1CN2[C@@H](C1)C(=O)NC3(CCCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(C)[C@@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(C)[C@H](CSC7=C(F)C(F)=C(C(=S)NCC5)C(F)=C7F)C(=O)N(C)CC(=O)N[C@@H](CCC8=CC(F)=C(C(F)=C8)C(F)(F)F)C2=O)C(=O)N(C)C
+
+official CSV sha256: 99F746AF20E4904EE6583C70461506783D2573AE01D7A69D127AD5F3AB927D0D
+expected           : 99F746AF20E4904EE6583C70461506783D2573AE01D7A69D127AD5F3AB927D0D
+unchanged          : True
+
+Text level only.  Chemical structure is not verified and the mass
+gate is not consulted.  No candidate was selected by RDKit
+parseability, the mass gate or DECIMER output.

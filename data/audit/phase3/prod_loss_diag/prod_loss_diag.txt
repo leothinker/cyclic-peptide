@@ -1,0 +1,34 @@
+page I100297  shape=(1312, 1939, 3)
+production SMILES column: x1=1088 x2=1919 (fraction 0.58..0.99 of width=1939)
+row bands: [(0, 52), (54, 679), (681, 1300)]
+
+=== A. what the column crop itself removes ===
+cmpd 1036: audit crop starts at x=1088, production column starts at x=1088 -> 0 px of the cell are outside the crop
+  no pixels excluded on the left
+cmpd 1037: audit crop starts at x=1088, production column starts at x=1088 -> 0 px of the cell are outside the crop
+  no pixels excluded on the left
+cmpd 1036: right edge excludes 20 px, ink there: 1315 px
+cmpd 1037: right edge excludes 20 px, ink there: 1267 px
+
+=== B. the production cell path, stage by stage (cmpd 1036) ===
+-- production col: crop x[1088:1919] shape=(625, 831, 3)
+   trim=False 2x det+rec              len= 244 open= 18 close= 33 eq= 13 edit=  82
+   trim=True 2x det+rec               len= 244 open= 18 close= 33 eq= 13 edit=  82
+
+-- audit col: crop x[1088:1939] shape=(625, 851, 3)
+   trim=False 2x det+rec              len= 242 open= 17 close= 33 eq= 13 edit= 105
+   trim=True 2x det+rec               len= 237 open= 14 close= 32 eq= 13 edit= 112
+
+=== C. the same page recognised at page level (no column crop) ===
+   page none 1036                     len= 250 open= 22 close= 37 eq= 16 edit=  90
+   page none 1037                     len= 245 open= 15 close= 32 eq= 15 edit= 128
+
+   page up2 1036                      len= 247 open= 18 close= 35 eq= 17 edit=  87
+   page up2 1037                      len= 250 open= 17 close= 36 eq= 18 edit= 101
+
+   page up2_th200 1036                len= 268 open= 36 close= 38 eq= 18 edit=   3
+   page up2_th200 1037                len= 273 open= 38 close= 36 eq= 22 edit=   2
+
+=== D. the same comparison on the production CSV ===
+   CSV 1036                           len= 244 open= 18 close= 33 eq= 13 edit=  82
+   CSV 1037                           len= 249 open= 22 close= 33 eq= 14 edit=  89

@@ -1,0 +1,18 @@
+=== page-level per-char top-k: rebuild summary ===
+
+Self-check (every row must pass both):
+  top3[0].char == chosen char
+  join(greedy walk) == official OCR text
+  I100297: 25 lines  PASS
+  I100298: 35 lines  PASS
+  I100300: 35 lines  PASS
+
+Row-count conservation is NOT asserted here: a page-level
+detector may legitimately miss a printed row, so a compound
+whose row count drops must be failed by the caller, not
+silently scored. Compare against the reference row count.
+
+Per-compound result (page-level boxes filtered to the SMILES column):
+  cmpd     page  rows  cellrows  joined   ref  edit      CER
+  1036  I100297     7         7     267   271    12  0.04428
+  1037  I100297     7         7     273   275     2  0.00727

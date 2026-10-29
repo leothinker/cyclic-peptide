@@ -1,0 +1,8 @@
+﻿line,box_x1,box_x2,ink_x1,ink_x2,ink_left_of_box_px,ink_right_of_box_px,official_text_tail,official_text_head
+0,9,1645,8,1640,1,-5,(C)[C@@H](C2CCCC,CC[C@H](C)[C@H]1
+1,11,1642,8,1636,3,-6,=O)N(C)[C@@H]4C(,C2)C(=O)N3[C@@H]
+2,41,1667,11,1666,30,-1,5=CC(F)=C(C(F)-C,O)N(C)CC(=O)N[C@
+3,10,1647,8,1644,2,-3,CCC6)C(=O)NC7(CC,5)C(F)(F)F)C(=O)
+4,8,1675,8,1674,0,-1,CC8)C(=O)N(C)[C@,CC7)C(=O)N(C)[C@
+5,13,1671,8,1666,5,-5,=S)C9=C(F)C(F)=C,@H](CC(=O)N(C)[C
+6,12,1234,8,1232,4,-2,=O)N1)C(=O)N(C)C,(SC4)C(F)=C9F)C(

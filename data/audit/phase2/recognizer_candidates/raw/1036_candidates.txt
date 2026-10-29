@@ -1,0 +1,50 @@
+# rank 1 logP=-10.8893
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 2 logP=-10.8989
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 3 logP=-11.0255
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC]C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 4 logP=-11.0352
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC]C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 5 logP=-11.1090
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC)C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 6 logP=-11.1186
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC)C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 7 logP=-11.1649
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 8 logP=-11.2410
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(-S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 9 logP=-11.2507
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(-S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 10 logP=-11.2909
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@)@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 11 logP=-11.3005
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@)@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 12 logP=-11.3012
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC]C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 13 logP=-11.3354
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C
+# rank 14 logP=-11.3450
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C
+# rank 15 logP=-11.3773
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC]C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(-S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 16 logP=-11.3846
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC)C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)=C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 17 logP=-11.3869
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC]C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(-S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 18 logP=-11.4003
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5-CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 19 logP=-11.4093
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9-C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 20 logP=-11.4189
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9-C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 21 logP=-11.4272
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC]C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@)@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 22 logP=-11.4368
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCC]C2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@)@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 23 logP=-11.4371
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CCCC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 24 logP=-11.4410
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(-O)N[C@@H](CCC5=CC(F)=C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CC)CC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
+# rank 25 logP=-11.4468
+CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)C(=O)N(C)[C@@H]4C(O)N(C)CC(=O)N[C@@H](CCC5=CC(F)-C(C(F)-C5)C(F)(F)F)C(=O)N6[C@@H](CCC6)C(=O)NC7(CCCC7)C(=O)N(C)[C@@H](C8CCCC8)C(=O)N(C)[C@@H](CC(=O)N(C)[C@H](CCNC(=S)C9=C(F)C(F)=C(SC4)C(F)=C9F)C(=O)N1)C(=O)N(C)C)
