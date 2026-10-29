@@ -93,10 +93,15 @@ cv2.resize(img, (resized_w, img_height))
 ```
 
 So the recogniser rescales whatever it is given.  A 30 px printed
-line is upscaled by the recogniser (one interpolation); a line we
-upscale to 60 px first is downscaled back to 48 (two interpolations).
-The second pass happens on the recogniser's own sampling grid, which
-is where the two short bars of `=` and the ring of `@` get merged.
+band is padded to 54-62 px by the route, which is already above 48, so
+the recogniser always *shrinks* it.  At scale 1 that is one
+interpolation, on the recogniser's own sampling grid; at scale 2 we
+first double the strip ourselves and the recogniser then shrinks it
+again -- two interpolations, the second one on its grid, which is
+where the two short bars of `=` and the ring of `@` get merged.
+
+Upscaling therefore never gives the recogniser more information; it
+only adds a resampling step.
 
 Measured on the validated route's own crops, with only the scale
 factor changing:
@@ -109,10 +114,10 @@ factor changing:
 
 Upscaling is therefore **not a resolution operation** — it is the
 choice of whether the recogniser should do the rescaling.  The target
-is 48 px: handing over a strip close to 48 px is best, and any
-distance from it costs detail through the extra interpolation.  2173
-shows the flip side — its bands are shorter, so there upscaling *does*
-help.
+is 48 px and the extra interpolation costs detail, so upscaling is not
+a systematic advantage: it does nothing on 1036 and 1037, it helps on
+2173, and scale 3 is worse on both.  The honest summary is that
+upscaling shifts the sampling phase; it does not add information.
 
 ### A second patent could not be downloaded
 

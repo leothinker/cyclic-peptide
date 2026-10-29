@@ -300,13 +300,15 @@ shipped CSV, and it is independent of how the cells are cropped.
 Upscaling is not a resolution operation. The recogniser is
 configured with `rec_img_shape: [3, 48, 320]` and always normalises
 the strip to **48 px tall**, so it rescales whatever height it is
-given. Handing it a 30 px line costs one interpolation; handing it a
-line we already upscaled to 60 px costs two, and the second one lands
-on the recogniser's own sampling grid -- which is where the bars of
-`=` and the ring of `@` get merged. Measured on the validated route's
-crops with only the scale factor changing, scale 1 and scale 2 are
-identical on 1036 and 1037, and scale 3 is worse on both. On 2173,
-whose bands are shorter, upscaling does help.
+given. The route's ink band is padded to 54-62 px, already above 48,
+so the recogniser always shrinks it: at scale 1 that is one
+interpolation, at scale 2 we double the strip first and the
+recogniser shrinks it again -- two interpolations, the second one on
+its own sampling grid, which is where the bars of `=` and the ring of
+`@` get merged. Upscaling therefore never adds information, it only
+adds a resampling step. Measured with only the scale factor
+changing: scale 1 and scale 2 are identical on 1036 and 1037, scale 3
+is worse on both, and 2173 is the one sample where upscaling helps.
 
 ### An external check: compound 2173
 
