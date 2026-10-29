@@ -53,6 +53,11 @@ from typing import Iterable, Sequence
 import cv2
 import numpy as np
 
+from cpd.ocr.printed_smiles import (
+    ROUTE_PRODUCTION,
+    ROUTE_VALIDATED,
+    PrintedSmilesOCR,
+)
 from cpd.parsers.headers import canonical_field
 
 
@@ -244,7 +249,8 @@ class RapidOcrTableExtractor:
     FIRST_ROW_MIN_PX: int = 50      # skip first-row probe when the slice is thinner
     ROW_BORDER_PX: int = 8          # horizontal-line border band on each side
 
-    def __init__(self, rec_lang: str = 'en', rec_top_k: int = 0) -> None:
+    def __init__(self, rec_lang: str = 'en', rec_top_k: int = 0,
+                 smiles_route: str = ROUTE_PRODUCTION) -> None:
         """Build the OCR engine(s).
 
         ``rec_lang`` selects the language of the *recogniser*:
@@ -261,6 +267,23 @@ class RapidOcrTableExtractor:
         engines so that header OCR can still see Chinese field names
         while every cell-level OCR call goes through the recogniser
         with the ASCII-friendly dictionary.
+
+        ``smiles_route`` selects how the printed SMILES cell is read:
+
+        * ``'production'`` (default) -- the historical behaviour: trim
+          the cell, upscale 2x, run the English PP-OCRv4 recogniser.
+          This recogniser drops the left bracket of ``C(=O)``, which is
+          why all 335 printed SMILES in the shipped CSV are unbalanced.
+        * ``'validated'`` -- the route validated on patent page I100298
+          (21 printed rows, edit distance 0, 1038 held out).  Uses the
+          upstream default recogniser, our own ink-band line
+          segmentation, and a crop geometry that trims the vertical
+          table rules and pads each printed line.  See
+          ``cpd.ocr.printed_smiles`` for the details.
+
+        The two routes are separate on purpose: the validated route is
+        only verified on one patent page so far, so switching the
+        pipeline over is a deliberate decision.
 
         ``rec_top_k`` (default ``0``) is the per-character top-k
         returned by the recogniser. When ``> 1``, SMILES cells are
@@ -311,6 +334,18 @@ class RapidOcrTableExtractor:
             self.rec_engine.return_top_k = self.rec_top_k
             self.rec_engine.cfg.Global.return_top_k = self.rec_top_k
             self.rec_engine.cfg.Rec["top_k"] = self.rec_top_k
+
+        self.smiles_route = smiles_route
+        self._printed_smiles_ocr: PrintedSmilesOCR | None = None
+
+    @property
+    def printed_smiles_ocr(self) -> PrintedSmilesOCR:
+        """The validated-route reader (built on first use)."""
+        if self._printed_smiles_ocr is None:
+            self._printed_smiles_ocr = PrintedSmilesOCR(
+                route=self.smiles_route
+            )
+        return self._printed_smiles_ocr
 
     # ---- public API ----
 
@@ -371,7 +406,8 @@ class RapidOcrTableExtractor:
             return list(prev_columns)
         if layout is None:
             layout = "activity"  # last-resort default
-        return self._snap_to_borders(img, default_columns(w, layout))
+        columns = self._snap_to_borders(img, default_columns(w, layout))
+        return self._widen_text_column_to_border(img, columns)
 
     def _scan_header_fields(self, header_img: np.ndarray) -> set[str]:
         """Return the set of canonical field names found in the header band."""
@@ -394,6 +430,7 @@ class RapidOcrTableExtractor:
         slice_img: np.ndarray,
         *,
         threshold_frac: float = 0.4,
+        include_edge: bool = False,
     ) -> list[int]:
         """Return x positions of vertical lines spanning ~threshold_frac of the slice.
 
@@ -402,6 +439,13 @@ class RapidOcrTableExtractor:
         height; the resulting clusters are filtered against the page
         borders. This is the single source of truth for every vertical
         divider detector in this class.
+
+        ``include_edge`` keeps rules that sit close to the page edge.
+        Column *counting* wants them excluded (a scan border would be
+        mistaken for a divider), but a table whose right-hand rule
+        happens to sit near the page edge still needs that rule to
+        place its last column -- see
+        :meth:`_widen_text_column_to_border`.
         """
         if slice_img.size == 0:
             return []
@@ -416,6 +460,8 @@ class RapidOcrTableExtractor:
         if len(xs) == 0:
             return []
         clusters = self._cluster(xs, gap=self.COLUMN_GAP_PX)
+        if include_edge:
+            return clusters
         return [
             x for x in clusters
             if self.COLUMN_BORDER_PX < x < w - self.COLUMN_BORDER_PX
@@ -458,6 +504,14 @@ class RapidOcrTableExtractor:
         """Return x positions of full-height vertical rules in the body."""
         return self._vertical_lines_in(self._body_slice(img))
 
+    def _detect_vertical_borders_including_edge(
+        self, img: np.ndarray
+    ) -> list[int]:
+        """Return vertical rule positions, keeping near-edge rules."""
+        return self._vertical_lines_in(
+            self._body_slice(img), include_edge=True
+        )
+
     def _snap_to_borders(
         self,
         img: np.ndarray,
@@ -488,6 +542,50 @@ class RapidOcrTableExtractor:
                     best_right = b
             snapped.append(Column(col.name, best_left, best_right, col.is_image))
         return snapped
+
+    def _widen_text_column_to_border(
+        self,
+        img: np.ndarray,
+        columns: list[Column],
+    ) -> list[Column]:
+        """Extend a trailing text column up to the table's right border.
+
+        The predefined column fractions are deliberately conservative,
+        so the last text column stops a few pixels *before* the
+        vertical rule that closes the table.  On patent page I100298
+        the printed SMILES of compound 1040 reaches page x = 1930
+        while the column boundary sits at x = 1925, so the final
+        glyph is sliced through the middle.
+
+        A half-cut glyph is not a small error: the CTC recogniser
+        returns garbage for the *entire* row when the trailing glyph
+        is incomplete (measured on I100298: 1040 and 1041 both went
+        from edit distance 0 to 29).  Extending the crop to the rule
+        restores the full glyph and the correct string.
+
+        Only the validated OCR route uses this, because the
+        production route has its own historical crop behaviour and
+        its output is already published in the CSV.
+        """
+        if self.smiles_route != ROUTE_VALIDATED:
+            return columns
+
+        borders = self._detect_vertical_borders_including_edge(img)
+        if not borders:
+            return columns
+
+        width = img.shape[1]
+        widest = max(borders)
+        # Only the *last* column can safely absorb the space up to the
+        # right-hand border; extending an inner column would swallow
+        # the next column's content.
+        result: list[Column] = []
+        for index, col in enumerate(columns):
+            is_last = index == len(columns) - 1
+            if col.name == "smiles" and is_last and col.x2 < widest:
+                col = Column(col.name, col.x1, min(width, widest + 1), col.is_image)
+            result.append(col)
+        return result
 
     # ---- row boundary detection ----
 
@@ -605,7 +703,10 @@ class RapidOcrTableExtractor:
                             cell, cmpd_id, cells_dir, image_path.stem
                         )
                     continue
-                if col.name == "smiles" and self.rec_top_k > 1:
+                if col.name == "smiles" and (
+                    self.rec_top_k > 1
+                    or self.smiles_route == ROUTE_VALIDATED
+                ):
                     text, ocr_stats = self._ocr_smiles_with_stats(cell)
                     row_values[col.name] = text
                     row_smiles_stats[cmpd_id] = ocr_stats
@@ -1077,6 +1178,13 @@ class RapidOcrTableExtractor:
         """
         if cell.size == 0:
             return None, OcrStats()
+
+        if self.smiles_route == ROUTE_VALIDATED:
+            # Different recogniser, different line segmentation and a
+            # different crop geometry.  The top-k entropy statistics do
+            # not exist for this route, so they stay at their defaults.
+            return self.printed_smiles_ocr.read_cell(cell), OcrStats()
+
         cell = self._trim_to_content(cell)
         if cell.size == 0:
             return None, OcrStats()
