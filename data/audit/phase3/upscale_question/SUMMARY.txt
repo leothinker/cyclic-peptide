@@ -1,0 +1,24 @@
+=== Why upscaling can hurt (phase 3) ===
+
+RapidOCR PP-OCRv6_rec_small: rec_img_shape = [3, 48, 320]
+ch_ppocr_rec/main.py::resize_norm_img -> cv2.resize(img, (ceil(48*w/h), 48))
+
+So the recogniser always normalises the strip to height 48.
+A strip we upscale to 60 px is then downscaled back to 48 by the
+recogniser; a strip we hand over at 30 px is upscaled to 48 by it.
+The first path adds an interpolation step at the recogniser's own
+sampling grid, which is where '=' and '@' strokes can be lost.
+
+--- measured ---
+ 1036  scale=1  strip_h=58/62        rows=7  len=271  brackets=38/38  edit=0
+ 1036  scale=2  strip_h=116/124      rows=7  len=271  brackets=38/38  edit=0
+ 1036  scale=3  strip_h=174/186      rows=7  len=271  brackets=38/38  edit=2
+ 1037  scale=1  strip_h=58/62        rows=7  len=274  brackets=38/38  edit=3
+ 1037  scale=2  strip_h=116/124      rows=7  len=274  brackets=38/38  edit=3
+ 1037  scale=3  strip_h=174/186      rows=7  len=273  brackets=37/38  edit=6
+ 1038  scale=1  strip_h=58/62        rows=7  len=273  brackets=40/40  edit=
+ 1038  scale=2  strip_h=116/124      rows=7  len=273  brackets=40/40  edit=
+ 1038  scale=3  strip_h=174/186      rows=7  len=273  brackets=40/40  edit=
+ 2173  scale=1  strip_h=54/58/62     rows=8  len=254  brackets=38/34  edit=
+ 2173  scale=2  strip_h=108/116/124  rows=8  len=282  brackets=38/38  edit=
+ 2173  scale=3  strip_h=162/174/186  rows=8  len=282  brackets=38/38  edit=

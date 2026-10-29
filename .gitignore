@@ -102,6 +102,12 @@ data/audit/**
 !data/audit/**/figure_*.png
 !data/audit/**/check_sheet.png
 !data/audit/**/flagged_montage.png
+!data/audit/**/evidence_*/line*.png
+
+# Rendered PDF pages used for the external check: keep the one page that
+# carries a printed-SMILES table, drop the rest of the bulk renders.
+data/audit/phase3/external/rendered/*.png
+!data/audit/phase3/external/rendered/pdf_page_0240.png
 
 # Half-written tables from interrupted runs -- never track them.
 data/audit/**/*_partial.*

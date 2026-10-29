@@ -1,0 +1,2 @@
+﻿cmpd_id,source_page,reference_length,validated_length,production_length,shipped_length,validated_edit_vs_reference,production_edit_vs_reference,shipped_edit_vs_reference,validated_brackets,production_brackets,shipped_brackets,validated_rdkit,validated_formula,reference_status
+2173,I100376 (PDF page 240),282,282,250,229,1,35,33,38/38,14/32,16/23,False,,printed_transcription_awaiting_human_check

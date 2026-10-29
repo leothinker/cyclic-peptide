@@ -1,0 +1,5 @@
+﻿cmpd_id,crop,shipped_smiles_len,production_len,validated_len,validated_matches_shipped,production_matches_shipped,validated_bracket_open,validated_bracket_close,production_bracket_open,production_bracket_close,validated_rdkit,production_rdkit,decimer_rdkit,decimer_len,validated_vs_decimer_sim,shipped_vs_decimer_sim
+2173,I100376_2173_text.png,229,250,282,False,False,38,38,14,32,False,False,False,237,0.0925,0.0944
+1036,I100297_1036_text.png,244,237,271,False,False,38,38,14,32,True,False,True,269,0.3593,0.3041
+1037,I100297_1037_text.png,249,252,274,False,False,38,38,20,33,False,False,True,237,0.3796,0.321
+1038,I100298_1038_text.png,249,248,273,False,False,40,40,21,35,True,False,True,263,0.4515,0.2617

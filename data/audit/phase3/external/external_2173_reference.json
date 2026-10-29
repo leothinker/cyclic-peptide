@@ -1,0 +1,26 @@
+{
+  "cmpd_id": "2173",
+  "source_page": "I100376 (PDF page 240 of WO2025/162428)",
+  "printed_lines": [
+    "FC(F)CO[C@@H]1C[C@H]2C(=O)N(C)C3(CCC3)C",
+    "(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](",
+    "CC(=O)N(CC)[C@H]5C(=O)N[C@@H]([C@@H](C)",
+    "CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)",
+    "C(=O)N(CCC(C)C)[C@@H](CC7=CC=C(C=C7)C8=",
+    "CN(N=N8)CC5)C(=O)N(C)CC(=O)N[C@@H](CCC9",
+    "=CC(F)=C(C(F)=C9)C(F)(F)F)C(=O)N2C1)C(=O)N(C",
+    "C)CC"
+  ],
+  "reference": "FC(F)CO[C@@H]1C[C@H]2C(=O)N(C)C3(CCC3)C(=O)N(C)[C@@H](C4CCCC4)C(=O)N(C)[C@@H](CC(=O)N(CC)[C@H]5C(=O)N[C@@H]([C@@H](C)CC)C(=O)N(C)[C@@H](C)C(=O)N6[C@@H](CC6)C(=O)N(CCC(C)C)[C@@H](CC7=CC=C(C=C7)C8=CN(N=N8)CC5)C(=O)N(C)CC(=O)N[C@@H](CCC9=CC(F)=C(C(F)=C9)C(F)(F)F)C(=O)N2C1)C(=O)N(CC)CC",
+  "status": "printed_transcription_awaiting_human_check",
+  "line_crops": [
+    "evidence_2173/line01.png",
+    "evidence_2173/line02.png",
+    "evidence_2173/line03.png",
+    "evidence_2173/line04.png",
+    "evidence_2173/line05.png",
+    "evidence_2173/line06.png",
+    "evidence_2173/line07.png",
+    "evidence_2173/line08.png"
+  ]
+}
