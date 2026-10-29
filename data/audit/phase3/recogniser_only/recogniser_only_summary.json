@@ -1,0 +1,17 @@
+{
+  "cells": 336,
+  "english_ppocrv4_mobile": {
+    "balanced": 2,
+    "illegal": 148,
+    "median_length": 262.0,
+    "total_brackets_open": 10434,
+    "total_brackets_close": 12863
+  },
+  "default_ppocrv6_small": {
+    "balanced": 228,
+    "illegal": 62,
+    "median_length": 268.0,
+    "total_brackets_open": 12815,
+    "total_brackets_close": 12881
+  }
+}

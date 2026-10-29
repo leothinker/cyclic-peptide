@@ -10,6 +10,132 @@
 
 ---
 
+## 0c. 2026-10-29 (evening) — external validation: a compound the
+## pipeline had never read
+
+**The validated route was checked on compound 2173 — a compound the
+pipeline has never managed to read — and it came back at edit
+distance 1.**  A clean recogniser-only comparison was also added,
+which explains the "upscaling made it worse" observation that came up
+when these numbers were reviewed.
+
+Full write-up: `data/audit/phase3/external/EXTERNAL_VALIDATION.md`.
+
+### Compound 2173, on a page never used for tuning
+
+Compound 2173 sits on patent page I100376 (= PDF page 240), which was
+never part of the configuration search.  In the shipped CSV its
+`smiles` is a bracket-less string and its `smiles_best` is **empty** —
+the pipeline had no usable structure for it at all.
+
+Its printed SMILES was re-read from the golden table line by line at
+3x (eight evidence images, `data/audit/phase3/external/evidence_2173/`),
+and the two routes were compared against that transcription:
+
+| source | length | edit vs reference | brackets |
+|---|---:|---:|---|
+| **validated route** | 282 | **1** | 38/38 |
+| production route | 250 | 35 | 14/32 |
+| shipped CSV `smiles` | 229 | 33 | 16/23 |
+| DECIMER (from the drawing) | 237 | 18 | 34/34 |
+
+The single error is a `C(=O)` read as `C(=0)` — the letter `O`
+mistaken for the digit zero.  The 3x crop confirms the printed glyph
+is a letter, so this is an OCR error, not a reference error.
+
+This is a **text-level** result.  The reference is a transcription
+awaiting a human check, exactly like the 1039-1041 references, and it
+says nothing about whether the recovered *structure* is right.
+
+### Corpus scale: the validated route over all 336 cells
+
+| metric | validated route | production route (shipped CSV) |
+|---|---:|---:|
+| cells | 336 | 335 |
+| bracket-balanced | **228** | **0** |
+| all printed rows recovered | **336** | — |
+| strict pass (balanced + rows + length 220-300) | 224 | 0 |
+| cells with characters outside the SMILES alphabet | 62 | — |
+
+Balanced brackets and complete rows are **text-level proxies, not
+accuracy**.  They only say the string *looks like* a whole SMILES.
+
+### A clean recogniser-only comparison
+
+The earlier "upscaled vs not" probe changed the recogniser and the
+preprocessing at the same time, which confounded it.  The new
+comparison holds the crop geometry completely fixed — same ink bands,
+same table rules trimmed, same padding, same 2x upscale, same
+recognition-only mode — and swaps only the recogniser:
+
+| | English PP-OCRv4 mobile (production) | default PP-OCRv6 small |
+|---|---:|---:|
+| bracket-balanced (of 336) | **2** | **228** |
+| cells with illegal characters | 148 | 62 |
+| total left brackets | 10434 | 12815 |
+| total right brackets | 12863 | 12881 |
+
+The English recogniser drops **2429 left brackets** across the corpus.
+That is the direct cause of the 335/335 bracket imbalance in the
+shipped CSV, and it has **nothing to do with the cropping**.
+
+### Why "upscaling made it worse" — the mechanism
+
+RapidOCR's recogniser is configured with `rec_img_shape: [3, 48, 320]`
+and `ch_ppocr_rec/main.py::resize_norm_img` always normalises the text
+strip to **48 px tall**:
+
+```python
+img_height = 48
+resized_w  = ceil(img_height * w / h)
+cv2.resize(img, (resized_w, img_height))
+
+```
+
+So the recogniser rescales whatever it is given.  A 30 px printed
+line is upscaled by the recogniser (one interpolation); a line we
+upscale to 60 px first is downscaled back to 48 (two interpolations).
+The second pass happens on the recogniser's own sampling grid, which
+is where the two short bars of `=` and the ring of `@` get merged.
+
+Measured on the validated route's own crops, with only the scale
+factor changing:
+
+| cmpd | scale 1 | scale 2 | scale 3 |
+|---|---|---|---|
+| 1036 | edit 0 | edit 0 | edit 2 |
+| 1037 | edit 3 | edit 3 | edit 6 |
+| 2173 | brackets 38/**34** | brackets 38/**38** | brackets 38/38 |
+
+Upscaling is therefore **not a resolution operation** — it is the
+choice of whether the recogniser should do the rescaling.  The target
+is 48 px: handing over a strip close to 48 px is best, and any
+distance from it costs detail through the extra interpolation.  2173
+shows the flip side — its bands are shorter, so there upscaling *does*
+help.
+
+### A second patent could not be downloaded
+
+Every public mirror tried refused the request: Google Patents answers
+503, the EPO publication server 500, Espacenet 403,
+`patentimages.storage.googleapis.com` 403, USPTO `image-ppubs` 404.
+The HTTP status of each attempt is recorded in
+`data/audit/phase3/external/external_patent_search.json` and
+`data/raw/_external_validation/fetch_WO2022234852.json`.
+
+The source PDF was scanned for pages the golden set does not cover,
+and there are none: the 270-page PDF's SMILES-bearing table pages are
+exactly the 103 golden tables.  PDF page 240 was confirmed to *be*
+golden table I100376, page 243 is a pure activity table and page 269
+is the international search report.  Compound 2173 is therefore the
+strongest generalisation test this patent can offer.
+
+PubChem's PUG REST is reachable and was used as an independent
+third-party reference; the patent compounds are not deposited there
+yet, so it yields no conclusions either way and is recorded as such.
+
+---
+
 ## 0b. Today (2026-10-29) — validated printed-SMILES route, and the
 ## right-edge bug that was breaking it
 
@@ -110,6 +236,8 @@ a bug that had been hiding the route's real quality.**
 * **Restored:** ``MORNING_BRIEF.md``, ``PRESENTATION.md``,
   ``PROGRESS_REPORT.md``, ``REPORT_MATERIAL.md`` were deleted from
   the worktree (still in HEAD) -- now back in place via ``git show``.
+  (They live in ``docs/archive/`` since 2026-10-29; each carries an
+  archive banner noting which of its numbers were later audited.)
 * **Deliverable for the 12:00 report.** ``demo_cmpd_1036_deck.png``
   stacks *original patent / manual SMILES / DECIMER raw /
   DECIMER canonical*. The deck's headline finding: the manually
