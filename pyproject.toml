@@ -33,6 +33,20 @@ packages = ["cpd"]
 [tool.setuptools.package-data]
 "*" = ["py.typed"]
 
+[tool.pytest.ini_options]
+# Only the project's own test suite.  ``references/`` holds upstream
+# vendor code with its own tests, and ``experiments/`` holds one-off
+# analysis scripts that are not meant to be collected as unit tests.
+testpaths = ["tests"]
+norecursedirs = [
+    "references",
+    "experiments",
+    "analysis",
+    "data",
+    ".venv",
+    ".git",
+]
+
 [tool.ruff]
 lint.select = [
     "E",  # pycodestyle errors

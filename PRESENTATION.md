@@ -1,5 +1,18 @@
 # Cyclic-Peptide Patent Pipeline -- Afternoon Presentation
 
+> **Archived snapshot (2026-10-16).** The numbers below are the state
+> as of that date and are kept for the record. Two of them have since
+> been **audited and corrected**, so do not quote them as current:
+>
+> * the "86 % macrocycle recovery" is the old ring-closure-only
+>   criterion; after the chemistry and mass gates were applied, **0 of
+>   the 119 candidate repairs validate** and the honest intact-macrocycle
+>   figure is 178 / 406 (43.8 %);
+> * the CSV is now **48 columns**, not 33.
+>
+> For the current state see `PROGRESS.md` (section "Today") and
+> `README.md`.
+
 **Repository**: `D:\GitHub\drugdesign\cyclic-peptide`
 **Date**: 2026-10-16 13:00
 **Audience**: drug-design team lead
