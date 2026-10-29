@@ -138,6 +138,7 @@ def _extract_all(
     img_dir: Path,
     cells_dir: Path,
     rec_top_k: int = 0,
+    smiles_route: str = "production",
 ) -> tuple[list[CompoundRecord], dict[str, AssayRecord], dict[str, str]]:
     """Run the extractor over every image, deduping across pages.
 
@@ -146,7 +147,9 @@ def _extract_all(
       * ``assays``    is a dict keyed by cmpd_id for fast lookup in
         ``_build_combined_rows``.
     """
-    extractor = RapidOcrTableExtractor(rec_top_k=rec_top_k)
+    extractor = RapidOcrTableExtractor(
+        rec_top_k=rec_top_k, smiles_route=smiles_route
+    )
     compounds: dict[str, CompoundRecord] = {}
     assays: dict[str, AssayRecord] = {}
     failures: dict[str, str] = {}
@@ -595,6 +598,7 @@ def run_pipeline(
     decimer_limit: int = 0,
     decimer_offset: int = 0,
     rec_top_k: int = 0,
+    smiles_route: str = "production",
     skip_ocr: bool = False,
 ) -> None:
     """Run extraction -> DECIMER -> write the combined CSV in order."""
@@ -607,7 +611,10 @@ def run_pipeline(
     jpgs = list(_iter_jpgs(img_path))
     print(f"   -> {len(jpgs)} JPGs")
 
-    print(f"\n[2/4] extracting SMILES + structure + KD/LCMS (rec_top_k={rec_top_k}) ...")
+    print(
+        f"\n[2/4] extracting SMILES + structure + KD/LCMS "
+        f"(rec_top_k={rec_top_k}, smiles_route={smiles_route}) ..."
+    )
     if skip_ocr:
         compounds, assays, failures = _load_from_csv(
             out_path / "compounds.csv", out_path / "assays.csv",
@@ -615,7 +622,8 @@ def run_pipeline(
         )
     else:
         compounds, assays, failures = _extract_all(
-            img_path, cells_dir, rec_top_k=rec_top_k
+            img_path, cells_dir,
+            rec_top_k=rec_top_k, smiles_route=smiles_route,
         )
 
     if skip_decimer:
@@ -701,6 +709,13 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--rec-top-k", type=int, default=5,
                    help="Per-character top-k returned by the SMILES-cell recogniser (default: 5). "
                         "Set to 0 to disable the RDKit-validated top-k repair.")
+    p.add_argument("--smiles-route", choices=("production", "validated"),
+                   default="production",
+                   help="How the printed SMILES cell is read. 'production' is the "
+                        "historical behaviour (English PP-OCRv4; drops the left "
+                        "bracket of C(=O)). 'validated' is the route validated on "
+                        "patent page I100298 (21/21 printed rows character-exact). "
+                        "Default: %(default)s.")
     p.add_argument("--report-l1", action="store_true",
                    help="Skip the pipeline; print the L1 breakdown from the existing combined CSV instead.")
     p.add_argument("--skip-ocr", action="store_true",
@@ -720,6 +735,7 @@ if __name__ == "__main__":
             decimer_limit=args.decimer_limit,
             decimer_offset=args.decimer_offset,
             rec_top_k=args.rec_top_k,
+            smiles_route=args.smiles_route,
             skip_ocr=args.skip_ocr,
         )
 
