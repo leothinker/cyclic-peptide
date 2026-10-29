@@ -1,0 +1,18 @@
+# RapidOCR per-char top-k for data/processed/cells/PCTCN2025075389-ftappb-I100297_1036_struct.png
+# rec_top_k = 5
+
+### engine: ch_PP-OCRv4
+line[0] conf=0.9232  text=HN
+
+pos | chosen     | p(chosen) | top-3 alternatives (char, prob)
+----+------------+-----------+--------------------------------------
+  0 | 'H'        | 1.000    | 'H'   1.000, 'エ'   0.000, 'h'   0.000
+  1 | 'N'        | 0.847    | 'N'   0.847, 'Ñ'   0.148, 'Ν'   0.000
+
+### engine: en_PP-OCRv4
+line[0] conf=0.9232  text=HN
+
+pos | chosen     | p(chosen) | top-3 alternatives (char, prob)
+----+------------+-----------+--------------------------------------
+  0 | 'H'        | 1.000    | 'H'   1.000, 'エ'   0.000, 'h'   0.000
+  1 | 'N'        | 0.847    | 'N'   0.847, 'Ñ'   0.148, 'Ν'   0.000
