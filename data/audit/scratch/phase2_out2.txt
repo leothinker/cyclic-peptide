@@ -1,4 +1,0 @@
-  File "D:\GitHub\drugdesign\cyclic-peptide\phase2_mass_gate_audit.py", line 211
-    )
-    ^
-SyntaxError: unmatched ')'

@@ -1,0 +1,98 @@
+{
+  "old": {
+    "production": {
+      "cells": 336,
+      "shipped_parses": 0,
+      "guarded_parses": 0,
+      "cells_with_reference": 5,
+      "shipped_edit": [
+        27,
+        18,
+        20,
+        32,
+        30
+      ],
+      "guarded_edit": [
+        27,
+        18,
+        20,
+        32,
+        30
+      ],
+      "total_edit_shipped": 127,
+      "total_edit_guarded": 127
+    },
+    "validated": {
+      "cells": 336,
+      "shipped_parses": 169,
+      "guarded_parses": 183,
+      "cells_with_reference": 5,
+      "shipped_edit": [
+        0,
+        2,
+        3,
+        5,
+        5
+      ],
+      "guarded_edit": [
+        0,
+        2,
+        3,
+        3,
+        5
+      ],
+      "total_edit_shipped": 15,
+      "total_edit_guarded": 13
+    }
+  },
+  "new": {
+    "production": {
+      "cells": 28,
+      "shipped_parses": 3,
+      "guarded_parses": 3,
+      "cells_with_reference": 6,
+      "shipped_edit": [
+        3,
+        3,
+        4,
+        2,
+        2,
+        5
+      ],
+      "guarded_edit": [
+        2,
+        2,
+        3,
+        1,
+        2,
+        5
+      ],
+      "total_edit_shipped": 19,
+      "total_edit_guarded": 15
+    },
+    "validated": {
+      "cells": 28,
+      "shipped_parses": 0,
+      "guarded_parses": 1,
+      "cells_with_reference": 6,
+      "shipped_edit": [
+        5,
+        5,
+        4,
+        4,
+        5,
+        6
+      ],
+      "guarded_edit": [
+        4,
+        4,
+        3,
+        3,
+        5,
+        5
+      ],
+      "total_edit_shipped": 29,
+      "total_edit_guarded": 24
+    }
+  }
+}

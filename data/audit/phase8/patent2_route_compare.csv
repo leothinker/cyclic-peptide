@@ -1,0 +1,13 @@
+route,cmpd_id,reference_length,read_length,edit_distance,exact,parses,balanced
+padded,1,207,207,0,True,True,True
+padded,2,214,214,0,True,True,True
+padded,3,214,214,0,True,True,True
+padded,4,209,209,0,True,True,True
+padded,10,201,201,0,True,True,True
+padded,28,204,204,0,True,True,True
+padded_vote,1,207,207,0,True,True,True
+padded_vote,2,214,214,0,True,True,True
+padded_vote,3,214,214,0,True,True,True
+padded_vote,4,209,209,0,True,True,True
+padded_vote,10,201,201,0,True,True,True
+padded_vote,28,204,204,0,True,True,True

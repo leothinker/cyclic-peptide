@@ -1,0 +1,68 @@
+{
+  "current_validated": {
+    "compounds": 28,
+    "bracket_balanced": 3,
+    "rdkit_parses": 0,
+    "hand_transcribed_compounds": 6,
+    "edit_to_reference": [
+      4,
+      4,
+      4,
+      4,
+      7,
+      8
+    ],
+    "cer_to_reference": [
+      0.01932,
+      0.01869,
+      0.01869,
+      0.01914,
+      0.03465,
+      0.03883
+    ]
+  },
+  "english_v4_nomargin": {
+    "compounds": 28,
+    "bracket_balanced": 1,
+    "rdkit_parses": 1,
+    "hand_transcribed_compounds": 6,
+    "edit_to_reference": [
+      5,
+      6,
+      6,
+      5,
+      4,
+      5
+    ],
+    "cer_to_reference": [
+      0.02415,
+      0.02804,
+      0.02804,
+      0.02392,
+      0.0198,
+      0.02427
+    ]
+  },
+  "english_v4_margin": {
+    "compounds": 28,
+    "bracket_balanced": 21,
+    "rdkit_parses": 17,
+    "hand_transcribed_compounds": 6,
+    "edit_to_reference": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      2
+    ],
+    "cer_to_reference": [
+      0.0,
+      0.00467,
+      0.0,
+      0.0,
+      0.0099,
+      0.00971
+    ]
+  }
+}

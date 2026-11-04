@@ -34,6 +34,7 @@ from cpd.chem import (
 from cpd.merge import (  # type: ignore[import-not-found]
     dedupe_assays,
     dedupe_compounds,
+    merge_compound_records,
     normalise_cmpd_id,
 )
 from cpd.parsers.table_extractor import (  # type: ignore[import-not-found]
@@ -42,35 +43,17 @@ from cpd.parsers.table_extractor import (  # type: ignore[import-not-found]
     CompoundRecord,
     RapidOcrTableExtractor,
 )
-
-
-COMBINED_COLUMNS: tuple[str, ...] = (
-    "cmpd_id",
-    "smiles",
-    "canonical_smiles",
-    "smiles_decimer",
-    "canonical_smiles_decimer",
-    "smiles_best",
-    "smiles_best_source",
-    "smiles_agree",
-    "molecular_weight",
-    "heavy_atom_count",
-    "is_valid",
-    "structure_image",
-    "source_image",
-    "kd_nm",
-    "rt_min",
-    "ms_mz",
-    "lcms_method",
-    "ms_polarity",
-    "assay_source_image",
-    "decimer_min_conf",
-    "decimer_low_conf_count",
-    "decimer_render_path",
-    "ocr_avg_entropy",
-    "ocr_min_top1",
-    "ocr_low_conf_count",
+from cpd.parsers.profiles import get_profile  # type: ignore[import-not-found]
+from cpd.schema import (  # type: ignore[import-not-found]
+    COMBINED_COLUMNS as FULL_COLUMNS,
+    PIPELINE_COLUMNS,
 )
+
+
+# The columns the extraction and DECIMER stages produce.  The full
+# schema of the deliverable adds the repair, search and derived layers
+# on top; see :mod:`cpd.schema`.
+COMBINED_COLUMNS: tuple[str, ...] = PIPELINE_COLUMNS
 
 # OCR entropy gate: when the average per-char entropy of the SMILES
 # cell exceeds this AND DECIMER has a valid canonical SMILES,
@@ -90,8 +73,13 @@ DECIMER_CACHE_FILENAME = "decimer_cache.json"
 DECIMER_CACHE_VERSION = 2  # bumped when the schema changes (e.g. adding confidence)
 
 
-def _iter_jpgs(img_dir: Path) -> Iterable[Path]:
-    return sorted(img_dir.glob("*.jpg"))
+def _iter_images(img_dir: Path, profile) -> Iterable[Path]:
+    """The source images of ``img_dir``, matched by the profile's patterns."""
+    found: dict[str, Path] = {}
+    for pattern in profile.image_patterns:
+        for path in img_dir.glob(pattern):
+            found[path.name] = path
+    return [found[name] for name in sorted(found)]
 
 
 def _load_decimer_cache(path: Path) -> dict[str, dict]:
@@ -138,7 +126,8 @@ def _extract_all(
     img_dir: Path,
     cells_dir: Path,
     rec_top_k: int = 0,
-    smiles_route: str = "production",
+    smiles_route: str | None = None,
+    profile_name: str = "WO2025162428",
 ) -> tuple[list[CompoundRecord], dict[str, AssayRecord], dict[str, str]]:
     """Run the extractor over every image, deduping across pages.
 
@@ -147,15 +136,19 @@ def _extract_all(
       * ``assays``    is a dict keyed by cmpd_id for fast lookup in
         ``_build_combined_rows``.
     """
+    profile = get_profile(profile_name)
+    if smiles_route is None:
+        smiles_route = profile.smiles_route
     extractor = RapidOcrTableExtractor(
-        rec_top_k=rec_top_k, smiles_route=smiles_route
+        rec_top_k=rec_top_k, smiles_route=smiles_route, profile=profile,
     )
     compounds: dict[str, CompoundRecord] = {}
+    all_compounds: list[CompoundRecord] = []
     assays: dict[str, AssayRecord] = {}
     failures: dict[str, str] = {}
     prev_columns: list[Column] = []
 
-    jpgs = list(_iter_jpgs(img_dir))
+    jpgs = list(_iter_images(img_dir, profile))
     for idx, image_path in enumerate(jpgs, start=1):
         page_compounds, page_assays, columns = _safe_extract(
             extractor, image_path, cells_dir, prev_columns
@@ -169,8 +162,15 @@ def _extract_all(
         page_compounds = [c for c in page_compounds if normalise_cmpd_id(c.cmpd_id)]
         page_assays = [a for a in page_assays if normalise_cmpd_id(a.cmpd_id)]
 
-        for cid, rec in dedupe_compounds(page_compounds).items():
-            compounds.setdefault(cid, rec)
+        if profile.merge_compounds == "prefer_structure":
+            # Keep every record: one table can carry the SMILES and
+            # another the structure image, and the two tables are not
+            # always on the same page.  The merge happens once, over
+            # the whole document.
+            all_compounds.extend(page_compounds)
+        else:
+            for cid, rec in dedupe_compounds(page_compounds).items():
+                compounds.setdefault(cid, rec)
         for cid, rec in dedupe_assays(page_assays).items():
             assays.setdefault(cid, rec)
 
@@ -181,6 +181,13 @@ def _extract_all(
             end="\r",
         )
     print()
+    # Rows that continued to the end of the document are closed here.
+    all_compounds.extend(extractor.flush_pending())
+    for cid, rec in merge_compound_records(
+        all_compounds,
+        prefer_structure=profile.merge_compounds == "prefer_structure",
+    ).items():
+        compounds.setdefault(cid, rec)
     return list(compounds.values()), assays, failures
 
 
@@ -598,18 +605,20 @@ def run_pipeline(
     decimer_limit: int = 0,
     decimer_offset: int = 0,
     rec_top_k: int = 0,
-    smiles_route: str = "production",
+    smiles_route: str | None = None,
     skip_ocr: bool = False,
+    profile_name: str = "WO2025162428",
 ) -> None:
     """Run extraction -> DECIMER -> write the combined CSV in order."""
     img_path = Path(img_dir)
     out_path = Path(out_dir)
     cells_dir = out_path / "cells"
     cache_path = out_path / DECIMER_CACHE_FILENAME
+    profile = get_profile(profile_name)
 
     print(f"[1/4] scanning {img_path} ...")
-    jpgs = list(_iter_jpgs(img_path))
-    print(f"   -> {len(jpgs)} JPGs")
+    jpgs = list(_iter_images(img_path, profile))
+    print(f"   -> {len(jpgs)} source images")
 
     print(
         f"\n[2/4] extracting SMILES + structure + KD/LCMS "
@@ -621,9 +630,13 @@ def run_pipeline(
             cells_dir, img_path,
         )
     else:
+        # ``None`` means "whatever the patent's profile declares".
+        if smiles_route is None:
+            smiles_route = profile.smiles_route
         compounds, assays, failures = _extract_all(
             img_path, cells_dir,
             rec_top_k=rec_top_k, smiles_route=smiles_route,
+            profile_name=profile_name,
         )
 
     if skip_decimer:
@@ -646,6 +659,16 @@ def run_pipeline(
         compounds, assays, decimer_raw, decimer_canon,
         decimer_min_conf, decimer_low_conf, decimer_render,
     )
+    # The repair layer: the DECIMER-side promotion policy.  It picks
+    # what goes into ``smiles_best`` and records the mass verdict.
+    from cpd.repair_policy import process_rows as _apply_repair_policy
+
+    combined_rows = _apply_repair_policy(combined_rows)
+    # The derived layer: ring statistics, data-quality flags and the
+    # bracket deficit of the printed text.
+    from cpd.postprocess import apply_derived_columns as _apply_derived
+
+    combined_rows = _apply_derived(combined_rows)
     # VSCode holds an exclusive write lock on compounds_combined.csv while
     # it is open in the Source Control diff view; writing to the canonical
     # filename raises PermissionError on Windows. Auto-detect and fall back
@@ -662,14 +685,29 @@ def run_pipeline(
     n_combined = _write_csv(
         combined_rows,
         target_csv,
-        COMBINED_COLUMNS,
+        FULL_COLUMNS,
     )
 
     n_decimer = len(decimer_raw)
     n_agree = sum(1 for r in combined_rows if r["smiles_agree"] == "True")
+    n_printed = sum(
+        1 for r in combined_rows if (r.get("smiles") or "").strip()
+    )
+    n_printed_valid = sum(
+        1 for r in combined_rows if r.get("is_valid") == "True"
+    )
+    n_best = sum(
+        1 for r in combined_rows if (r.get("smiles_best") or "").strip()
+    )
+    n_mass = sum(
+        1 for r in combined_rows if r.get("ms_check_verdict") == "match"
+    )
 
     print("\n" + "=" * 60)
     print(f"compounds_combined.csv : {n_combined} rows")
+    print(f"printed SMILES read    : {n_printed} rows; RDKit-valid: {n_printed_valid}")
+    print(f"smiles_best populated  : {n_best} rows")
+    print(f"mass gate matched      : {n_mass} rows")
     print(f"DECIMER SMILES         : {n_decimer} rows; agreement: {n_agree}")
     if failures:
         print(f"[!] images without rows ({len(failures)}): {', '.join(list(failures)[:5])}"
@@ -692,10 +730,15 @@ def report_l1(csv_path: str = "data/processed/compounds_combined.csv",
     print(_format_l1_block(stats))
 
 
-def _parse_args() -> argparse.Namespace:
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description="Extract compounds + assays + DECIMER SMILES from patent tables.",
     )
+    p.add_argument("--profile", default="WO2025162428",
+                   help="Which patent to process. The profile decides the "
+                        "input kind, the table layouts, the compound-number "
+                        "syntax, the activity fields and the OCR route "
+                        "(default: %(default)s).")
     p.add_argument("--img-dir", default="data/raw/WO2025162428/golden_tables",
                    help="Directory of source table JPGs (default: %(default)s).")
     p.add_argument("--out-dir", default="data/processed",
@@ -709,18 +752,22 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--rec-top-k", type=int, default=5,
                    help="Per-character top-k returned by the SMILES-cell recogniser (default: 5). "
                         "Set to 0 to disable the RDKit-validated top-k repair.")
-    p.add_argument("--smiles-route", choices=("production", "validated"),
-                   default="production",
+    p.add_argument("--smiles-route",
+                   choices=("production", "validated", "padded"),
+                   default=None,
                    help="How the printed SMILES cell is read. 'production' is the "
                         "historical behaviour (English PP-OCRv4; drops the left "
                         "bracket of C(=O)). 'validated' is the route validated on "
                         "patent page I100298 (21/21 printed rows character-exact). "
-                        "Default: %(default)s.")
+                        "'padded' is the same ink-band geometry with the English "
+                        "PP-OCRv4 recogniser and a 6 px margin around each printed "
+                        "line, measured on patent WO2022251372. "
+                        "Default: the route the patent's profile declares.")
     p.add_argument("--report-l1", action="store_true",
                    help="Skip the pipeline; print the L1 breakdown from the existing combined CSV instead.")
     p.add_argument("--skip-ocr", action="store_true",
                    help="Skip OCR; load OCR text from data/processed/compounds.csv (when available).")
-    return p.parse_args()
+    return p.parse_args(argv)
 
 
 if __name__ == "__main__":
@@ -728,8 +775,13 @@ if __name__ == "__main__":
     if args.report_l1:
         report_l1()
     else:
+        # ``--img-dir`` follows the profile unless it was given
+        # explicitly, so a new patent needs no path plumbing.
+        img_dir = args.img_dir
+        if img_dir == "data/raw/WO2025162428/golden_tables":
+            img_dir = f"data/raw/{args.profile}/golden_tables"
         run_pipeline(
-            img_dir=args.img_dir,
+            img_dir=img_dir,
             out_dir=args.out_dir,
             skip_decimer=args.skip_decimer,
             decimer_limit=args.decimer_limit,
@@ -737,5 +789,6 @@ if __name__ == "__main__":
             rec_top_k=args.rec_top_k,
             smiles_route=args.smiles_route,
             skip_ocr=args.skip_ocr,
+            profile_name=args.profile,
         )
 

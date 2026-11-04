@@ -31,6 +31,21 @@ def test_rewrite_does_not_touch_intact_carbonyls():
     assert text == "CC(=O)N"
 
 
+def test_rewrite_leaves_lactam_with_ring_closure_alone():
+    # ``C1=O)`` is a lactam printed correctly: the ``1`` closes the
+    # ring and ``=O`` is the carbonyl.  Inserting a bracket there
+    # would break a string that was never damaged.
+    text, n = rewrite_oxo("C1=O)")
+    assert n == 0
+    assert text == "C1=O)"
+
+
+def test_rewrite_leaves_lactam_with_ring_closure_alone_in_context():
+    text, n = rewrite_oxo("C(=O)NC1=O)")
+    assert n == 0
+    assert text == "C(=O)NC1=O)"
+
+
 def test_rewrite_handles_real_1036_corruption():
     ref = (
         "CC[C@H](C)[C@H]1C(=O)N(C)[C@@H](C2CCCCC2)C(=O)N3[C@@H](CC3)"

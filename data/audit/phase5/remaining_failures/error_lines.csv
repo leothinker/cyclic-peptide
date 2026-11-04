@@ -1,0 +1,5 @@
+compound_id,line_index,ocr_line,reference_line,edit_distance,line_parses,whole_cell_parses,has_reference
+2,9,@@H](C)OC(=O)c1ccccc,@@H](C)OC(=O)c1ccccc1,1,False,False,True
+10,7,@H](C)N(C)C(=O)[C@H]C,@@H](C)N(C)C(=O)[C@H](C,2,False,False,True
+28,3,(C)N(C)C(=O)[C@H](CCO,(C)N(C)C(=O)[C@@H](CCO,1,False,True,True
+28,5,(=O)[C@H](Cc2ccccc2)N(C,(=O)[C@H](Cc2ccccc2)NC(C,1,False,True,True

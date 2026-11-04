@@ -1,0 +1,146 @@
+{
+  "en_v4@1x": {
+    "exact_lines": 33,
+    "total_lines": 60,
+    "total_line_edit": 31,
+    "mean_line_cer": 0.02415,
+    "compound_cer": [
+      0.02415,
+      0.02804,
+      0.02804,
+      0.02392,
+      0.0198,
+      0.02427
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  },
+  "en_v4@2x": {
+    "exact_lines": 31,
+    "total_lines": 60,
+    "total_line_edit": 33,
+    "mean_line_cer": 0.0258,
+    "compound_cer": [
+      0.02899,
+      0.03271,
+      0.02804,
+      0.02871,
+      0.0198,
+      0.01942
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  },
+  "en_v4@3x": {
+    "exact_lines": 33,
+    "total_lines": 60,
+    "total_line_edit": 31,
+    "mean_line_cer": 0.02415,
+    "compound_cer": [
+      0.02415,
+      0.02804,
+      0.02804,
+      0.02392,
+      0.0198,
+      0.02427
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  },
+  "en_v5@1x": {
+    "exact_lines": 37,
+    "total_lines": 60,
+    "total_line_edit": 29,
+    "mean_line_cer": 0.02493,
+    "compound_cer": [
+      0.02415,
+      0.02336,
+      0.01869,
+      0.01914,
+      0.01485,
+      0.03883
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  },
+  "en_v5@2x": {
+    "exact_lines": 32,
+    "total_lines": 60,
+    "total_line_edit": 38,
+    "mean_line_cer": 0.03213,
+    "compound_cer": [
+      0.03382,
+      0.03271,
+      0.02804,
+      0.02871,
+      0.0198,
+      0.03883
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  },
+  "en_v5@3x": {
+    "exact_lines": 37,
+    "total_lines": 60,
+    "total_line_edit": 29,
+    "mean_line_cer": 0.02493,
+    "compound_cer": [
+      0.02415,
+      0.02336,
+      0.01869,
+      0.01914,
+      0.01485,
+      0.03883
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  },
+  "default_v6@1x": {
+    "exact_lines": 35,
+    "total_lines": 60,
+    "total_line_edit": 50,
+    "mean_line_cer": 0.04069,
+    "compound_cer": [
+      0.01932,
+      0.01869,
+      0.01869,
+      0.01914,
+      0.12376,
+      0.04369
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  },
+  "default_v6@2x": {
+    "exact_lines": 36,
+    "total_lines": 60,
+    "total_line_edit": 31,
+    "mean_line_cer": 0.02695,
+    "compound_cer": [
+      0.01932,
+      0.01869,
+      0.01869,
+      0.01914,
+      0.03465,
+      0.03883
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  },
+  "default_v6@3x": {
+    "exact_lines": 35,
+    "total_lines": 60,
+    "total_line_edit": 52,
+    "mean_line_cer": 0.04211,
+    "compound_cer": [
+      0.01932,
+      0.01869,
+      0.01869,
+      0.01914,
+      0.12871,
+      0.04854
+    ],
+    "compounds_parsing": 0,
+    "compounds_total": 6
+  }
+}

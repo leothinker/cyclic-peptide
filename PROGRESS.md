@@ -1,12 +1,556 @@
 # Progress report — cyclic-peptide OCSR pipeline
 
+<!-- role-banner:start -->
+> **Working repository.**  This log is written from `cyclic-peptide`,
+> the working repository, where the experiments are run.  The
+> reviewable deliverable is `drug_ocr`, kept in step with this one by
+> `tools/sync_delivery.py`.
+<!-- role-banner:end -->
+
 **Dataset:** WO2025162428 golden tables (`PCTCN2025075389-ftappb-I100280...382.jpg`)
 **Scope:** 406 compounds, cmpd 1001-2173 and 3001-3003
-**Last updated:** 2026-10-29 (today's addendum at the top)
+**Last updated:** 2026-11-04 (today's addendum at the top)
 
 ![1036 progress](data/audit/demos/figures/demo_cmpd_1036_progress.png)
 ![audit summary](data/audit/demos/figures/report_figure.png)
 ![1036 render-style comparison](data/audit/demos/figures/demo_cmpd_1036_render_styles.png)
+
+---
+
+## 0f. 2026-11-04 (night, continued) -- the activity reader was
+## still wrong, a second recogniser was added, and the delivery
+## repository was audited
+
+Four things happened.  The activity columns of the shipped CSV were
+found to be corrupted and the reader was rewritten.  A second
+recogniser was added so that the characters the first one loses are
+settled by the one that reads them.  The repository that was handed
+to the supervisor was audited line by line against the working
+repository and was found to be one sync behind -- and worse,
+wrong in two places.  And the module split was finished, so that a
+new patent is a configuration change.
+
+### 1. The shipped activity columns were wrong
+
+The CSV that was handed over carried the correct *shape* -- 406 rows,
+48 columns -- and wrong *content*.  `ms_polarity` read `M+H]+` instead
+of `[M+H]+` on **all 406 rows**: the opening bracket was cut off
+before the recogniser ever saw it.  `ms_mz` was empty on 33 rows and
+`rt_min` on 6.
+
+The cause was the band-based line reader.  On the dense table the
+band of the polarity cell reaches past the value into the column
+rules and returns the residue `T1 O1 [M+II]+`.  And because every band
+is measured separately, the band that holds the `1` of a printed
+`1.53` and the band that holds the `53` are not the same band, so the
+decimal point falls between them and the value comes out as `123`.
+
+The reader now takes a **fourth** reading of every activity cell: the
+whole value region, with the rules stripped out, recognised in one
+go.  It is the mirror image of the band reading -- the band reading is
+good at a cell with two printed lines (`40-100-` above `2min`), the
+whole-crop reading is good at a cell with one printed value -- and the
+policy picks between them.
+
+Measured over **all 2025 activity cells of the 103 pages**
+(`data/audit/phase7/activity_dump.csv`):
+
+| policy | kd_nm | rt_min | ms_mz | lcms_method | ms_polarity | total |
+|---|---:|---:|---:|---:|---:|---:|
+| line first (the old behaviour) | 403 | 382 | 370 | 405 | 337 | 1897 |
+| whole crop first | 405 | 405 | 403 | 378 | 405 | 1996 |
+| **agreeing group (shipped)** | **405** | **405** | **403** | **405** | **405** | **2023** |
+
+**2023 of 2030 cells agree with the archived extraction.**  The two
+that do not are a single ambiguous digit each -- compound 1166 reads
+`1664.9` where the archive has `1664.8`, and compound 2116 reads
+`1558.9` where the archive has `1538.9`.  Both are visible in the
+image and both readings are plausible, so they are recorded rather
+than silently corrected.
+
+### 2. A second recogniser settles the characters the first one loses
+
+One recogniser reads a printed line and sometimes drops or confuses a
+single character.  The damage is small but systematic, and the kind of
+damage a *different* model does not make in the same place: on the 60
+hand-transcribed lines of WO2022251372 the English PP-OCRv4 model
+misses 5 characters and the upstream PP-OCRv6 model misses 29, and
+they miss different ones.
+
+Every printed line is now read **twice** and the two readings are
+combined by one rule:
+
+> **Take the combination that RDKit can parse, and among those the one
+> that replaces the fewest printed lines of the primary reading.**
+
+The rule never looks at a reference transcription, so it works on a
+patent nobody has transcribed.  The primary reading is the first
+candidate and is kept whenever it already parses, and at most three
+lines may be changed, so the rule cannot make a working reading worse.
+
+End to end on WO2022251372, over the real pipeline:
+
+| route | transcribed exact | CER | all 28 parse | all 28 balanced |
+|---|---:|---:|---:|---:|
+| `padded` | 6 / 6 | 0.000 % | 24 / 28 | 24 / 28 |
+| `padded_vote` | 6 / 6 | 0.000 % | **27 / 28** | **27 / 28** |
+
+All six hand transcriptions are character exact.  Three of the six
+were wrong in the ground truth itself -- the patent prints its
+chiral marker as a circled italic ``a``, which is easy to mis-read
+as one or three ``@`` signs -- and the corrections are recorded with
+their pixel evidence in ``experiments/wo2022251372_references.py``.
+Against the *original* transcriptions the same readings carry 4
+edits (0.320 % CER) and 4 of the 6 are exact.  The one compound
+that still fails does so on a stereo confusion (``@@`` read as
+``@``), which a parse check cannot see.
+
+On WO2025162428 the vote changes nothing on the three checked
+compounds -- the `validated` route already returns a parseable string,
+so the vote keeps the primary reading.  Over the whole corpus it
+does have work to do.  Measured on the **335 cells the pipeline
+itself cuts** (`experiments/phase8_pipeline_cells_corpus.py`):
+
+| route | bracket balanced | RDKit parses |
+|---|---:|---:|
+| `validated` | 210 / 335 | 169 / 335 |
+| `validated_vote` | 211 / 335 | **171 / 335** |
+
+The vote broke none of the readings that parsed before.  Most of its
+changes are the same repair: the letter ``O`` was read as the digit
+``0``, so ``C(=O)`` became ``C(=0)`` -- which is not a SMILES at all,
+because a ring-closure digit cannot stand where an atom belongs.
+
+Two guards keep the vote from changing chemistry while it fixes
+syntax:
+
+* the characters must be SMILES characters -- RDKit reads ``"CC O"``
+  as ``CC`` and accepts ``"CC*O"``, and a printed column has neither
+  a space nor a wildcard atom.  The alphabet is built from the
+  **element symbols**, so it holds ``l`` for ``Cl`` and ``r`` for
+  ``Br``; the corpus contains real chlorines, and an alphabet without
+  ``l`` would reject them;
+* the bond order may not shrink -- ``C1=CC=CC=C1`` and
+  ``C1-CC-C-C-C1`` both parse and they are different molecules.
+  Measured on the 335 cells the pipeline cuts
+  (``experiments/phase9_bond_guard_evidence.py``), a vote *without*
+  this guard changes 17 strings and loses a bond in 5 of them --
+  compound 2160 loses four bonds at once.  With the guard the vote
+  changes 12 strings and **no cell loses a bond**.
+
+Both profiles now use the vote routes: `validated_vote` for
+WO2025162428 and `padded_vote` for WO2022251372.
+
+This is a **text-level** decision.  Choosing between two readings of
+the same ink by asking which one is a well-formed SMILES says "these
+two pixels were read in two ways and only one of them is a valid
+SMILES".  It does not say that the result is the compound the patent
+drew, and nothing in this section claims it does.
+
+### 2a. A wrong number was corrected: 29/41 was never right
+
+The figures quoted above for WO2025162428 -- 29 of 334 cells parsing
+with `validated`, 41 with `validated_vote` -- were **wrong**, and the
+measurement that produced them was measuring the wrong thing.
+
+The script cut only the *first band* of a printed row.  A printed
+SMILES that runs over the bottom of a page is read as two cells, and
+the pipeline appends the second to the first; the measurement saw
+only the first, so it read a truncated molecule and scored it as a
+broken one.
+
+The measurement was rewritten to capture the cell the pipeline
+actually hands to the recogniser (a subclass of the real extractor
+overrides the one method that does the handing over) and to join the
+continuation bands the way the pipeline joins them.  It now finds
+**335** compounds -- the same 335 the delivered CSV carries -- and
+the corrected figures are:
+
+| route | bracket balanced | RDKit parses |
+|---|---:|---:|
+| `validated` | 210 / 335 | 169 / 335 |
+| `validated_vote` | 211 / 335 | **171 / 335** |
+
+The vote changed **12** strings -- one printed line each -- and it
+broke none of the readings that parsed before.  Eight of the twelve
+are the `C(=0)` -> `C(=O)` repair that the repair chain makes
+anyway, so only **4** of them reach the deliverable, and 2 of those
+became parseable.  Three of the four are the same repair (`0` read
+as `O`); one is a damaged line replaced wholesale by the second
+recogniser's reading.
+
+The corrected numbers agree with the delivered CSV, which is the
+authority: `experiments/phase9_csv_stats.py` reads the shipped file
+and counts 171 parseable printed SMILES in the shipped build, with
+every activity column unchanged.
+
+The correction also fixes a claim about compound 1037.  It was
+described as having three character errors; the raw OCR has three,
+but only **one** reached the deliverable.  The recogniser drops the
+closing bracket of `[C@@H4`, and it reads one `O` as `0`, but the
+repair chain turns `C(=0)` into `C(=O)`, so the zero never reached
+the deliverable either.
+
+### 2b. The dropped bracket was a systematic error, not one compound
+
+The repair chain already handled the same recogniser failure in front
+of a parenthesis (`[C@H(` -> `[C@H](`), but not in front of a
+ring-closure digit.  Scanning the CSV for the pattern finds **29
+rows**, not one.
+
+The repair is narrow: a digit cannot sit inside a bracket atom in
+SMILES, so `[C@@H4` is never valid and cannot be what was printed.
+The digit is restored as a ring closure, so it has to have a partner
+in the string -- a digit without one is left alone.
+
+Measured on the delivered CSV: **29 rows changed, 1 became parseable
+(compound 1037), 0 stopped parsing, and no activity value moved.**
+
+For 1037 the bracket was the only error left, so the repair makes it
+character exact.  **All three hand-verified references are now
+character exact** -- 1036, 1037 and 1038 at edit distance 0
+(`experiments/phase9_reference_check.py`).
+
+### 3. The delivery repository was one sync behind -- and wrong in two
+### places
+
+`drug_ocr` was checked line by line against the working
+repository.  It was missing the modules that carry the whole fix
+(`cpd/ocr/lines.py`, `cpd/ocr/activity.py`), it still selected the
+**old** `production` route in its profile, and `main.py` hard-coded
+that route as the default of its public API.  So the version that was
+handed over would have reproduced the bracket-less SMILES.
+
+Two further defects were found:
+
+* its `LICENSE` had been overwritten with the text of the GNU AGPL
+  and the change was **staged**, so a plain `git commit` would have
+  shipped the wrong licence;
+* its `pyproject.toml` listed only the `cpd` package, so a wheel
+  built from it would have contained `cpd` without `cpd.ocr` and
+  `cpd.parsers` -- a package that cannot run the pipeline.
+
+Full audit: `data/audit/phase7/DELIVERY_AUDIT.md`.
+
+### 4. The module split is finished
+
+Everything that differs between patents is data in one file,
+`src/cpd/parsers/profiles.py`.  Nothing else in the code asks which
+patent it is running on.  Two patents are served by one extractor, one
+OCR layer, one repair chain and one merge code; the module map is in
+`docs/ARCHITECTURE.md` and the recipe for a third patent is in its
+section 6.
+
+### 5. What did **not** change
+
+DECIMER is shelved: reading a 2D structure drawing is a much harder
+problem than reading printed text, and its output is not trustworthy
+for these macrocycles.  Its output stays in the CSV as a second
+opinion, and `smiles_best` falls back to it for the compounds whose
+printed text does not parse -- those strings are **not** verified
+against the drawing.
+
+The mass gate still rejects every candidate, and that is now
+understood rather than mysterious (see `data/audit/phase7/MASS_OFFSET.md`).
+The tolerance was **not** widened and the gate was **not** changed.
+
+No compound has been verified against its drawn structure.  Nothing in
+this report claims it, and the four levels -- text recognised, RDKit
+parseable, mass gate passed, structure verified -- are kept strictly
+apart throughout.
+
+---
+
+## 0e. 2026-11-04 (night, continued) — the activity table was found
+## to be corrupted by the reader, and the reader was rewritten
+
+The rebuild of the previous section produced a CSV with **406 of 406**
+rows, but the activity columns of that file were *wrong*: the
+retention time of compound 1002 read `172.0` instead of `1.72`, the
+potency of compound 1019 read `789.0` instead of `978.0`, and the
+LC-MS method of compound 2154 read `40- 100 - -` instead of
+`40-100-2MIN`.  Those are not OCR slips of the kind this project
+usually argues about -- they are the *same* value written down
+wrongly, and they had to be explained before anything was shipped.
+
+### 1. What the reader was doing
+
+Both defects live in the activity-cell reader, and both are about the
+detector being allowed to decide how a value is cut into pieces.
+
+**A number was split across several boxes.**  The English detector
+cut the printed `1.72` into the boxes `1` and `72`.  The boxes were
+joined without a separator, so the decimal point was lost and the
+value became `172`.  On a dense page the printed `1.48` was cut into
+`7`, `48` and `-`, which does not parse as a number at all, so the
+retention time was *dropped* from the CSV.  The value that was
+written was therefore not a different way of writing `1.48` -- it was
+a different number.
+
+**The boxes were put back in the wrong order.**  They were sorted by
+their vertical midpoint, which is only correct while every box on a
+line has the same height.  The line `[M+H]+` mixes tall brackets with
+shorter letters, so the midpoint order returned `H] + [M+] 1`.
+
+**The guard that was supposed to catch this was too narrow.**  A
+reading was only rejected as "shattered" when it had at least three
+single-character boxes.  `1` + `72` has two boxes and passed, and so
+did `7` + `48` + `-`.
+
+### 2. What was changed
+
+* `cpd.ocr.lines` -- the line geometry that the SMILES reader and the
+  activity reader now share: the ink bands, the horizontal span with
+  the table rules removed, and `order_boxes`, which groups the boxes
+  into lines by their vertical overlap and sorts them left to right
+  inside a line.
+* `cpd.ocr.activity` -- the new activity-cell reader.  It reads the
+  printed line itself (our own segmentation, recognition only), and
+  keeps the two detector readings as corroboration.  A reading that
+  needed several boxes has already lost information, so it cannot
+  outvote a reading that was recognised as one token.  When the
+  readings agree -- even when they differ only in spacing, as
+  `10-80- 2min` and `10-80-2min` do -- the detector's text is kept,
+  so the column keeps the format it already had.
+* `cpd.parsers.table_extractor` -- the activity columns now go through
+  that reader.  The old candidate scorer and the over-segmentation
+  guard are gone; they were only ever used for these cells.
+
+The behaviour is locked by `tests/test_activity_reading.py` (13
+tests) and checked against the archived extraction by
+`experiments/phase7_activity_validate.py`.
+
+### 3. The mass gate is a separate question, and it is now answered
+
+The mass gate rejects every candidate, and the reason was not known.
+It is now measured (`data/audit/phase7/MASS_OFFSET.md`):
+
+| mass convention | median offset | within +-0.05 Da |
+|---|---:|---:|
+| monoisotopic `[M+H]+` (what the gate uses) | +0.163 Da (+104 ppm) | 0 / 171 |
+| rounded table `[M+H]+` (H = 1.008, S = 32.06) | +0.008 Da (+5 ppm) | 63 / 171 |
+
+The offset is far too small to be a reading error -- the lightest atom
+is hydrogen at 1.008 Da -- and far too tight to be noise: the middle
+half of the offsets lie between +0.133 and +0.202 Da.  It points at the
+mass table the patent used for its own `m/z` column, not at the
+printed SMILES.  **The tolerance was not widened and the gate was not
+changed**; that is a chemistry decision and is written up as the next
+step, not taken here.
+
+### 4. The delivery repository
+
+`drug_ocr` was checked line by line against the working
+repository.  Three things were wrong beyond the missing files:
+
+* its `LICENSE` had been overwritten with the text of the GNU AGPL
+  (35 kB) and was *staged*, so a plain `git commit` would have shipped
+  the wrong licence;
+* its virtual environment had an editable install of `cpd` pointing
+  at **the working repository**, so its test suite measured the working
+  repository's code;
+* `pyproject.toml` listed only the `cpd` package, so a wheel built
+  from it would have contained `cpd` without `cpd.ocr` and
+  `cpd.parsers` -- a package that cannot run the pipeline.
+
+All three are fixed.
+
+---
+
+## 0e. 2026-11-04 (late night) — the second patent's ground truth
+## was wrong, and one bracket rule was written wrong
+
+Two things happened that change what the numbers mean.
+
+### 1. The WO2022251372 hand transcription was wrong, not the OCR
+
+The second patent had been measured at 4 edits over 1252 reference
+characters (0.320 % CER), 4 of 6 compounds exact.  The six
+transcriptions were re-checked against the magnified pixels, one
+character at a time, and **three of them were wrong**.  The patent
+prints its chiral marker as a *circled italic "a"*, and that is
+exactly the glyph that makes `[C@@H]` easy to mis-transcribe:
+
+| compound | line | transcribed | printed |
+|---|---:|---|---|
+| 10 | 7 | `[C@@@H]` | `[C@@H]` (two circled ``a``) |
+| 28 | 3 | `[C@@H]` | `[C@H]` (one circled ``a``) |
+| 28 | 5 | `NC(C` | `N(C` |
+
+So the recogniser was being marked down for transcriptions that were
+wrong.  Measured against the **corrected** references the same
+readings carry **0 edits** and **6 of 6** are character exact.  The
+corrections are recorded in `experiments/wo2022251372_references.py`
+(`CORRECTIONS`), each with the path to its pixel evidence, and
+`experiments/phase9_patent2_corrected_references.py` reproduces both
+sides of the correction, so the original figures stay recoverable.
+
+### 2. The repair rule for a mirror-image bracket was wrong
+
+Compound 28 was still one edit off after the transcription fix: it
+reads `C(=O)]C@@H](C)` where the page prints `C(=O)[C@@H](C)`, so the
+recogniser saw the *closing* bracket where the page has the opening
+one.
+
+The first attempt at a rule for this was **wrong in a way that
+looked like a clean negative result**.  It required the string to
+hold exactly one `]` more than `[`, but a bracket read as its mirror
+image moves that difference by **two** -- one bracket becomes its
+opposite, so the counts differ by two, not one.  A difference of one
+can never come from this mistake, so the rule could not match
+anything at all; it returned 0 rows on both patents, which reads like
+"the repair does not work" rather than "the rule is impossible".
+
+The corrected rule fires on the right row and on nothing else:
+1 of 28 compounds of WO2022251372, 0 of 335 of WO2025162428, and 0
+of the 406 rows of the delivered CSV.  It is narrow on purpose: the
+brackets must differ by two, the parentheses must still balance, the
+string must not parse as it stands, exactly one position may be
+flipped into a string that parses, and the flip may not pull a digit
+inside a bracket -- where it would change from a ring closure into an
+isotope, and with it the molecule.
+
+### 3. Where the second patent stands now
+
+End to end over the real pipeline -- same extractor, same repair
+chain, same merge code:
+
+| route | transcribed exact | edits | CER | all 28 parse | all 28 balanced |
+|---|---:|---:|---:|---:|---:|
+| `padded` | 6 / 6 | 0 | 0.000 % | 24 / 28 | 24 / 28 |
+| `padded_vote` | 6 / 6 | 0 | 0.000 % | **27 / 28** | **27 / 28** |
+
+The one compound that still does not parse fails on a stereo
+confusion (`@@` read as `@`), which a parse check cannot see.
+
+### 4. What did **not** change
+
+* The delivered CSV for WO2025162428 is **untouched**: 406 rows, 48
+  columns, 171 of the 335 printed readings parse, and the mirrored
+  bracket rule alters 0 of the 406 rows.
+* The three hand-verified references of WO2025162428 are still
+  character exact (1036, 1037, 1038 -- edit distance 0).
+* The mass gate was **not** widened, and DECIMER is still shelved.
+
+---
+
+## 0d. 2026-11-04 (night) — the delivery repository audited, the
+## activity table repaired, and the second patent made configurable
+
+Three things happened.  The `drug_ocr` repository that was handed to
+the supervisor was checked line by line against the working
+repository, two real defects were found in the activity-table
+reader, and the patent adapter was finished so that a third patent
+is a configuration change rather than a code change.
+
+### 1. The delivery repository was behind, and wrong in two places
+
+`drug_ocr` was a copy of the working repository taken before the
+adapter layer existed.  It was missing the profile registry, the schema
+module, the repair and derived layers, and the `--profile` switch;
+its `printed_smiles.py` had only two of the three recogniser routes.
+
+Two of its differences were not merely "behind" but **wrong**:
+
+* the candidate scorer still preferred garbage over a correct
+  reading (defect 1 below);
+* the compound number was still read from the untrimmed cell
+  (defect 2 below).
+
+So the version that was submitted would have reproduced the activity
+loss.  It has been corrected and re-synced.
+
+### 2. Two defects in the activity-table reader
+
+Rebuilding the combined CSV with the improved printed-SMILES route
+produced a file with **222 of 406** activity rows, and with values
+such as `1 R R - X 1 1 4 +` in the LC-MS method column.  The archived
+extraction has 406 of 406 with correct values.  Both were *reader*
+defects; the patent's table was always legible.
+
+**Defect 1 — the candidate scorer preferred garbage.**
+`_score_candidate` gave an over-segmented reading (one box per
+character) a score of `-1.0`, while a *correct* reading scored
+`-2.0`, because the "numeric-tolerant" pattern
+`[\d.,\- <>~nNaAmMpPuU/]+` does not allow the letters in
+`40-100-2MIN` (the `I`) or in `[M+H]+` (`[`, `]`, `+`).  The junk
+therefore won the vote.  Over-segmented readings now score `-10.0`,
+which is worse than any plausible reading can score.
+
+**Defect 2 — the compound number was dropped on many rows.**
+The compound-number cell is about 330 px wide and almost entirely
+empty; the digits occupy a narrow block in the middle.  The detector
+was given the whole cell, saw a large low-contrast canvas, and
+returned **no text box at all** for many rows — the digits are
+perfectly legible in the image.  On page I100377 only **26 of 58**
+numbers were read.  Trimming the cell to the bounding box of its
+dark content before recognition fixes it: **58 of 58**.
+
+Both defects were pre-existing; an A/B run of the old and new
+extractor over the same page confirmed that the old code produced
+the same 26 of 58.  The loss was confined to the seven dense
+activity pages (I100376–I100382); the twenty-two SMILES pages were
+never affected.
+
+Evidence: `data/audit/phase7/`.
+
+### 3. The adapter layer is finished, and the second patent works
+
+The patent-specific facts now live in one place,
+`src/cpd/parsers/profiles.py`, and nothing else in the code asks
+which patent it is running on.  Two patents are served by one
+extractor, one OCR layer, one repair chain and one merge code:
+
+| | WO2025162428 | WO2022251372 |
+|---|---|---|
+| input | cropped table JPGs | full-page TIFF scans |
+| layouts | activity / dense / smiles | activity8 / smiles3 |
+| activity values | numbers and free text | letter grades (A–D) |
+| printed-SMILES route | `validated_vote` | `padded_vote` |
+| cross-page rows | no | yes |
+
+Re-measured tonight, unchanged from the phase-6 numbers:
+
+```
+WO2022251372
+  pages read              20
+  compounds               28
+  RDKit-parseable         23
+  structures              28
+  assay rows              28
+  hand-transcribed refs      6
+  exact matches              4 / 6
+  aggregate CER          0.48 %
+  lines touching a rule      0 of 141
+```
+
+The `padded` route is *worse* on the first patent and the
+`validated` route is *worse* on the second, so the route is a
+property of the patent, not a global setting.
+
+### 4. DECIMER is shelved
+
+Reading a 2D structure drawing is a different and much harder
+problem than reading printed text.  Its output is kept as a second
+opinion in its own columns and is not promoted into the deliverable
+on its own.  The rebuild reuses the existing DECIMER columns rather
+than re-running the model, so the printed-SMILES work can ship
+without touching it.
+
+### 5. What did **not** change
+
+The mass gate still rejects every candidate, and that is now
+understood rather than mysterious: the patent's printed `m/z` sits
+about **+0.17 Da** above the monoisotopic `[M+H]+` of the printed
+SMILES (compound 1036: printed 1610.9 → implied neutral 1609.8927
+vs exact 1609.6912, i.e. +125 ppm, against a tolerance of ±0.05 Da
+≈ 31 ppm).  Widening the tolerance would hide a real discrepancy,
+so it was not done.
+
+No claim about chemical *structure* is made anywhere in this
+report.  A SMILES that parses is a well-formed string; a SMILES
+that matches a mass is a string with the right formula.  Comparing
+the graph with the printed structure image is still not automated.
 
 ---
 

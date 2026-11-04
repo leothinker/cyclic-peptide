@@ -1,0 +1,5 @@
+cmpd_id,operation,reference_fragment,read_fragment,reference_position,reference_length,read_length
+10,delete,OC)C(=O)[C@@@H](C)N(C)C(=,OC)C(=O)[C@@H](C)N(C)C(=,150,202,201
+28,replace,H]1N(C)C(=O)[C@@H](C)N(C),H]1N(C)C(=O)]C@@H](C)N(C),19,206,204
+28,delete,N(C)C(=O)[C@@H](CCOC)NC(=,N(C)C(=O)[C@H](CCOC)NC(=,78,206,204
+28,delete,(Cc2ccccc2)NC(C)C(=O)[C@H,(Cc2ccccc2)N(C)C(=O)[C@H,126,206,204

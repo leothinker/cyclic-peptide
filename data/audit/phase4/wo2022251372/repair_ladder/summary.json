@@ -1,0 +1,79 @@
+{
+  "compounds": 28,
+  "parses": {
+    "raw": 17,
+    "after_rewrite_oxo": 9,
+    "after_equals_zero": 11,
+    "after_auto_repair": 11,
+    "after_bracket_close": 11,
+    "after_guarded_oxo": 17,
+    "after_guarded_equals_zero": 19,
+    "after_guarded_bracket_close": 19
+  },
+  "edit_to_reference": {
+    "raw": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      2
+    ],
+    "after_rewrite_oxo": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      2
+    ],
+    "after_equals_zero": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      2
+    ],
+    "after_auto_repair": [
+      1,
+      2,
+      1,
+      1,
+      2,
+      2
+    ],
+    "after_bracket_close": [
+      2,
+      2,
+      2,
+      2,
+      2,
+      2
+    ],
+    "after_guarded_oxo": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      2
+    ],
+    "after_guarded_equals_zero": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      2
+    ],
+    "after_guarded_bracket_close": [
+      0,
+      1,
+      0,
+      0,
+      2,
+      2
+    ]
+  }
+}

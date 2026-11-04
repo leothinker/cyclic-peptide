@@ -51,6 +51,13 @@ RDLogger.DisableLog("rdApp.*")
 
 _OXO = re.compile(r"(.)[-=](O\))")
 
+# A ring-closure digit may sit between the atom and the bond symbol:
+# the lactam of a cyclic peptide is printed as ``C1=O)``, where ``1``
+# closes the ring and ``=O`` is the carbonyl.  The atom before the
+# ``=`` is then the digit, not a carbon, and the substring is *not* a
+# damaged carbonyl -- it must not be rewritten.
+_RING_CLOSURE = re.compile(r"[0-9]")
+
 
 def rewrite_oxo(text: str) -> tuple:
     """Repair ``-O)`` / ``=O)`` back into ``(=O)``.
@@ -66,6 +73,11 @@ def rewrite_oxo(text: str) -> tuple:
         # the ``=O)`` substring is the *inside* of ``C(=O)``, not a
         # damaged carbonyl. Leaving it alone keeps intact amides intact.
         if m.group(1) == "(":
+            return m.group(0)
+        # Same reasoning for a ring-closure digit: ``C1=O)`` is a
+        # lactam printed correctly, and inserting a bracket there
+        # breaks a string that was never damaged.
+        if _RING_CLOSURE.fullmatch(m.group(1)):
             return m.group(0)
         nonlocal count
         count += 1

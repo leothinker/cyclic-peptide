@@ -1,0 +1,29 @@
+{
+  "routes": {
+    "padded": {
+      "compounds": 28,
+      "parses": 24,
+      "bracket_balanced": 24,
+      "transcribed_exact": 6,
+      "transcribed_total": 6,
+      "transcribed_edits": 0,
+      "transcribed_chars": 1249,
+      "transcribed_cer_percent": 0.0
+    },
+    "padded_vote": {
+      "compounds": 28,
+      "parses": 27,
+      "bracket_balanced": 27,
+      "transcribed_exact": 6,
+      "transcribed_total": 6,
+      "transcribed_edits": 0,
+      "transcribed_chars": 1249,
+      "transcribed_cer_percent": 0.0
+    }
+  },
+  "vote_effect": {
+    "compounds": 28,
+    "changed": 3,
+    "changed_but_parsed_before": 0
+  }
+}

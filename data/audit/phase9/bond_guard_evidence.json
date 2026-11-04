@@ -1,0 +1,49 @@
+{
+  "cells_with_two_readings": 5,
+  "guarded_vote_changed": 12,
+  "unguarded_vote_changed": 17,
+  "guarded_lost_a_bond": 0,
+  "unguarded_lost_a_bond": 5,
+  "cells_where_the_guard_matters": [
+    {
+      "cmpd_id": "1053",
+      "primary_bonds": 19,
+      "guarded_bonds": 19,
+      "unguarded_bonds": 18,
+      "unguarded_lost_a_bond": true,
+      "guarded_lost_a_bond": false
+    },
+    {
+      "cmpd_id": "1095",
+      "primary_bonds": 18,
+      "guarded_bonds": 18,
+      "unguarded_bonds": 17,
+      "unguarded_lost_a_bond": true,
+      "guarded_lost_a_bond": false
+    },
+    {
+      "cmpd_id": "1154",
+      "primary_bonds": 19,
+      "guarded_bonds": 19,
+      "unguarded_bonds": 17,
+      "unguarded_lost_a_bond": true,
+      "guarded_lost_a_bond": false
+    },
+    {
+      "cmpd_id": "2141",
+      "primary_bonds": 20,
+      "guarded_bonds": 20,
+      "unguarded_bonds": 18,
+      "unguarded_lost_a_bond": true,
+      "guarded_lost_a_bond": false
+    },
+    {
+      "cmpd_id": "2160",
+      "primary_bonds": 20,
+      "guarded_bonds": 20,
+      "unguarded_bonds": 16,
+      "unguarded_lost_a_bond": true,
+      "guarded_lost_a_bond": false
+    }
+  ]
+}

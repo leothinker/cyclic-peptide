@@ -1,0 +1,46 @@
+{
+  "repository": "D:\\GitHub\\drugdesign\\cyclic-peptide",
+  "cpd_package": "D:\\GitHub\\drugdesign\\cyclic-peptide\\src\\cpd\\__init__.py",
+  "cpd_is_local": true,
+  "profiles": [
+    "WO2022251372",
+    "WO2025162428"
+  ],
+  "routes": [
+    "production",
+    "validated",
+    "padded",
+    "validated_vote",
+    "padded_vote"
+  ],
+  "WO2025162428_route": "validated_vote",
+  "WO2022251372_route": "padded_vote",
+  "references": {
+    "1036": {
+      "edit_distance_raw": 0,
+      "edit_distance_repaired": 0,
+      "exact": true,
+      "length": 271,
+      "reference_length": 271,
+      "source": "PCTCN2025075389-ftappb-I100297.jpg"
+    },
+    "1037": {
+      "edit_distance_raw": 3,
+      "edit_distance_repaired": 0,
+      "exact": true,
+      "length": 275,
+      "reference_length": 275,
+      "source": "PCTCN2025075389-ftappb-I100297.jpg"
+    },
+    "1038": {
+      "edit_distance_raw": 0,
+      "edit_distance_repaired": 0,
+      "exact": true,
+      "length": 273,
+      "reference_length": 273,
+      "source": "PCTCN2025075389-ftappb-I100298.jpg"
+    }
+  },
+  "references_exact": 3,
+  "references_total": 3
+}

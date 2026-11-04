@@ -46,7 +46,7 @@ zero records and are filtered out.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Sequence
 
@@ -54,11 +54,12 @@ import cv2
 import numpy as np
 
 from cpd.ocr.printed_smiles import (
-    ROUTE_PRODUCTION,
-    ROUTE_VALIDATED,
+    INK_BAND_ROUTES,
     PrintedSmilesOCR,
 )
 from cpd.parsers.headers import canonical_field
+from cpd.parsers.page_tables import locate_page_tables
+from cpd.parsers.profiles import TableProfile, get_profile
 
 
 # ---------- row schemas ----------
@@ -97,9 +98,17 @@ class AssayRecord:
     lcms_method: str | None = None
     ms_polarity: str | None = None
     source_image: str | None = None
+    # Patent-specific activity fields.  The tuple keeps the record
+    # immutable and hashable while allowing a profile to add fields such
+    # as MDM2 without changing the original five canonical fields.
+    extra: tuple[tuple[str, str], ...] = ()
 
     def to_dict(self) -> dict:
-        return self.__dict__.copy()
+        result = self.__dict__.copy()
+        result.pop("extra", None)
+        if self.extra:
+            result.update(dict(self.extra))
+        return result
 
 
 @dataclass(frozen=True)
@@ -126,6 +135,28 @@ class OcrStats:
 # ~0.5-0.7 for genuinely ambiguous ones (0/O, 1/l, etc.).
 LOW_CONF_PROB_THRESHOLD = 0.7
 # ---------- column geometry ----------
+
+
+@dataclass
+class _PendingRow:
+    """A table row that is still open for continuation.
+
+    Some patents print one compound over several rows: the row runs
+    past the bottom of a page and resumes at the top of the next one.
+    The resumed band carries no compound number, so the row has to
+    stay open until the next numbered band proves it ended.
+    """
+
+    cmpd_id: str
+    smiles_text: str = ""
+    structure_path: str | None = None
+    source_image: str | None = None
+    ocr_stats: OcrStats = field(default_factory=OcrStats)
+    # Which layout the open row came from.  The layout key is what
+    # keeps the pending rows of two different tables of the same
+    # patent apart, so it is recorded on the row itself rather than
+    # looked up afterwards.
+    layout_key: str = ""
 
 
 @dataclass(frozen=True)
@@ -249,8 +280,13 @@ class RapidOcrTableExtractor:
     FIRST_ROW_MIN_PX: int = 50      # skip first-row probe when the slice is thinner
     ROW_BORDER_PX: int = 8          # horizontal-line border band on each side
 
-    def __init__(self, rec_lang: str = 'en', rec_top_k: int = 0,
-                 smiles_route: str = ROUTE_PRODUCTION) -> None:
+    def __init__(
+        self,
+        rec_lang: str = 'en',
+        rec_top_k: int = 0,
+        smiles_route: str | None = None,
+        profile: TableProfile | None = None,
+    ) -> None:
         """Build the OCR engine(s).
 
         ``rec_lang`` selects the language of the *recogniser*:
@@ -280,6 +316,11 @@ class RapidOcrTableExtractor:
           segmentation, and a crop geometry that trims the vertical
           table rules and pads each printed line.  See
           ``cpd.ocr.printed_smiles`` for the details.
+        * ``'padded'`` -- the same ink-band geometry and crop as
+          ``'validated'``, but with the English PP-OCRv4 recogniser
+          and a 6 px white margin around every printed line.  It was
+          measured on patent WO2022251372, whose serif type leaves
+          the last glyph of each line flush against the crop border.
 
         The two routes are separate on purpose: the validated route is
         only verified on one patent page so far, so switching the
@@ -335,8 +376,13 @@ class RapidOcrTableExtractor:
             self.rec_engine.cfg.Global.return_top_k = self.rec_top_k
             self.rec_engine.cfg.Rec["top_k"] = self.rec_top_k
 
-        self.smiles_route = smiles_route
+        self.profile = profile or get_profile("WO2025162428")
+        self.smiles_route = smiles_route or self.profile.smiles_route
         self._printed_smiles_ocr: PrintedSmilesOCR | None = None
+        self._activity_reader = None
+        # Rows that may continue across a page break, keyed by layout.
+        self._pending: dict[str, _PendingRow] = {}
+        self._grade_ocr = None
 
     @property
     def printed_smiles_ocr(self) -> PrintedSmilesOCR:
@@ -360,6 +406,11 @@ class RapidOcrTableExtractor:
         if img is None or img.size == 0 or min(img.shape[:2]) < self.MIN_HEADER_PX:
             return [], [], prev_columns or []
 
+        if self.profile.source_mode == "full_page":
+            return self._extract_full_page_records(
+                img, image_path, cells_dir, prev_columns
+            )
+
         columns = self._detect_columns(img, prev_columns)
         if not columns:
             columns = prev_columns or default_columns(img.shape[1], "activity")
@@ -378,6 +429,77 @@ class RapidOcrTableExtractor:
             img, rows, columns, image_path, cells_dir
         )
         return compounds, assays, columns
+
+    def _extract_full_page_records(
+        self,
+        img: np.ndarray,
+        image_path: Path,
+        cells_dir: Path | None,
+        prev_columns: list[Column] | None,
+    ) -> tuple[list[CompoundRecord], list[AssayRecord], list[Column]]:
+        """Extract every supported table from a full patent page.
+
+        The page adapter locates ruled tables and measures their column
+        boundaries.  The selected profile then maps those boundaries to
+        logical columns; all cell OCR and chemistry code remains shared.
+        """
+        all_compounds: list[CompoundRecord] = []
+        all_assays: list[AssayRecord] = []
+        last_columns = list(prev_columns or [])
+
+        for table in locate_page_tables(img):
+            layout_name = self.profile.layout_for_column_count(
+                table.n_columns
+            )
+            if layout_name is None:
+                continue
+            layout = self.profile.layout(layout_name)
+            if len(layout.columns) != table.n_columns:
+                continue
+
+            crop = img[table.y1:table.y2, table.x1:table.x2]
+            columns = [
+                Column(
+                    template.name,
+                    table.column_boundaries[index],
+                    table.column_boundaries[index + 1],
+                    template.is_image,
+                )
+                for index, template in enumerate(layout.columns)
+            ]
+            # The row bands are the horizontal rules that were already
+            # measured to find the columns, so they are reused rather
+            # than re-detected on the cropped table.  Re-detection
+            # cannot separate a table that holds a single data row
+            # from its header, because such a table has only one
+            # internal rule.
+            rows = table.row_bands()
+            if layout.header_bands:
+                rows = rows[layout.header_bands:]
+            compounds, assays = self._extract_rows(
+                crop, rows, columns, image_path, cells_dir,
+                continuation=layout.continuation,
+                layout_key=layout_name,
+            )
+            all_compounds.extend(compounds)
+            all_assays.extend(assays)
+            last_columns = columns
+
+        return all_compounds, all_assays, last_columns
+
+    def flush_pending(self) -> list[CompoundRecord]:
+        """Close every row that is still open at the end of the input.
+
+        A row that continues across a page break is closed when the
+        next numbered row proves it ended.  The last compound of the
+        document has no such successor, so the caller flushes the
+        remaining rows once every page has been read.
+        """
+        compounds: dict[str, CompoundRecord] = {}
+        for key, pending in list(self._pending.items()):
+            self._pending.pop(key, None)
+            self._close_pending_row(pending, compounds)
+        return list(compounds.values())
 
     # ---- column / layout detection ----
 
@@ -399,14 +521,26 @@ class RapidOcrTableExtractor:
 
         layout: str | None = None
         if header is not None and header.size:
-            layout = detect_layout(self._scan_header_fields(header))
+            layout = self.profile.layout_for_fields(
+                self._scan_header_fields(header)
+            )
         if layout is None:
-            layout = detect_layout_from_columns(self._count_columns(img))
+            layout = self.profile.layout_for_column_count(
+                self._count_columns(img)
+            )
         if layout is None and prev_columns:
             return list(prev_columns)
         if layout is None:
-            layout = "activity"  # last-resort default
-        columns = self._snap_to_borders(img, default_columns(w, layout))
+            layout = self.profile.default_layout
+        columns = self._snap_to_borders(
+            img,
+            [
+                Column(name, x1, x2, is_image)
+                for name, x1, x2, is_image in self.profile.scaled_columns(
+                    layout, w
+                )
+            ],
+        )
         return self._widen_text_column_to_border(img, columns)
 
     def _scan_header_fields(self, header_img: np.ndarray) -> set[str]:
@@ -497,8 +631,18 @@ class RapidOcrTableExtractor:
         if y2 - y1 < self.FIRST_ROW_MIN_PX:
             return None
         xs = self._vertical_lines_in(img[y1:y2, :])
-        layout = detect_layout_from_columns(len(xs) + 1) if xs else None
-        return default_columns(img.shape[1], layout) if layout else None
+        layout = (
+            self.profile.layout_for_column_count(len(xs) + 1)
+            if xs else None
+        )
+        if not layout:
+            return None
+        return [
+            Column(name, x1, x2, is_image)
+            for name, x1, x2, is_image in self.profile.scaled_columns(
+                layout, img.shape[1]
+            )
+        ]
 
     def _detect_vertical_borders(self, img: np.ndarray) -> list[int]:
         """Return x positions of full-height vertical rules in the body."""
@@ -563,11 +707,11 @@ class RapidOcrTableExtractor:
         from edit distance 0 to 29).  Extending the crop to the rule
         restores the full glyph and the correct string.
 
-        Only the validated OCR route uses this, because the
+        Only the ink-band OCR routes use this, because the
         production route has its own historical crop behaviour and
         its output is already published in the CSV.
         """
-        if self.smiles_route != ROUTE_VALIDATED:
+        if self.smiles_route not in INK_BAND_ROUTES:
             return columns
 
         borders = self._detect_vertical_borders_including_edge(img)
@@ -652,6 +796,8 @@ class RapidOcrTableExtractor:
         columns: Sequence[Column],
         image_path: Path,
         cells_dir: Path | None,
+        continuation: bool = False,
+        layout_key: str = "",
     ) -> tuple[list[CompoundRecord], list[AssayRecord]]:
         compounds: dict[str, CompoundRecord] = {}
         assays: dict[str, AssayRecord] = {}
@@ -688,6 +834,14 @@ class RapidOcrTableExtractor:
                 img[y1:y2, cid_col_local.x1:cid_col_local.x2]
             )
             if cmpd_id is None:
+                # No compound number: either the header band, or a row
+                # that continues the previous compound across a page
+                # break.  Only the continuation case carries SMILES.
+                if continuation:
+                    self._append_continuation(
+                        self._pending.get(layout_key), img[y1:y2],
+                        slice_columns,
+                    )
                 continue
 
             row_values: dict[str, str | None] = {}
@@ -705,7 +859,7 @@ class RapidOcrTableExtractor:
                     continue
                 if col.name == "smiles" and (
                     self.rec_top_k > 1
-                    or self.smiles_route == ROUTE_VALIDATED
+                    or self.smiles_route in INK_BAND_ROUTES
                 ):
                     text, ocr_stats = self._ocr_smiles_with_stats(cell)
                     row_values[col.name] = text
@@ -714,6 +868,26 @@ class RapidOcrTableExtractor:
                     row_values[col.name] = self._ocr_cell(cell, col.name)
 
             has_smiles = "smiles" in row_values and row_values["smiles"]
+            stats = row_smiles_stats.get(cmpd_id) or OcrStats()
+
+            if continuation:
+                # A row that may continue on the next page stays open
+                # until the next numbered row proves that it ended.
+                previous = self._pending.pop(layout_key, None)
+                if previous is not None:
+                    self._close_pending_row(previous, compounds)
+                self._pending[layout_key] = _PendingRow(
+                    cmpd_id=cmpd_id,
+                    smiles_text=row_values.get("smiles") or "",
+                    structure_path=structure_path,
+                    source_image=image_path.name,
+                    ocr_stats=stats,
+                    layout_key=layout_key,
+                )
+                # The assay values live on the first band of the row.
+                self._store_assay(assays, cmpd_id, row_values, image_path)
+                continue
+
             # Build a CompoundRecord whenever we have a structure crop
             # OR a SMILES string. SMILES validation still runs when
             # present; structure-only rows get is_valid=False with
@@ -726,7 +900,6 @@ class RapidOcrTableExtractor:
                     from cpd.chem import auto_repair_smiles, validate_and_enrich
                     fixed = auto_repair_smiles(row_values["smiles"] or "")
                     chem = validate_and_enrich(fixed) if fixed else None
-                stats = row_smiles_stats.get(cmpd_id) or OcrStats()
                 compounds[cmpd_id] = CompoundRecord(
                     cmpd_id=cmpd_id,
                     smiles=fixed or None,
@@ -741,23 +914,31 @@ class RapidOcrTableExtractor:
                     ocr_low_conf_count=stats.low_conf_count,
                 )
 
-            if {"kd_nm", "rt_min", "ms_mz"} & row_values.keys():
-                assays[cmpd_id] = AssayRecord(
-                    cmpd_id=cmpd_id,
-                    kd_nm=_as_float(row_values.get("kd_nm")),
-                    rt_min=_as_float(row_values.get("rt_min")),
-                    ms_mz=_as_float(row_values.get("ms_mz")),
-                    lcms_method=row_values.get("lcms_method"),
-                    ms_polarity=row_values.get("ms_polarity"),
-                    source_image=image_path.name,
-                )
+            self._store_assay(assays, cmpd_id, row_values, image_path)
 
         return list(compounds.values()), list(assays.values())
 
     def _read_cmpd_id(self, cell: np.ndarray) -> str | None:
-        """Find the 4-digit compound id in the leftmost cell."""
+        """Find the compound id in the leftmost cell."""
         if cell.size == 0:
             return None
+        if self.profile.cmpd_id_inset_px:
+            inset = self.profile.cmpd_id_inset_px
+            cell = cell[:, inset:cell.shape[1] - inset]
+        if self.profile.cmpd_id_top_px is not None:
+            cell = cell[:self.profile.cmpd_id_top_px, :]
+        if cell.size == 0:
+            return None
+        # The compound-number cell is wide and mostly empty: the digits
+        # occupy a narrow block in the middle of a ~330-px column.  The
+        # detector sees a large low-contrast canvas and returns *no
+        # text box at all* for some rows -- the number is perfectly
+        # legible in the image, but the crop is not (measured on
+        # I100377: 26 of 58 numbers were read before this crop, 58 of
+        # 58 after).  Trimming the cell to the bounding box of its
+        # dark content removes the empty canvas and the numbers are
+        # found.  The untrimmed crop is kept as a fallback so a cell
+        # whose content the trim cannot locate is still read.
         # cmpd_id cells are tall narrow columns where the 4-digit text
         # sits in the middle surrounded by whitespace and the cell's own
         # border lines. We try the Chinese (default) engine first because
@@ -766,15 +947,156 @@ class RapidOcrTableExtractor:
         # while the Chinese recogniser returns the digit string cleanly.
         # Falling back to the EN engine only matters when the Chinese
         # detector finds nothing on a tight crop.
-        for engine in (self.engine, self.rec_engine):
-            result = engine(self._upscale(cell))
-            if not result:
+        trimmed = self._trim_to_content(cell)
+        for candidate in (trimmed, cell):
+            if candidate.size == 0:
                 continue
-            for text in self._txts(result):
-                for token in text.split():
-                    if re.fullmatch(r"\d{4}", token.strip()):
-                        return token.strip()
+            for engine in (self.engine, self.rec_engine):
+                result = engine(self._upscale(candidate))
+                if not result:
+                    continue
+                for text in self._txts(result):
+                    for token in text.split():
+                        if re.fullmatch(
+                            self.profile.cmpd_id_pattern, token.strip()
+                        ):
+                            return token.strip()
         return None
+
+    def _ocr_grade_cell(
+        self, cell: np.ndarray, field_spec
+    ) -> str | None:
+        """Read an activity-grade cell, restricted to its allowed set."""
+        if self._grade_ocr is None:
+            from cpd.ocr.constrained import ConstrainedCellOCR
+
+            self._grade_ocr = ConstrainedCellOCR(
+                field_spec.allowed,
+                detector_engine=self.engine,
+                english_engine=self.rec_engine,
+            )
+        return self._grade_ocr.read(cell)
+
+    @property
+    def activity_reader(self):
+        """The reader for the activity columns, built on demand.
+
+        The engines are the ones the extractor already owns: the
+        English detector + recogniser, the default Chinese detector +
+        recogniser, and the default recogniser used in recognition-only
+        mode for the printed line.
+        """
+        if self._activity_reader is None:
+            from cpd.ocr.activity import ActivityCellReader
+
+            self._activity_reader = ActivityCellReader(
+                english_engine=self.rec_engine,
+                chinese_engine=self.engine,
+                line_engine=self.engine,
+            )
+        return self._activity_reader
+
+    def _read_activity_cell(
+        self, cell: np.ndarray, field_name: str
+    ) -> str | None:
+        """Read one activity cell of the characterisation table."""
+        spec = self.profile.assay_field(field_name)
+        numeric = bool(spec and spec.kind == "number")
+        result = self.activity_reader.read(cell, numeric=numeric)
+        return result.reading.text
+
+    # ---- continuation rows (a row that runs over a page break) ----
+
+    def _append_continuation(
+        self,
+        pending: _PendingRow | None,
+        band: np.ndarray,
+        columns: Sequence[Column],
+    ) -> None:
+        """Append a continuation band to the row that is still open.
+
+        The band carries no compound number, but it does carry the rest
+        of the printed SMILES.  The text is appended verbatim so the
+        joined string is the molecule as printed, not a re-joined
+        guess.
+        """
+        if pending is None:
+            return
+        smiles_col = next(
+            (c for c in columns if c.name == "smiles"), None
+        )
+        if smiles_col is None or smiles_col.x2 <= smiles_col.x1:
+            return
+        cell = band[:, smiles_col.x1:smiles_col.x2]
+        if cell.size == 0:
+            return
+        text, _stats = self._ocr_smiles_with_stats(cell)
+        if text:
+            pending.smiles_text += text
+
+    def _close_pending_row(
+        self,
+        pending: _PendingRow,
+        compounds: dict[str, CompoundRecord],
+    ) -> None:
+        """Finish an open row and store its compound record."""
+        if pending.structure_path is None and not pending.smiles_text:
+            return
+        fixed, chem = None, None
+        if pending.smiles_text:
+            from cpd.chem import auto_repair_smiles, validate_and_enrich
+
+            fixed = auto_repair_smiles(pending.smiles_text)
+            chem = validate_and_enrich(fixed) if fixed else None
+        compounds[pending.cmpd_id] = CompoundRecord(
+            cmpd_id=pending.cmpd_id,
+            smiles=fixed or None,
+            canonical_smiles=chem.canonical_smiles if chem else None,
+            molecular_weight=chem.molecular_weight if chem else None,
+            heavy_atom_count=chem.heavy_atom_count if chem else None,
+            is_valid=chem is not None,
+            structure_image=pending.structure_path,
+            source_image=pending.source_image,
+            ocr_avg_entropy=pending.ocr_stats.avg_entropy,
+            ocr_min_top1=pending.ocr_stats.min_top1,
+            ocr_low_conf_count=pending.ocr_stats.low_conf_count,
+        )
+
+    def _store_assay(
+        self,
+        assays: dict[str, AssayRecord],
+        cmpd_id: str,
+        row_values: dict[str, str | None],
+        image_path: Path,
+    ) -> None:
+        """Store the assay row for one compound."""
+        if not (set(self.profile.assay_trigger_fields) & row_values.keys()):
+            return
+        known = {
+            "kd_nm": _as_float(row_values.get("kd_nm")),
+            "rt_min": _as_float(row_values.get("rt_min")),
+            "ms_mz": _as_float(row_values.get("ms_mz")),
+            "lcms_method": row_values.get("lcms_method"),
+            "ms_polarity": row_values.get("ms_polarity"),
+        }
+        extra: list[tuple[str, str]] = []
+        for field_spec in self.profile.assay_fields:
+            if field_spec.name in known:
+                continue
+            raw = row_values.get(field_spec.name)
+            value = _as_float(raw) if field_spec.kind == "number" else raw
+            if value is not None and value != "":
+                extra.append((field_spec.name, str(value)))
+        assays[cmpd_id] = AssayRecord(
+            cmpd_id=cmpd_id,
+            kd_nm=known["kd_nm"],
+            rt_min=known["rt_min"],
+            ms_mz=known["ms_mz"],
+            lcms_method=known["lcms_method"],
+            ms_polarity=known["ms_polarity"],
+            source_image=image_path.name,
+            extra=tuple(extra),
+        )
 
     def _ocr_cell(self, cell: np.ndarray, field_name: str) -> str | None:
         """OCR one cell. SMILES lines concatenate; other cells join with spaces.
@@ -788,65 +1110,33 @@ class RapidOcrTableExtractor:
         """
         if cell.size == 0:
             return None
+
+        # A constrained field (an activity grade, for example) is read
+        # by its own reader: the value has to come from a closed set,
+        # so a misread glyph is dropped instead of being written out.
+        field_spec = self.profile.assay_field(field_name)
+        if field_spec is not None and field_spec.kind == "grade":
+            return self._ocr_grade_cell(cell, field_spec)
+
         cell = self._trim_to_content(cell)
         if cell.size == 0:
             return None
-        # Activity-table cells (KD/RT/m/z/method/polarity) are short and
-        # dense; the English mobile recogniser over-segments them into
-        # one box per character (``1.554`` -> ``['1', '.', '5', '5', '4']``)
-        # while the Chinese default recogniser reads them cleanly once
-        # we strip the table borders and re-upscale. SMILES is kept on
-        # the EN recogniser since CH routinely returns empty detections
-        # for those long strings.
+        if field_name != "smiles":
+            # An activity cell holds one short printed value: a
+            # retention time, an m/z, a potency, a gradient, an
+            # ionisation mode.  The detector must not decide how such
+            # a value is cut into pieces.  It split ``1.72`` into
+            # ``1`` + ``72`` and the decimal point was lost, and it
+            # split ``[M+H]+`` into four boxes that the old vertical
+            # midpoint sort then put back in the wrong order.  The
+            # activity reader segments the printed line itself and
+            # keeps the detector readings as corroboration; see
+            # ``cpd.ocr.activity``.
+            return self._read_activity_cell(cell, field_name)
+
+        # SMILES is kept on the EN recogniser since CH routinely
+        # returns empty detections for those long strings.
         result = self.rec_engine(self._upscale(cell))
-        if field_name != "smiles" and self._looks_over_segmented(result):
-            # Multi-strategy fallback. The CH detector on dense-table
-            # cells sometimes can't find text on the strip-bordered crop
-            # (e.g. cmpd 1038 kd '5.505' returns None on strip@4x)
-            # but reads cleanly on a binarised crop, and vice versa
-            # (cmpd 1036 rt '1.555' returns None on binary@4x but
-            # works on strip@4x). Score every candidate and keep the
-            # cleanest one.
-            # ``cell`` was already cropped to its dark content above, so
-            # the heavy black gridlines are gone. A flat 20-px strip on
-            # each side over-trims tight trimmed cells (e.g. cmpd 1040
-            # ms_mz "1,558.8" -> ",558." because the leading "1" lived
-            # in the leftmost few pixels). Use 4 px on each side --
-            # only enough to swallow any remaining anti-aliased border
-            # fringe, not enough to eat into the text itself.
-            candidates = []
-            pad = 4
-            if cell.shape[1] > 2 * pad + 20:
-                src = cell[:, pad:cell.shape[1] - pad]
-            else:
-                src = cell
-            h, w = src.shape[:2]
-            # Pick an upscale factor that brings the shorter side
-            # to >= 100 px. OpenCV shape is (rows, cols) -- height is
-            # the bottleneck, so we check min() (NOT max(), which is
-            # dominated by cell width and would never trigger here).
-            scale = 1 if min(h, w) >= 100 else (2 if min(h, w) * 2 >= 100 else 4)
-            upscaled = src if scale == 1 else cv2.resize(
-                src, (w * scale, h * scale), interpolation=cv2.INTER_CUBIC,
-            )
-            # Strategy 1: CH on strip-borders upscale.
-            r = self.engine(upscaled)
-            if r and self._txts(r):
-                candidates.append(self._score_candidate(self._txts(r), r, 'CH-strip'))
-            # Strategy 2: CH on binarised upscale (force high contrast).
-            gray = cv2.cvtColor(upscaled, cv2.COLOR_BGR2GRAY)
-            _, binary = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
-            binary_bgr = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
-            r = self.engine(binary_bgr)
-            if r and self._txts(r):
-                candidates.append(self._score_candidate(self._txts(r), r, 'CH-binary'))
-            # Strategy 3: EN on strip upscale (last resort; usually junk).
-            r = self.rec_engine(upscaled)
-            if r and self._txts(r):
-                candidates.append(self._score_candidate(self._txts(r), r, 'EN-strip'))
-            if candidates:
-                candidates.sort(key=lambda c: -c[0])
-                result = candidates[0][2]
         if not result:
             return None
         boxes = self._boxes(result)
@@ -861,35 +1151,11 @@ class RapidOcrTableExtractor:
         parts = [t.strip() for _, t in items if t and t.strip()]
         if not parts:
             return None
-        joiner = "" if field_name == "smiles" else " "
-        text = joiner.join(parts)
+        text = "".join(parts)
 
-        if field_name == "smiles" and self.rec_top_k > 1:
+        if self.rec_top_k > 1:
             return self._fix_smiles_with_top_k(result, parts)
         return text
-
-    def _score_candidate(self, txts, result, label):
-        """Score an OCR result for an activity cell. Higher is better.
-
-        Reject obvious over-segmented output (each box ~ 1 char) and
-        prefer all-digit results.
-        """
-        joined = "".join(t for t in txts if t)
-        if not joined:
-            return (-1.0, txts, result)
-        if len(txts) >= 3 and sum(len(t) for t in txts if t) <= len(txts) + 2:
-            # Every box is ~1 char -- over-segmented.
-            return (-1.0, txts, result)
-        score = 0.0
-        if re.fullmatch(r"[\d.,\-]+", joined):
-            score += 5.0
-        elif re.fullmatch(r"[\d.,\- <>~nNaAmMpPuU/]+", joined):
-            score += 1.0
-        else:
-            score -= 2.0
-        if '  ' in joined or joined.count(' ') >= 2:
-            score -= 3.0
-        return (score, txts, result)
 
     def _save_structure_crop(
         self,
@@ -978,21 +1244,6 @@ class RapidOcrTableExtractor:
         if img.ndim < 2 or img.shape[1] <= 2 * pad:
             return img
         return img[:, pad:img.shape[1] - pad]
-
-    def _looks_over_segmented(self, result, min_boxes: int = 3) -> bool:
-        """True when the recogniser returned one short box per character.
-
-        The EN mobile recogniser splits short numeric cells like ``1.554``
-        into ``['1', '.', '5', '5', '4']``. That sort of output is
-        unusable downstream; we detect it by counting boxes whose text is
-        a single printable character and ask the caller to retry with the
-        CH recogniser on a stripped cell.
-        """
-        txts = self._txts(result) or []
-        if len(txts) < min_boxes:
-            return False
-        single = sum(1 for t in txts if t and len(t.strip()) <= 1)
-        return single >= min_boxes
 
     @staticmethod
     def _trim_to_content(img: np.ndarray, pad: int = 4) -> np.ndarray:
@@ -1179,7 +1430,7 @@ class RapidOcrTableExtractor:
         if cell.size == 0:
             return None, OcrStats()
 
-        if self.smiles_route == ROUTE_VALIDATED:
+        if self.smiles_route in INK_BAND_ROUTES:
             # Different recogniser, different line segmentation and a
             # different crop geometry.  The top-k entropy statistics do
             # not exist for this route, so they stay at their defaults.

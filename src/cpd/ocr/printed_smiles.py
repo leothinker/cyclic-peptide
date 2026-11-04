@@ -1,6 +1,6 @@
 """Recognising the printed SMILES column of patent characterisation tables.
 
-Two routes are implemented side by side.
+Three routes are implemented side by side.
 
 ``production`` (the historical pipeline behaviour)
     Crop the SMILES cell, trim it to its content, upscale 2x, then run
@@ -28,6 +28,33 @@ Two routes are implemented side by side.
     One single configuration is used for every row of every compound --
     there is no per-row or per-compound tuning.
 
+``padded``
+    The ink-band route of ``validated``, but with the *English*
+    PP-OCRv4 recogniser and a 6 px white margin around every printed
+    line and no upscale.  It was derived on patent WO2022251372
+    (Table 1a, 28 compounds, serif type): ``text_span`` returns the
+    first and last column that contains any ink, so the final glyph of
+    a printed line ends up flush against the crop border and the
+    recogniser mis-reads or drops it.  The margin restores the missing
+    border without touching the pixels.
+
+    Measured on the 60 hand-transcribed lines of that patent, the
+    margin takes the total line edit count from 31 (no margin) to 5.
+    The two patents need *opposite* settings, though: on
+    WO2025162428 the same margin makes the result much worse
+    (total edit 15 -> 95 on five reference rows), because that
+    patent's rows are packed tightly enough that the ink band also
+    contains fragments of the neighbouring lines.  The margin is
+    therefore a separate route, not a change to the existing ones.
+
+    The route deliberately does *not* upscale, unlike ``validated``.
+    That was measured, not assumed: over the 28 Table 1a compounds,
+    no upscale gives 21/28 bracket balanced, 17/28 RDKit-parseable
+    and 19/28 after the repair chain, while 2x gives 20/28, 15/28 and
+    17/28.  The edit distance to the six hand transcriptions is the
+    same either way (0, 1, 0, 0, 2, 2), so the difference is in
+    bracket balance rather than in character accuracy.
+
 What this module does **not** do: it does not judge whether the
 recognised string is the correct chemical structure.  Text recognition,
 RDKit parseability, the LC-MS mass gate and structure validation are
@@ -52,20 +79,60 @@ from typing import Iterable
 import cv2
 import numpy as np
 
+from cpd.ocr.lines import (
+    INK_THRESHOLD,
+    INTERPOLATION,
+    MIN_BAND_HEIGHT,
+    MIN_BAND_INK,
+    RULE_HEIGHT_RATIO,
+    UPSCALE,
+    WHITE,
+    ink_bands,
+    text_span,
+    upscale,
+)
+
 ROUTE_PRODUCTION = "production"
 ROUTE_VALIDATED = "validated"
-ROUTES = (ROUTE_PRODUCTION, ROUTE_VALIDATED)
+ROUTE_PADDED = "padded"
+ROUTE_VALIDATED_VOTE = "validated_vote"
+ROUTE_PADDED_VOTE = "padded_vote"
+ROUTES = (
+    ROUTE_PRODUCTION,
+    ROUTE_VALIDATED,
+    ROUTE_PADDED,
+    ROUTE_VALIDATED_VOTE,
+    ROUTE_PADDED_VOTE,
+)
+
+# Routes that segment the printed lines with our own ink-band
+# segmentation instead of the detector.  They share the crop geometry;
+# they differ in the recogniser and in the margin.
+INK_BAND_ROUTES = (
+    ROUTE_VALIDATED,
+    ROUTE_PADDED,
+    ROUTE_VALIDATED_VOTE,
+    ROUTE_PADDED_VOTE,
+)
+
+# The routes that read every printed line with a second recogniser and
+# let the two readings settle the characters they disagree on.
+VOTE_ROUTES = (ROUTE_VALIDATED_VOTE, ROUTE_PADDED_VOTE)
 
 # --- validated route geometry -------------------------------------------
-UPSCALE = 2
-INTERPOLATION = cv2.INTER_CUBIC
 PAD_TOP = 14
 PAD_BOTTOM = 15
-RULE_HEIGHT_RATIO = 0.80
-INK_THRESHOLD = 160
-MIN_BAND_HEIGHT = 8
-MIN_BAND_INK = 5
 
+# --- padded route geometry ----------------------------------------------
+# White border added left and right of every printed line, measured in
+# the pixels of the original crop (i.e. before the 2x upscale).
+PADDED_MARGIN_PX = 6
+
+# The padded route recognises the band at its original size.  Measured
+# on WO2022251372 (28 compounds): 1x gives 21/28 bracket balanced and
+# 17/28 RDKit-parseable, 2x gives 20/28 and 15/28.  The character
+# accuracy against the hand transcriptions is identical either way.
+PADDED_SCALE = 1
 
 def default_recogniser():
     """Upstream default RapidOCR engine (PP-OCRv6 detector + recogniser).
@@ -107,69 +174,32 @@ def english_recogniser():
     )
 
 
-def ink_bands(
-    gray: np.ndarray,
-    *,
-    threshold: int = INK_THRESHOLD,
-    min_height: int = MIN_BAND_HEIGHT,
-    min_ink: int = MIN_BAND_INK,
-) -> list[tuple[int, int]]:
-    """Vertical bands of printed text, as ``(top, bottom)`` pixel rows.
+def english_recogniser_only():
+    """English PP-OCRv4 mobile recogniser, with no detector configured.
 
-    The left and right edges of the cell are ignored so that the
-    vertical table rules cannot keep a band alive on their own.
+    The padded route never runs the detector -- it segments the lines
+    itself and recognises them one by one -- so the detector model is
+    pure overhead here.  This is the configuration the 6 px margin was
+    measured with.
     """
-    height, width = gray.shape
-    left = min(10, max(1, width // 100))
-    right = max(left + 1, width - 10)
-    ink = (gray[:, left:right] < threshold).astype(np.uint8)
-    sums = ink.sum(axis=1)
-    active = np.flatnonzero(sums > min_ink)
-    if not len(active):
-        return []
+    from rapidocr import RapidOCR
+    from rapidocr.utils.typings import (
+        EngineType,
+        ModelType,
+        OCRVersion,
+        TaskType,
+    )
 
-    groups: list[list[int]] = []
-    start = previous = int(active[0])
-    for value in active[1:]:
-        current = int(value)
-        if current > previous + 1:
-            groups.append([start, previous])
-            start = current
-        previous = current
-    groups.append([start, previous])
-    return [(a, b) for a, b in groups if b - a >= min_height]
-
-
-def text_span(
-    gray: np.ndarray,
-    *,
-    threshold: int = INK_THRESHOLD,
-    rule_height_ratio: float = RULE_HEIGHT_RATIO,
-) -> tuple[int, int]:
-    """Horizontal ink span of a row, with the vertical table rules removed.
-
-    A patent table rule is a column that is dark over (almost) the whole
-    cell height.  Such columns are excluded, and so are the one-pixel
-    neighbours that belong to the same rule.
-    """
-    dark = gray < threshold
-    height = gray.shape[0]
-    rule = dark.sum(axis=0) / max(height, 1) >= rule_height_ratio
-    for x in np.flatnonzero(rule).tolist():
-        for dx in (-1, 1):
-            if 0 <= x + dx < gray.shape[1]:
-                if dark[:, x + dx].sum() / max(height, 1) >= 0.5:
-                    rule[x + dx] = True
-    columns = np.flatnonzero((dark.sum(axis=0) > 0) & (~rule))
-    if not len(columns):
-        return 0, gray.shape[1] - 1
-    return int(columns[0]), int(columns[-1])
-
-
-def upscale(image: np.ndarray, scale: int = UPSCALE) -> np.ndarray:
-    """Upscale without binarisation (binarisation was measured to hurt)."""
-    return cv2.resize(
-        image, None, fx=scale, fy=scale, interpolation=INTERPOLATION
+    return RapidOCR(
+        params={
+            "Rec.lang_type": "en",
+            "Rec.ocr_version": OCRVersion.PPOCRV4,
+            "Rec.model_type": ModelType.MOBILE,
+            "Rec.engine_type": EngineType.ONNXRUNTIME,
+            "Rec.task_type": TaskType.REC,
+            "Global.text_score": 0.0,
+            "Global.use_cls": False,
+        }
     )
 
 
@@ -183,23 +213,53 @@ class PrintedSmilesOCR:
             )
         self.route = route
         self._engine = None
+        self._second_engine = None
 
     @property
     def engine(self):
         """Lazily build the OCR engine (loading ONNX models is slow)."""
         if self._engine is None:
-            if self.route == ROUTE_VALIDATED:
+            if self.route in (ROUTE_VALIDATED, ROUTE_VALIDATED_VOTE):
                 self._engine = default_recogniser()
+            elif self.route in (ROUTE_PADDED, ROUTE_PADDED_VOTE):
+                self._engine = english_recogniser_only()
             else:
                 self._engine = english_recogniser()
         return self._engine
+
+    @property
+    def second_engine(self):
+        """The second recogniser of the voting routes.
+
+        The vote needs two recognisers that make *different* mistakes.
+        The English PP-OCRv4 mobile model and the upstream PP-OCRv6
+        model are such a pair: on the transcribed lines of
+        WO2022251372 the first one misses 5 characters and the second
+        one misses 29, and they miss different ones.
+        """
+        if self._second_engine is None:
+            if self.route in (ROUTE_VALIDATED, ROUTE_VALIDATED_VOTE):
+                self._second_engine = english_recogniser_only()
+            else:
+                self._second_engine = default_recogniser()
+        return self._second_engine
 
     def read_cell(self, cell: np.ndarray) -> str | None:
         """Return the printed SMILES in one cell, or ``None`` if empty."""
         if cell is None or cell.size == 0:
             return None
+        if self.route == ROUTE_VALIDATED_VOTE:
+            return self._read_cell_voted(
+                cell, margin=0, scale=UPSCALE
+            )
+        if self.route == ROUTE_PADDED_VOTE:
+            return self._read_cell_voted(
+                cell, margin=PADDED_MARGIN_PX, scale=PADDED_SCALE
+            )
         if self.route == ROUTE_VALIDATED:
             return self._read_cell_validated(cell)
+        if self.route == ROUTE_PADDED:
+            return self._read_cell_padded(cell)
         return self._read_cell_production(cell)
 
     def read_cells(self, directory: Path) -> dict[str, str]:
@@ -249,6 +309,59 @@ class PrintedSmilesOCR:
 
     def _read_cell_validated(self, cell: np.ndarray) -> str | None:
         """Validated behaviour: ink bands, trimmed rules, padded, rec-only."""
+        return self._read_cell_ink_bands(cell, margin=0, scale=UPSCALE)
+
+    def _read_cell_padded(self, cell: np.ndarray) -> str | None:
+        """Ink bands plus a white margin around every printed line.
+
+        The pixels are unchanged; only a white border is added on the
+        left and the right of each line, so the final glyph of the line
+        no longer touches the crop border.  The band is recognised at
+        its original size; see ``PADDED_SCALE``.
+        """
+        return self._read_cell_ink_bands(
+            cell, margin=PADDED_MARGIN_PX, scale=PADDED_SCALE
+        )
+
+    def _read_cell_voted(
+        self, cell: np.ndarray, *, margin: int, scale: int
+    ) -> str | None:
+        """Read the printed lines twice and let the two readings vote.
+
+        The geometry is the one of the route this vote was derived
+        from -- the margin and the upscale are the measured settings
+        of that patent.  Only the *reading* differs: every printed
+        line is recognised by the route's own recogniser and by the
+        other one, and the two readings are combined by
+        :func:`cpd.ocr.vote.vote_lines`.
+        """
+        from cpd.ocr.vote import vote_lines
+
+        primary = self._read_cell_ink_bands(
+            cell, margin=margin, scale=scale, engine=self.engine,
+            as_lines=True,
+        )
+        if not primary:
+            return None
+        secondary = self._read_cell_ink_bands(
+            cell, margin=margin, scale=scale, engine=self.second_engine,
+            as_lines=True,
+        )
+        result = vote_lines(primary, secondary)
+        return result.text or None
+
+    def _read_cell_ink_bands(
+        self,
+        cell: np.ndarray,
+        *,
+        margin: int,
+        scale: int,
+        engine=None,
+        as_lines: bool = False,
+    ) -> str | None:
+        """Shared ink-band reader for the ``validated``/``padded`` routes."""
+        if engine is None:
+            engine = self.engine
         gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY)
         bands = ink_bands(gray)
         if not bands:
@@ -264,15 +377,31 @@ class PrintedSmilesOCR:
             variant = row[:, x1:x2 + 1]
             if variant.size == 0:
                 continue
-            text = self._recognise_only(upscale(variant))
+            if margin:
+                variant = cv2.copyMakeBorder(
+                    variant,
+                    0,
+                    0,
+                    margin,
+                    margin,
+                    cv2.BORDER_CONSTANT,
+                    value=WHITE,
+                )
+            if scale != 1:
+                variant = upscale(variant, scale)
+            text = self._recognise_only(variant, engine=engine)
             if text:
                 parts.append(text)
         if not parts:
             return None
+        if as_lines:
+            return parts  # type: ignore[return-value]
         return "".join(parts)
 
-    def _recognise_only(self, crop: np.ndarray) -> str:
-        result = self.engine(crop, use_det=False, use_rec=True)
+    def _recognise_only(self, crop: np.ndarray, engine=None) -> str:
+        if engine is None:
+            engine = self.engine
+        result = engine(crop, use_det=False, use_rec=True)
         txts = getattr(result, "txts", None) or []
         if not txts:
             return ""

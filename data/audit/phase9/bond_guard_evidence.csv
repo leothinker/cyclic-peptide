@@ -1,0 +1,6 @@
+﻿cmpd_id,primary_bonds,guarded_bonds,unguarded_bonds,unguarded_lost_a_bond,guarded_lost_a_bond
+1053,19,19,18,True,False
+1095,18,18,17,True,False
+1154,19,19,17,True,False
+2141,20,20,18,True,False
+2160,20,20,16,True,False

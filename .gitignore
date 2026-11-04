@@ -48,6 +48,7 @@ ENV/
 htmlcov/
 .pytest_cache/
 .pytesttmp/
+.ruff_cache/
 .tox/
 
 # Distribution
@@ -86,10 +87,24 @@ data/raw/WO2025162428/*
 !data/raw/WO2025162428/golden_tables/*.jpg
 !data/raw/WO2025162428/*.pdf
 
+# Patent 2 (WO2022251372): its golden tables are the ground truth for
+# the second patent, so they travel with the deliverable as well.  The
+# PDF stays out -- it is large, and it is the tables the pipeline reads.
+!data/raw/WO2022251372/
+data/raw/WO2022251372/*
+!data/raw/WO2022251372/golden_tables/
+!data/raw/WO2022251372/golden_tables/*.tif
+
 # Processed output: keep the combined CSV, drop the regenerated crops,
 # re-renders and run logs.
 data/processed/*
 !data/processed/compounds_combined.csv
+
+# The route archives: the same CSV under three different OCR routes.
+# They are kept so the route comparison in the report can be re-checked
+# against the data rather than taken on trust.
+!data/processed/archive/
+!data/processed/archive/*.csv
 
 # Audit evidence: keep the summaries, result tables and report figures.
 # The bulk (cell crops, montages, raw OCR dumps) stays out of git.
@@ -103,6 +118,16 @@ data/audit/**
 !data/audit/**/check_sheet.png
 !data/audit/**/flagged_montage.png
 !data/audit/**/evidence_*/line*.png
+
+# The demo and report figures the write-up points at.
+!data/audit/demos/**/*.png
+
+# Three crops from the patent-2 transcription audit: the pixels that
+# back the three corrections.  The other ~87 crops in these two
+# directories are working material and stay out of git.
+!data/audit/phase9/patent2_reference_audit/cmpd10_line07.png
+!data/audit/phase9/patent2_zoom/cmpd28_band2_line03.png
+!data/audit/phase9/patent2_zoom/cmpd28_band2_line05.png
 
 # Rendered PDF pages used for the external check: keep the one page that
 # carries a printed-SMILES table, drop the rest of the bulk renders.

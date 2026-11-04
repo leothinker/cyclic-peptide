@@ -1,0 +1,106 @@
+{
+  "old": {
+    "scale1": {
+      "cells": 336,
+      "balanced_raw": 1,
+      "parses_raw": 0,
+      "balanced_after_repair": 1,
+      "parses_after_repair": 0,
+      "cells_with_reference": 5,
+      "edits": [
+        15,
+        16,
+        15,
+        20,
+        21
+      ],
+      "edits_after_repair": [
+        9,
+        14,
+        9,
+        15,
+        17
+      ],
+      "total_edit": 87,
+      "total_edit_after_repair": 64
+    },
+    "scale2": {
+      "cells": 336,
+      "balanced_raw": 1,
+      "parses_raw": 0,
+      "balanced_after_repair": 1,
+      "parses_after_repair": 0,
+      "cells_with_reference": 5,
+      "edits": [
+        15,
+        18,
+        16,
+        23,
+        23
+      ],
+      "edits_after_repair": [
+        9,
+        16,
+        10,
+        17,
+        18
+      ],
+      "total_edit": 95,
+      "total_edit_after_repair": 70
+    }
+  },
+  "new": {
+    "scale1": {
+      "cells": 28,
+      "balanced_raw": 21,
+      "parses_raw": 17,
+      "balanced_after_repair": 21,
+      "parses_after_repair": 19,
+      "cells_with_reference": 6,
+      "edits": [
+        0,
+        1,
+        0,
+        0,
+        2,
+        2
+      ],
+      "edits_after_repair": [
+        0,
+        1,
+        0,
+        0,
+        2,
+        2
+      ],
+      "total_edit": 5,
+      "total_edit_after_repair": 5
+    },
+    "scale2": {
+      "cells": 28,
+      "balanced_raw": 20,
+      "parses_raw": 15,
+      "balanced_after_repair": 20,
+      "parses_after_repair": 17,
+      "cells_with_reference": 6,
+      "edits": [
+        0,
+        1,
+        0,
+        0,
+        2,
+        2
+      ],
+      "edits_after_repair": [
+        0,
+        1,
+        0,
+        0,
+        2,
+        2
+      ],
+      "total_edit": 5,
+      "total_edit_after_repair": 5
+    }
+  }
+}

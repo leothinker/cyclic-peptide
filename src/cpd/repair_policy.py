@@ -39,17 +39,35 @@ they can disagree and conflating them hides the real finding:
     ``rejected``          the repair failed the chemistry gate outright
     ``not_attempted``     no DECIMER output to work from
 
-``structure_confidence`` -- about the structure itself
-    ``mass_verified``     the formula reproduces the reported m/z
+``structure_confidence`` -- about the structure in ``smiles_best``
+    ``printed_mass_verified``
+        the printed SMILES parses *and* its formula reproduces the
+        reported m/z.  This is the strongest statement the data
+        supports: the string is what the patent prints, and an
+        independent measurement agrees with it.
+    ``printed_text``
+        the printed SMILES parses, but nothing independent confirms the
+        structure.  The string is the patent's own text; whether every
+        character of it was read correctly is a separate question.
+    ``mass_verified``     a DECIMER-derived structure whose formula
+                          reproduces the reported m/z
     ``mass_mismatch``     it does not
     ``no_mass_reference`` no usable m/z for this row
+    ``no_structure``      the row has no candidate structure at all
 
 ``smiles_best``
-    Best available structure: DECIMER's own output when its macrocycle is
-    intact, otherwise a repair that passed the chemistry gate. A repair that
-    only passed the chemistry gate is still a *proposal*, so
-    ``structure_confidence`` is what tells a downstream user how far to
-    trust it.
+    Best available structure, chosen in this order:
+
+    1. the **printed** SMILES, when the recogniser produced a string
+       that RDKit can parse.  The patent prints this SMILES in its own
+       table, so it is the most direct evidence available and it does
+       not depend on any structure-recognition model.
+    2. DECIMER's own output, when its macrocycle is intact.
+    3. a repair that passed the chemistry gate.
+
+    A repair that only passed the chemistry gate is still a *proposal*,
+    so ``structure_confidence`` is what tells a downstream user how far
+    to trust it.
 ``smiles_candidate_repair``
     The heuristic's proposal when it did *not* pass the chemistry gate.
 ``repair_confidence``
@@ -98,12 +116,19 @@ NEW_COLUMNS = (
 )
 
 
-def _num(value: str | None) -> Optional[float]:
-    value = (value or "").strip().replace(",", "")
-    if not value:
+def _num(value: object) -> Optional[float]:
+    """Parse a number out of a cell.
+
+    A cell value reaches this function in two shapes: the string that
+    came out of the OCR, and the float that the extractor already
+    parsed for the activity columns.  Both have to work, and an empty
+    cell has to mean "no number" rather than an error.
+    """
+    text = str(value or "").strip().replace(",", "")
+    if not text:
         return None
     try:
-        return float(value)
+        return float(text)
     except ValueError:
         return None
 
@@ -123,6 +148,8 @@ def process_rows(rows: list[dict], require_mass_gate: bool = True) -> list[dict]
     for row in rows:
         new = dict(row)
         decimer = (row.get("smiles_decimer") or "").strip()
+        decimer_canon = (row.get("canonical_smiles_decimer") or "").strip()
+        printed_canon = (row.get("canonical_smiles") or "").strip()
         mz = _num(row.get("ms_mz"))
         polarity = (row.get("ms_polarity") or "").strip()
 
@@ -134,84 +161,93 @@ def process_rows(rows: list[dict], require_mass_gate: bool = True) -> list[dict]
         new["repair_atoms_deleted"] = ""
         new["ms_check_verdict"] = "unknown"
         new["ms_error_ppm"] = ""
+        new["is_repaired"] = "False"
+        new["repair_method"] = ""
+        new["repaired_smiles"] = ""
 
-        # ---- case 1: DECIMER already produced a plausible macrocycle ----
-        if decimer and is_macrocycle_intact(decimer):
-            ms = validate_against_ms(decimer, mz, polarity)
-            new["ms_check_verdict"] = ms["verdict"]
-            if ms["error_ppm"] is not None:
-                new["ms_error_ppm"] = ms["error_ppm"]
-            new["structure_confidence"] = _mass_confidence(ms)
+        # ---- the DECIMER side: repair only when DECIMER is broken ----
+        # Everything in this block describes the *structure image* that
+        # DECIMER read.  It is recorded whether or not it wins the
+        # ``smiles_best`` column, so that the two lines of evidence stay
+        # separable.
+        decimer_intact = bool(decimer) and is_macrocycle_intact(decimer)
+        repair_candidate = ""
+        if not decimer:
+            new["repair_review_status"] = "not_attempted"
+            new["repair_method"] = "no_decimer_output"
+        elif decimer_intact:
             # No repair was needed; the status reflects that fact, not a
             # judgement about whether DECIMER's graph is chemically right.
-            new["repair_confidence"] = "none"
             new["repair_review_status"] = "not_repaired"
-            # Keep whatever smiles_best already held if DECIMER's own value
-            # is what produced it; otherwise prefer the DECIMER canonical.
-            if not (new.get("smiles_best") or "").strip():
-                new["smiles_best"] = decimer
-                new["smiles_best_source"] = "decimer"
-            new["is_repaired"] = "False"
-            new["repair_method"] = ""
-            new["repaired_smiles"] = ""
-            out.append(new)
-            continue
-
-        # ---- case 2: no DECIMER output at all ----
-        if not decimer:
-            new["repair_confidence"] = "none"
-            new["repair_review_status"] = "not_attempted"
-            new["structure_confidence"] = "no_mass_reference"
-            new["is_repaired"] = "False"
-            new["repair_method"] = "no_decimer_output"
-            new["repaired_smiles"] = ""
-            new["smiles_best"] = ""
-            new["smiles_best_source"] = ""
-            out.append(new)
-            continue
-
-        # ---- case 3: try the repair heuristics, then gate the result ----
-        candidate, method = repair_macrocycle_with_method(decimer)
-        if candidate is None:
-            new["repair_confidence"] = "none"
-            new["repair_review_status"] = "rejected"
-            new["repair_method"] = "no_repair_found"
-            new["repaired_smiles"] = ""
-            new["smiles_best"] = ""
-            new["smiles_best_source"] = ""
-            out.append(new)
-            continue
-
-        audit = audit_repair(decimer, candidate, method or "", None)
-        ms = validate_against_ms(candidate, mz, polarity)
-        new["repair_confidence"] = audit.tier
-        new["repair_atoms_invented"] = audit.atoms_invented
-        new["repair_atoms_deleted"] = audit.atoms_deleted
-        new["ms_check_verdict"] = ms["verdict"]
-        if ms["error_ppm"] is not None:
-            new["ms_error_ppm"] = ms["error_ppm"]
-        new["repaired_smiles"] = candidate
-        new["repair_method"] = method or ""
-        new["is_repaired"] = "True"
-
-        chemistry_ok = audit.validated
-        mass_ok = ms["verdict"] == "match"
-        new["structure_confidence"] = _mass_confidence(ms)
-        if chemistry_ok and (mass_ok or not require_mass_gate):
-            new["repair_review_status"] = "validated" if mass_ok else "experimental"
-            new["smiles_best"] = candidate
-            new["smiles_best_source"] = f"repair_{method}"
         else:
-            new["repair_review_status"] = (
-                "experimental"
-                if chemistry_ok and not require_mass_gate
-                else ("rejected" if audit.tier == "rejected" else "experimental")
-            )
-            new["smiles_candidate_repair"] = candidate
-            # A rejected or unvalidated candidate must not be presented as
-            # the production structure.
-            new["smiles_best"] = ""
-            new["smiles_best_source"] = ""
+            candidate, method = repair_macrocycle_with_method(decimer)
+            if candidate is None:
+                new["repair_confidence"] = "none"
+                new["repair_review_status"] = "rejected"
+                new["repair_method"] = "no_repair_found"
+            else:
+                audit = audit_repair(decimer, candidate, method or "", None)
+                new["repair_confidence"] = audit.tier
+                new["repair_atoms_invented"] = audit.atoms_invented
+                new["repair_atoms_deleted"] = audit.atoms_deleted
+                new["repaired_smiles"] = candidate
+                new["repair_method"] = method or ""
+                new["is_repaired"] = "True"
+                if audit.validated:
+                    repair_candidate = candidate
+                    rep_ms = validate_against_ms(candidate, mz, polarity)
+                    mass_ok = rep_ms["verdict"] == "match"
+                    new["repair_review_status"] = (
+                        "validated" if (mass_ok or not require_mass_gate)
+                        else "experimental"
+                    )
+                else:
+                    new["repair_review_status"] = (
+                        "rejected" if audit.tier == "rejected"
+                        else "experimental"
+                    )
+                if new["repair_review_status"] != "validated":
+                    # A repair that did not clear the gates must not be
+                    # presented as the production structure, but it is
+                    # kept so a chemist can look at it.
+                    new["smiles_candidate_repair"] = candidate
+
+        # ---- choose the structure that goes into smiles_best ----
+        # The printed SMILES wins whenever it parses: it is the patent's
+        # own text and it does not depend on a structure-recognition
+        # model.  DECIMER's output is the fallback, and a validated
+        # repair the last resort.
+        if printed_canon:
+            best = printed_canon
+            best_source = "printed_ocr"
+        elif decimer_intact:
+            best = decimer_canon or decimer
+            best_source = "decimer"
+        elif repair_candidate:
+            best = repair_candidate
+            best_source = f"repair_{new['repair_method']}"
+        else:
+            best = ""
+            best_source = ""
+        new["smiles_best"] = best
+        new["smiles_best_source"] = best_source
+
+        # ---- the mass gate, applied to whatever ended up in smiles_best ----
+        if best:
+            ms = validate_against_ms(best, mz, polarity)
+            new["ms_check_verdict"] = ms["verdict"]
+            if ms.get("error_ppm") is not None:
+                new["ms_error_ppm"] = ms["error_ppm"]
+            if best_source == "printed_ocr":
+                new["structure_confidence"] = (
+                    "printed_mass_verified" if ms["verdict"] == "match"
+                    else "printed_text"
+                )
+            else:
+                new["structure_confidence"] = _mass_confidence(ms)
+        else:
+            # No candidate structure at all for this row.
+            new["structure_confidence"] = "no_structure"
         out.append(new)
 
     # Derived columns, computed from whatever ended up in smiles_best.

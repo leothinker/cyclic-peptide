@@ -1,0 +1,23 @@
+{
+  "reference_compounds": [
+    1,
+    2,
+    3,
+    4,
+    10,
+    28
+  ],
+  "reference_lines": 60,
+  "detected_bands": 60,
+  "band_count_matches_reference": true,
+  "en_v4_mobile": {
+    "exact_lines": 31,
+    "total_edit": 33,
+    "mean_cer": 0.0258
+  },
+  "default_v6": {
+    "exact_lines": 36,
+    "total_edit": 31,
+    "mean_cer": 0.02695
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "en_v5@1x": {
+    "compounds": 28,
+    "raw_parses": 0,
+    "repaired_parses": 0,
+    "raw_bracket_balanced": 0,
+    "referenced_compounds": 3,
+    "raw_edit_to_reference": [
+      4,
+      4,
+      3
+    ],
+    "repaired_edit_to_reference": [
+      5,
+      5,
+      4
+    ],
+    "repaired_matches_reference": 0
+  },
+  "default_v6@2x": {
+    "compounds": 28,
+    "raw_parses": 0,
+    "repaired_parses": 0,
+    "raw_bracket_balanced": 3,
+    "referenced_compounds": 3,
+    "raw_edit_to_reference": [
+      5,
+      5,
+      5
+    ],
+    "repaired_edit_to_reference": [
+      6,
+      6,
+      5
+    ],
+    "repaired_matches_reference": 0
+  }
+}

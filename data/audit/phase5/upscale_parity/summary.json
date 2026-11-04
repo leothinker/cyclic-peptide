@@ -1,0 +1,32 @@
+{
+  "cells": 28,
+  "shipped_parses": 15,
+  "pad_then_upscale_parses": 15,
+  "pad_no_upscale_parses": 17,
+  "shipped_identical_to_pad_then_upscale": 28,
+  "shipped_identical_to_pad_no_upscale": 25,
+  "shipped_edits": [
+    0,
+    1,
+    0,
+    0,
+    2,
+    2
+  ],
+  "pad_then_upscale_edits": [
+    0,
+    1,
+    0,
+    0,
+    2,
+    2
+  ],
+  "pad_no_upscale_edits": [
+    0,
+    1,
+    0,
+    0,
+    2,
+    2
+  ]
+}

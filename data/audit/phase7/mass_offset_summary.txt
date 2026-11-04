@@ -1,0 +1,38 @@
+rows              : 406
+with a mass pair  : 168
+
+convention           median Da  median ppm    min Da    max Da
+mono_1plus              0.1673       105.6 -1075.6868   28.2489
+mono_2plus            794.0191    998947.1 -133.9487  853.0434
+rounded_1plus           0.0082         5.1 -1075.8003   28.2316
+rounded_2plus         793.9228    998749.2 -134.0454  852.9466
+average_1plus          -0.9048      -565.0 -1077.1493   27.2917
+
+within +-0.05 Da of mono_1plus       0/168
+   spread (sd) 165.5558 Da   quartiles 0.1332 / 0.1673 / 0.2039
+within +-0.05 Da of rounded_1plus    65/168
+   spread (sd) 165.5560 Da   quartiles -0.0516 / 0.0082 / 0.0896
+within +-0.05 Da of rounded_2plus    0/168
+   spread (sd) 146.4007 Da   quartiles 778.1264 / 793.9228 / 809.8680
+
+closest convention per compound
+  mono_1plus       13
+  rounded_1plus    150
+  mono_2plus       3
+  rounded_2plus    2
+  within +-0.05 Da of the closest one: 65/168
+
+per-element shift of the patent's m/z (least squares on the inliers)
+  compounds used : 153
+  rms residual   : 0.4403 Da
+  C   +0.173875 Da/atom   -> implied mass 12.17387
+  H   -0.077400 Da/atom   -> implied mass 0.93042
+  N   -0.167027 Da/atom   -> implied mass 13.83605
+  O   +0.036179 Da/atom   -> implied mass 16.03109
+  F   -0.062106 Da/atom   -> implied mass 18.93630
+  S   -0.101303 Da/atom   -> implied mass 31.87077
+  Cl  +1.112169 Da/atom   -> implied mass 36.08102
+  I   +0.000000 Da/atom   -> implied mass 126.90447
+  intercept      : -2.6076 Da
+
+wrote D:\GitHub\drugdesign\cyclic-peptide\data\audit\phase7\mass_offset.csv

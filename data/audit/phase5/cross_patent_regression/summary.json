@@ -1,0 +1,151 @@
+{
+  "WO2025162428": {
+    "default_v6@2x+0px": {
+      "samples": 5,
+      "exact": 1,
+      "total_edit": 15,
+      "mean_cer": 0.01082,
+      "parses": 3,
+      "edits": [
+        0,
+        3,
+        3,
+        3,
+        6
+      ]
+    },
+    "default_v6@2x+6px": {
+      "samples": 5,
+      "exact": 0,
+      "total_edit": 147,
+      "mean_cer": 0.10696,
+      "parses": 2,
+      "edits": [
+        53,
+        61,
+        3,
+        3,
+        27
+      ]
+    },
+    "en_v4@2x+0px": {
+      "samples": 5,
+      "exact": 0,
+      "total_edit": 97,
+      "mean_cer": 0.07036,
+      "parses": 0,
+      "edits": [
+        14,
+        18,
+        14,
+        26,
+        25
+      ]
+    },
+    "en_v4@2x+6px": {
+      "samples": 5,
+      "exact": 0,
+      "total_edit": 95,
+      "mean_cer": 0.06897,
+      "parses": 0,
+      "edits": [
+        15,
+        18,
+        16,
+        23,
+        23
+      ]
+    },
+    "en_v4@1x+6px": {
+      "samples": 5,
+      "exact": 0,
+      "total_edit": 87,
+      "mean_cer": 0.06317,
+      "parses": 0,
+      "edits": [
+        15,
+        16,
+        15,
+        20,
+        21
+      ]
+    }
+  },
+  "WO2022251372": {
+    "default_v6@2x+0px": {
+      "samples": 6,
+      "exact": 0,
+      "total_edit": 31,
+      "mean_cer": 0.02489,
+      "parses": 0,
+      "edits": [
+        4,
+        4,
+        4,
+        4,
+        7,
+        8
+      ]
+    },
+    "default_v6@2x+6px": {
+      "samples": 6,
+      "exact": 0,
+      "total_edit": 32,
+      "mean_cer": 0.02569,
+      "parses": 0,
+      "edits": [
+        12,
+        3,
+        3,
+        3,
+        4,
+        7
+      ]
+    },
+    "en_v4@2x+0px": {
+      "samples": 6,
+      "exact": 0,
+      "total_edit": 33,
+      "mean_cer": 0.02628,
+      "parses": 0,
+      "edits": [
+        6,
+        7,
+        6,
+        6,
+        4,
+        4
+      ]
+    },
+    "en_v4@2x+6px": {
+      "samples": 6,
+      "exact": 3,
+      "total_edit": 5,
+      "mean_cer": 0.00405,
+      "parses": 4,
+      "edits": [
+        0,
+        1,
+        0,
+        0,
+        2,
+        2
+      ]
+    },
+    "en_v4@1x+6px": {
+      "samples": 6,
+      "exact": 3,
+      "total_edit": 5,
+      "mean_cer": 0.00405,
+      "parses": 4,
+      "edits": [
+        0,
+        1,
+        0,
+        0,
+        2,
+        2
+      ]
+    }
+  }
+}

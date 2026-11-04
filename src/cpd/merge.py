@@ -15,6 +15,7 @@ module has to work without it.
 from __future__ import annotations
 
 import re
+from dataclasses import replace
 from typing import Iterable
 
 from cpd.parsers.table_extractor import AssayRecord, CompoundRecord
@@ -63,6 +64,42 @@ def dedupe_compounds(rows: Iterable[CompoundRecord]) -> dict[str, CompoundRecord
     return seen
 
 
+def merge_compound_records(
+    rows: Iterable[CompoundRecord],
+    *,
+    prefer_structure: bool = False,
+) -> dict[str, CompoundRecord]:
+    """Deduplicate compounds, optionally combining complementary records.
+
+    Most patents keep SMILES and activity in separate tables, so the
+    ordinary first-valid-wins rule is sufficient.  Some patents repeat a
+    compound across two tables and put the structure image in only one of
+    them.  ``prefer_structure`` keeps the RDKit-valid text but fills a
+    missing structure crop from the complementary record.
+    """
+    grouped: dict[str, list[CompoundRecord]] = {}
+    for row in rows:
+        cid = normalise_cmpd_id(row.cmpd_id)
+        if cid is None:
+            continue
+        grouped.setdefault(cid, []).append(row)
+
+    result: dict[str, CompoundRecord] = {}
+    for cid, records in grouped.items():
+        valid = [record for record in records if record.is_valid]
+        chosen = valid[0] if valid else records[0]
+        if prefer_structure and not chosen.structure_image:
+            for candidate in records:
+                if candidate.structure_image:
+                    chosen = replace(
+                        chosen,
+                        structure_image=candidate.structure_image,
+                    )
+                    break
+        result[cid] = chosen
+    return result
+
+
 def dedupe_assays(rows: Iterable[AssayRecord]) -> dict[str, AssayRecord]:
     """Collapse duplicate assay rows per cmpd_id (first one wins)."""
     seen: dict[str, AssayRecord] = {}
@@ -78,4 +115,5 @@ __all__ = [
     "normalise_cmpd_id",
     "dedupe_compounds",
     "dedupe_assays",
+    "merge_compound_records",
 ]

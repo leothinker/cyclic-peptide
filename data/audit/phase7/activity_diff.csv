@@ -1,0 +1,35 @@
+cmpd_id,field,archived,chosen,line,ch,en,page
+1001,lcms_method,10-80- 2min,10-8 0-,10-8 0-,2,10-80- 2min,PCTCN2025075389-ftappb-I100280.jpg
+1002,lcms_method,10-80- 2min,10-80-,10-80-,2,10-80- 2min,PCTCN2025075389-ftappb-I100280.jpg
+1003,lcms_method,10-80- 2min,10-80-,10-80-,t,10-80- 2min,PCTCN2025075389-ftappb-I100280.jpg
+1004,lcms_method,10-80- 2min,10-8 0-,10-8 0-,2,10-80- 2min,PCTCN2025075389-ftappb-I100280.jpg
+1013,lcms_method,40-100- 2min,42-100-,42-100-,,40-100- 2min,PCTCN2025075389-ftappb-I100282.jpg
+1014,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100282.jpg
+1022,lcms_method,40-100- 2min,42-100-,42-100-,,40-100- 2min,PCTCN2025075389-ftappb-I100284.jpg
+1024,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100284.jpg
+1025,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100284.jpg
+1026,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100285.jpg
+1027,lcms_method,40-100- 2min,42-100-,42-100-,,40-100- 2min,PCTCN2025075389-ftappb-I100285.jpg
+1028,lcms_method,40-100- 2min,42-100-,42-100-,,40-100- 2min,PCTCN2025075389-ftappb-I100285.jpg
+1029,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100285.jpg
+1030,lcms_method,40-100- 2min,42-100-,42-100-,,40-100- 2min,PCTCN2025075389-ftappb-I100285.jpg
+1031,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100286.jpg
+1032,lcms_method,40-100- 2min,42-100-,42-100-,,40-100- 2min,PCTCN2025075389-ftappb-I100286.jpg
+1033,lcms_method,40-100- 2min,42-100-,42-100-,,40-100- 2min,PCTCN2025075389-ftappb-I100286.jpg
+1034,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100286.jpg
+1035,lcms_method,40-100- 2min,42-100-,42-100-,,40-100- 2min,PCTCN2025075389-ftappb-I100286.jpg
+2002,lcms_method,10-80- 2min,10-8 0-,10-8 0-,2,10-80- 2min,PCTCN2025075389-ftappb-I100288.jpg
+2008,lcms_method,10-80- 2min,10-8i0-,10-8i0-,2,10-80- 2min,PCTCN2025075389-ftappb-I100289.jpg
+2012,lcms_method,40-100- 2min,42-mi0-,42-mi0-,2,40-100- 2min,PCTCN2025075389-ftappb-I100290.jpg
+2032,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100294.jpg
+2033,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100294.jpg
+2034,lcms_method,40-100- 2min,42-100-,42-100-,2,40-100- 2min,PCTCN2025075389-ftappb-I100294.jpg
+3001,lcms_method,10-80- 2min,10-80-,10-80-,t,10-80- 2min,PCTCN2025075389-ftappb-I100295.jpg
+3003,lcms_method,10-80- 2min,10-80-,10-80-,2,10-80- 2min,PCTCN2025075389-ftappb-I100296.jpg
+2173,rt_min,1.549,—,,—,HN 0 N F F F,PCTCN2025075389-ftappb-I100376.jpg
+2173,ms_mz,1625.0,2,2,,N O HN A N N-N O,PCTCN2025075389-ftappb-I100376.jpg
+2173,lcms_method,40-100-2min,2,2,2,FC(F)CO[C@ =ON(C)[Ca CC(=O)N(CC CCJC(=O)N( C(=O)N(CCC CN(N=N8)CC CC(F)=C(C CJCC,PCTCN2025075389-ftappb-I100376.jpg
+2173,ms_polarity,[M+H]+,2,2,,@H1C[C@H] @H]C4CCCC [C@H]5C=O] [C@@H](C)C CC[C@@H] 5)C(=O)N(C)C F=C9C(F)F),PCTCN2025075389-ftappb-I100376.jpg
+2173,kd_nm,0.13,2,2,二,C=O)N(C)C3(CCC3 4C=ON(C)[C@@H N[C@@H][C@@H] -ON6C@@H]CC CC7=CC=C(C-C7)C C=O)N[C@@H](CC )C=O)N2C1)C=O)N,PCTCN2025075389-ftappb-I100376.jpg
+1166,ms_mz,1664.8,"1,664.9","1,664.9","1,664.9",4 1 F 0 O # 0,PCTCN2025075389-ftappb-I100378.jpg
+2116,ms_mz,1538.9,"1,558.9","1,558.9","1,558.9",4 - 5 O 0 1 F 4,PCTCN2025075389-ftappb-I100381.jpg

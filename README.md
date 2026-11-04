@@ -1,5 +1,12 @@
 # Cyclic Peptide Dataset Pipeline
 
+<!-- role-banner:start -->
+> **Working repository.**  This is `cyclic-peptide`: the code, every
+> experiment, every audit artefact and the research log.  The
+> reviewable deliverable is a separate repository, `drug_ocr`, which
+> `tools/sync_delivery.py` fills from here and verifies file by file.
+<!-- role-banner:end -->
+
 Extract cyclic-peptide SMILES and KRAS G12V GDP KD bioactivity data from
 patent characterization tables (e.g. WO2025162428). One combined CSV is the
 main deliverable: **406 cmpds x 48 columns** -- SMILES, DECIMER 2D re-render,
@@ -8,11 +15,26 @@ macrocycle-intact diagnostic, and a post-hoc repair stage that is audited
 against both chemical invariants and the patent's own LC-MS mass before
 anything is promoted. See `PROGRESS.md` for the current findings.
 
-The printed-SMILES column can be read by two interchangeable OCR routes
+The printed-SMILES column can be read by five interchangeable OCR routes
 (see [Reading the printed SMILES](#reading-the-printed-smiles)):
-`production` (the historical route, which produced the shipped CSV) and
-`validated` (a route that reaches character-level accuracy on the patent
-pages measured so far). They are selected with `--smiles-route`.
+`production` (the historical route, which produced the first-generation
+CSV), `validated` (the route that reaches character-level accuracy on
+WO2025162428), `padded` (the route measured on WO2022251372), and the two
+*vote* routes `validated_vote` / `padded_vote`, which read every printed
+line with a second recogniser as well and let the two readings settle the
+characters they disagree on. The patent's profile names the route;
+`--smiles-route` overrides it. **The two profiles use the vote routes**:
+`validated_vote` for WO2025162428 and `padded_vote` for WO2022251372.
+
+The pipeline is **patent-configured, not patent-specific**: everything
+that differs between patents -- the input file kind, the table layout,
+the compound-number syntax, how an activity value is written, and how
+the printed SMILES is read -- lives in a profile in
+`src/cpd/parsers/profiles.py`. Two patents are configured today:
+WO2025162428 (cropped JPEG tables) and WO2022251372 (full-page TIFF
+scans with letter-grade activity values). See
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the module map and for
+how to add a third.
 
 ## Quick Start
 
@@ -21,21 +43,29 @@ pages measured so far). They are selected with `--smiles-route`.
 uv sync
 
 # 2. Optional: install DECIMER for OCSR SMILES (pulls PyTorch ~2 GB).
-#    Skip it if you only need the OCR SMILES column.
+#    Skip it if you only need the printed-SMILES column; the OCSR stage
+#    is currently shelved because it is not accurate enough to trust.
 uv pip install --python .venv/Scripts/python.exe DECIMER
 
 # 3. Run the pipeline (reads data/raw/WO2025162428/golden_tables by default)
 $env:PYTHONIOENCODING = "utf-8"
 uv run python main.py
 
-# 4. Re-use cached OCR + DECIMER results (fast; only re-renders)
-uv run python main.py --skip-ocr --skip-decimer
+# 4. Run it for the other patent
+uv run python main.py --profile WO2022251372
 
-# 5. Read the printed SMILES with the validated OCR route
-uv run python main.py --smiles-route validated
+# 5. Read the printed SMILES with a specific route
+uv run python main.py --smiles-route validated_vote
 
-# 6. Run the test suite
-uv run pytest
+# 6. Rebuild only the OCR half of the CSV, keeping the DECIMER columns
+uv run python experiments/rebuild_csv.py --route validated_vote \
+    --base data/processed/compounds_combined.csv \
+    --out data/processed/compounds_combined.csv
+
+# 7. Run the test suite
+# On Windows the sandbox denies os.scandir on the directories pytest
+# creates for its tmp_path fixture; tools/run_tests.py works around it.
+uv run python tools/run_tests.py
 ```
 
 When DECIMER is not installed the `smiles_decimer` column stays empty;
@@ -94,65 +124,75 @@ cyclic-peptide/
  +- LICENSE
  +- src/cpd/
  |   +- __init__.py
- |   +- chem.py                   # RDKit validation, repair, descriptors
- |   +- decimer.py                # Optional DECIMER (OCSR) wrapper
- |   +- merge.py                  # cmpd_id normalisation + row dedupe
- |   +- render.py                 # 2D structure render + macrocycle-intact gate
- |   +- macrocycle_repair.py      # Six post-hoc repair heuristics
- |   +- repair_audit.py           # Chemical invariants + confidence tiering
- |   +- ms_validation.py          # Check a SMILES against the reported m/z
- |   +- repair_policy.py          # Gated promotion into the deliverable CSV
-|   +- mass_constrained_search.py# Atom-mass-constrained SMILES search
-|   +- ocr_rewrite.py            # Deterministic OCR artefact rewrites
-|   +- ocr_edit_model.py         # Edit-cost model for OCR repair
-|   +- ocr_mass_gate.py          # Mass gate for OCR-derived candidates
-|   +- ocr_repair_costs.py       # Cost tables for OCR repair strategies
-|   +- render_polygonal.py       # ChemDraw-style polygonal macrocycle render
-|   +- ocr/
-|       +- __init__.py
-|       +- printed_smiles.py     # The two printed-SMILES OCR routes
+ |   +- chem.py
+ |   +- decimer.py
+ |   +- macrocycle_repair.py
+ |   +- mass_constrained_search.py
+ |   +- merge.py
+ |   +- ms_validation.py
+ |   +- ocr_edit_model.py
+ |   +- ocr_mass_gate.py
+ |   +- ocr_repair_costs.py
+ |   +- ocr_rewrite.py
+ |   +- ocr_search.py
+ |   +- postprocess.py
+ |   +- render.py
+ |   +- render_polygonal.py
+ |   +- repair_audit.py
+ |   +- repair_policy.py
+ |   +- schema.py
+ |   +- ocr/
+ |       +- __init__.py
+ |       +- activity.py
+ |       +- constrained.py
+ |       +- lines.py
+ |       +- printed_smiles.py
+ |       +- vote.py
  |   +- parsers/
  |       +- __init__.py
- |       +- headers.py            # Header alias map (Cmpd # / Compound # / ...)
- |       +- table_extractor.py    # RapidOCR + OpenCV cell extractor
- |       +- grammar.py            # SMILES prefix grammar for beam pruning
- |       +- beam_search.py        # Top-k OCR beam search over SMILES prefixes
-|       +- prefix_validator.py   # Prefix validity check for beam search
+ |       +- beam_search.py
+ |       +- grammar.py
+ |       +- headers.py
+ |       +- page_tables.py
+ |       +- prefix_validator.py
+ |       +- profiles.py
+ |       +- table_extractor.py
  +- tests/
+ |   +- __init__.py
+ |   +- test_activity_reading.py
  |   +- test_chem.py
- |   +- test_merge.py
- |   +- test_table_pipeline.py
  |   +- test_combined_pipeline.py
- |   +- test_render.py            # render.macrocycle_intact / audit / draw
- |   +- test_macrocycle_repair.py # digit-swap + terminal-bridge heuristics
+ |   +- test_macrocycle_repair.py
+ |   +- test_merge.py
  |   +- test_new_repair_strategies.py
- |   +- test_repair_audit.py      # invariants, tiers, LC-MS validation
-|   +- test_ocr_repair_search.py
-|   +- test_ocr_rewrite.py
-|   +- test_prefix_validator.py
-+- experiments/                  # One-off analysis scripts (not a package)
-+- analysis/                     # Exploratory analysis scripts
+ |   +- test_ocr_repair_search.py
+ |   +- test_ocr_rewrite.py
+ |   +- test_postprocess.py
+ |   +- test_prefix_validator.py
+ |   +- test_printed_smiles_routes.py
+ |   +- test_profiles.py
+ |   +- test_render.py
+ |   +- test_repair_audit.py
+ |   +- test_sync_delivery.py
+ |   +- test_table_pipeline.py
+ |   +- test_vote.py
+ +- tools/
+ |   +- check_readme_tree.py
+ |   +- run_tests.py
+ |   +- sync_delivery.py
+ +- experiments/                  # One-off analysis scripts (not a package)
+ +- analysis/                     # Exploratory analysis scripts
  +- docs/
- |   +- archive/                 # Dated snapshots of earlier reports
- |       +- MORNING_BRIEF.md     #   (each carries an archive banner
- |       +- PRESENTATION.md      #    naming the numbers later audited)
- |       +- PROGRESS_REPORT.md
- |       +- REPORT_MATERIAL.md
+ |   +- ARCHITECTURE.md           # module map, the routes, adding a patent
  +- data/
  |   +- raw/WO2025162428/
- |   |   +- WO2025162428-PAMPH-20250807-0047.pdf
  |   |   +- golden_tables/        # 103 source pages used by the pipeline
- |   +- raw/_external_validation/ # probe logs for the second-patent search
- |   +- processed/                # regenerated by `main.py`; gitignored
- |       +- compounds_combined.csv
- |       +- cells/                # 406 cropped structure PNGs
- |       +- rendered/             # 406 re-rendered PNGs
+ |   +- raw/WO2022251372/
+ |   |   +- golden_tables/        # 20 full-page TIFF scans
+ |   +- processed/
+ |   |   +- compounds_combined.csv
  |   +- audit/                    # evidence: phase2 / phase3 / demos
  +- references/                   # Read-only upstream OCSR/OCR source clones
- |   +- RapidOCR/
- |   +- DECIMER-Image_Transformer/
- |   +- Hiro-OCSR/
- |   +- README.md
  +- .gitignore
 ```
 
@@ -213,16 +253,95 @@ cyclic-peptide/
 
 The patent prints its SMILES as plain text in a table column, so the
 text can be read directly instead of being inferred from the 2D
-structure image. Two routes are implemented in
-`src/cpd/ocr/printed_smiles.py` and selected with `--smiles-route`:
+structure image. Five routes are implemented in
+`src/cpd/ocr/printed_smiles.py`. A patent's profile names one of them;
+`--smiles-route` overrides the profile:
 
-| | `production` | `validated` |
-|---|---|---|
-| recogniser | English PP-OCRv4 mobile | upstream default (PP-OCRv6 rec) |
-| line segmentation | OCR detector boxes | our own ink-band projection |
-| crop geometry | trim to content, 2x upscale | trim table rules, pad each ink band |
-| cell column | fractional boundary | extended to the table's right-hand rule |
-| status | produced the shipped CSV | verified on the pages measured so far |
+| | `production` | `validated` | `padded` | `validated_vote` | `padded_vote` |
+|---|---|---|---|---|---|
+| recogniser | English PP-OCRv4 mobile | upstream default (PP-OCRv6 rec) | English PP-OCRv4 mobile | PP-OCRv6 + English PP-OCRv4 | English PP-OCRv4 + PP-OCRv6 |
+| line segmentation | OCR detector boxes | our own ink-band projection | our own ink-band projection | our own ink-band projection | our own ink-band projection |
+| crop geometry | trim to content, 2x upscale | trim table rules, pad each ink band | trim table rules, 6 px white margin | as `validated` | as `padded` |
+| cell column | fractional boundary | extended to the table's right-hand rule | extended to the table's right-hand rule | extended to the table's right-hand rule | extended to the table's right-hand rule |
+| upscale | 2x | 2x | none | 2x | none |
+| reading | one model | one model | one model | the vote | the vote |
+| measured on | the first-generation CSV | WO2025162428 | WO2022251372 | WO2025162428 | WO2022251372 |
+| status | historical baseline | measured | measured | **the default for WO2025162428** | **the default for WO2022251372** |
+
+The two patents need opposite settings, and that was measured rather
+than assumed. On WO2022251372 the printed lines are far enough apart
+that a 6 px margin reaches only white paper, and it fixes the last
+glyph of every line (60 hand-transcribed lines: 31 errors without the
+margin, 5 with it). On WO2025162428 the rows are packed tightly
+enough that the same margin pulls in fragments of the neighbouring
+lines and makes the result much worse (5 references: 15 errors
+without the margin, 95 with it). Hence two routes rather than one
+tunable parameter.
+
+### The vote routes: two recognisers, one string
+
+One recogniser reads a printed line and sometimes drops or confuses a
+single character. The damage is small but systematic, and the kind of
+damage a *different* model does not make in the same place. On the 60
+hand-transcribed lines of WO2022251372 the English PP-OCRv4 model
+misses 5 characters and the upstream PP-OCRv6 model misses 29, and
+they miss different ones: PP-OCRv6 reads `O` as `0`, while PP-OCRv4
+drops brackets.
+
+The vote routes therefore read every printed line **twice** and combine
+the two readings with one rule:
+
+> **Take the combination that RDKit can parse, and among those the one
+> that replaces the fewest printed lines of the primary reading.**
+
+The rule never looks at a reference transcription, so it works on a
+patent nobody has transcribed. The primary reading is the first
+candidate and is kept whenever it already parses, and at most three
+lines may be changed, so the rule cannot make a working reading worse.
+
+End to end on WO2022251372, over the real pipeline:
+
+| route | transcribed exact | CER | all 28 parse | all 28 balanced |
+|---|---:|---:|---:|---:|
+| `padded` | 6 / 6 | 0.000 % | 24 / 28 | 24 / 28 |
+| `padded_vote` | 6 / 6 | 0.000 % | **27 / 28** | **27 / 28** |
+
+All six hand transcriptions are character exact.  Three of the six
+transcriptions were themselves wrong when first read from the page --
+the patent prints its chiral marker as a circled italic "a", which is
+easy to mis-read as one or three `@` signs -- and the corrections are
+recorded with their pixel evidence in
+`experiments/wo2022251372_references.py`.  Measured against the
+original transcriptions the same readings carry 4 edits
+(0.320 % CER); measured against the corrected ones they carry 0.
+
+On WO2025162428 the vote changes nothing on the three checked
+compounds, because the `validated` route already returns a parseable
+string there and the vote keeps the primary reading. Over the whole
+corpus it does have work to do: on the
+335 cells the pipeline itself cuts, 169 parse with `validated` and 171
+with `validated_vote`. The vote changes 12 strings -- one printed line
+each -- and breaks none of the readings that parsed before. Eight of
+the twelve are the same repair, the letter `O` read as the digit `0`,
+so `C(=O)` became `C(=0)`, which is not a SMILES at all; the repair
+chain mends that pattern anyway, so only four of the twelve reach the
+deliverable.
+
+Two guards keep the vote from changing chemistry while it fixes
+syntax. The characters must be SMILES characters: RDKit reads
+`"CC O"` as `CC` and accepts `"CC*O"`, and a printed column has
+neither a space nor a wildcard atom. And the bond order may not
+shrink: `C1=CC=CC=C1` and `C1-CC-C-C-C1` both parse and they are
+different molecules, so a combination that declares fewer double
+bonds than the primary reading is refused. Measured on the 335 cells
+the pipeline cuts, a vote *without* that guard changes 17 strings and
+loses a bond in 5 of them -- compound 2160 loses four bonds at once.
+With the guard the vote changes 12 strings and **no** cell loses one.
+
+The vote never looks at a reference transcription, so it works on a
+patent nobody has transcribed. It is a **text-level** decision: it
+says which of two readings of the same ink is a well-formed SMILES.
+It does not say that the result is the compound the patent drew.
 
 ### Why the validated route extends the column
 
@@ -264,19 +383,22 @@ throughout this project.
 
 ### Over the whole corpus
 
-Across all 336 cropped printed-SMILES cells (335 data cells plus one
-header), the validated route gives:
+Across the 335 printed-SMILES cells the pipeline itself cuts (the
+pages that carry a printed-SMILES column), the route gives:
 
-| metric | `validated` | `production` (shipped CSV) |
+| metric | `validated` | `validated_vote` (shipped) |
 |---|---:|---:|
-| bracket-balanced | **228** | **0** |
-| all printed rows recovered | **336** | -- |
-| strict pass (balanced + rows + length 220-300) | 224 | 0 |
-| cells with characters outside the SMILES alphabet | 62 | -- |
+| bracket-balanced | 210 | **211** |
+| RDKit-parseable | 169 | **171** |
+| cells with characters outside the SMILES alphabet | 8 | **8** |
 
 Bracket balance and row completeness are **text-level proxies, not
 accuracy**: they say the string looks like a whole SMILES, not that
 the structure is right.
+
+The three hand-verified references are **character exact** in the
+delivered CSV -- 1036, 1037 and 1038 all at edit distance 0.  See
+`experiments/phase9_reference_check.py`.
 
 ### Why the recogniser matters more than the cropping
 
@@ -327,6 +449,110 @@ the printed text from the golden table and comparing:
 The single error is a `C(=O)` read as `C(=0)`. The reference is a
 transcription awaiting a human check, like the 1039-1041 references.
 See `data/audit/phase3/external/EXTERNAL_VALIDATION.md`.
+
+## A second patent: WO2022251372
+
+WO2022251372 arrives as full-page TIFF scans rather than cropped
+tables, its tables have eight columns where the first patent has
+three to seven, its compound numbers are one or two digits instead of
+four, and every activity value is a letter grade rather than a number.
+All of that is configuration, so all of it lives in the profile
+`WO2022251372` in `src/cpd/parsers/profiles.py`:
+
+| | WO2025162428 | WO2022251372 |
+|---|---|---|
+| input | 103 cropped JPEG tables | 20 full-page TIFF scans |
+| page handling | the image *is* the table | find the ruled table in the page (`cpd.parsers.page_tables`) |
+| layouts | 3-column SMILES, 6-column dense, 7-column activity | 8-column activity, 3-column SMILES |
+| compound id | four digits | one or two digits, top-left of the row band |
+| activity values | numbers | letter grades A-D, read through the closed-set reader (`cpd.ocr.constrained`) |
+| printed SMILES route | `validated_vote` | `padded_vote` |
+| row continuation | no | yes -- a row may run over the page break |
+
+Measured on the 28 compounds of the patent, against six hand
+transcriptions: the printed text comes back with **0 character
+errors** over 1252 reference characters (0.000 % CER), and all 6
+transcribed compounds are character-exact and parse with RDKit. Across
+all 28 compounds, 27 strings parse with the `padded_vote` route the
+profile selects -- 24 with the single recogniser.
+
+Those six transcriptions were themselves corrected during this work:
+the patent prints its chiral marker as a *circled italic "a"*, which
+is exactly the glyph that makes `[C@@H]` easy to mis-read as `[C@H]`
+or `[C@@@H]`. Three of the six were wrong in the ground truth, and
+the corrections are recorded with their pixel evidence in
+`experiments/wo2022251372_references.py`. Measured against the
+*original* transcriptions the same readings carry 4 edits
+(0.320 % CER) and 4 of the 6 are exact.
+
+The one compound that still does not parse fails on a stereo
+confusion (`@@` read as `@`), which a parse check cannot see.
+
+The two patents need *opposite* settings, and that is measured rather
+than assumed: the `padded` route fixes the last glyph of every line on
+WO2022251372 and makes the first patent much worse, because there the
+rows are packed tightly enough that the same margin pulls in fragments
+of the neighbouring lines. Hence two routes rather than one parameter.
+
+The letter grades are read by a *closed-set* reader: the glyph is
+located by ink analysis instead of by the text detector, and it is
+accepted only if it is one of A/B/C/D. A misread glyph therefore
+leaves the cell empty instead of writing a wrong value -- with the
+one exception that an A read as a B (or B as a C) cannot be detected
+from inside the allowed set.
+
+See `data/audit/phase6/SUMMARY.md` for the full measurement and
+`data/audit/phase6/accuracy_vs_reference.csv` for the per-compound
+comparison.
+
+## What is shelved, and why
+
+**Reading a 2D chemical structure image.** DECIMER recognises the
+cropped macrocycle drawings, and for these compounds it is not
+accurate enough to be trusted: its output routinely loses ring
+closures or breaks the backbone into fragments, and the repair
+heuristics that were written to mend it invent atoms and bonds. The
+stage is kept in the code and its output is kept in the CSV, because
+it is a second opinion and because it is cheap to re-run from the
+on-disk cache -- but the *printed* SMILES is now the primary source
+of the structure, and nothing in the deliverable is derived from
+DECIMER unless the printed text is missing.
+
+**The macrocycle repair heuristics.** They are still measured and
+still reported, but they no longer promote themselves into
+`smiles_best`; the printed SMILES wins whenever it parses. The
+audit that motivated this is in `PROGRESS.md`.
+
+**The mass-constrained OCR search.** It proposes strings that
+reproduce the measured mass. A proposal is not a reading, so it
+writes its own columns and never touches `smiles_best`. It is run
+on request (`--ocr-search`).
+
+## The two repositories
+
+`cyclic-peptide` is the working repository: the code, every
+experiment, every audit artefact and the research log.
+
+`drug_ocr` is the delivery repository: the same code, the patent
+inputs, the deliverable CSV and the evidence documents -- and nothing
+else.
+
+`tools\sync_delivery.py` copies the curated set from `cyclic-peptide`
+into `drug_ocr` and verifies every file by SHA256, so "the delivery
+repo matches the working repo" is a checkable statement:
+
+```powershell
+# report what would change (the default is a dry run)
+.venv\Scripts\python.exe tools\sync_delivery.py
+
+# copy, and drop everything that is not part of the curated set
+.venv\Scripts\python.exe tools\sync_delivery.py --apply --prune
+```
+
+The curated set includes the scripts that reproduce the headline
+numbers (`experiments/rebuild_csv.py`, the phase-6 and phase-7 audit
+scripts, and `analysis/verify_deliverable.py`), so a reviewer can
+re-run the audit rather than take it on trust.
 
 ## Open Research: the repair strategies do not survive auditing
 

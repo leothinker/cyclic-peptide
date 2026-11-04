@@ -1,0 +1,55 @@
+{
+  "compounds": 335,
+  "compounds_whose_text_changed": 12,
+  "printed_lines_changed": 12,
+  "per_compound": [
+    {
+      "cmpd_id": "1054",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "1067",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "1094",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "1196",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "1220",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "1221",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "1229",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "1230",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "1231",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "2053",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "2093",
+      "lines_changed": 1
+    },
+    {
+      "cmpd_id": "2145",
+      "lines_changed": 1
+    }
+  ]
+}

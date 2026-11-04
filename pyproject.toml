@@ -25,7 +25,11 @@ requires = ["setuptools>=73.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["cpd"]
+# The sub-packages have to be listed as well.  Leaving them out
+# builds a wheel that contains ``cpd`` but not ``cpd.ocr`` and
+# ``cpd.parsers``, so ``pip install .`` produces a package that
+# cannot run the pipeline.
+packages = ["cpd", "cpd.ocr", "cpd.parsers"]
 
 [tool.setuptools.package-dir]
 "cpd" = "src/cpd"

@@ -1,0 +1,10 @@
+{
+  "lines": 277,
+  "lines_with_reference": 60,
+  "reference_lines_exact": 56,
+  "reference_lines_with_errors": 4,
+  "error_signatures": {
+    "other_character_error": 3,
+    "lost_bracket": 1
+  }
+}

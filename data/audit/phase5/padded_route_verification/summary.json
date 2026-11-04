@@ -1,0 +1,156 @@
+{
+  "old": {
+    "production": {
+      "cells": 336,
+      "balanced_raw": 1,
+      "parses_raw": 0,
+      "balanced_after_repair": 5,
+      "parses_after_repair": 0,
+      "cells_with_reference": 5,
+      "edit_to_reference": [
+        39,
+        28,
+        36,
+        41,
+        42
+      ],
+      "edit_to_reference_after_repair": [
+        27,
+        18,
+        20,
+        32,
+        30
+      ],
+      "total_edit_raw": 186,
+      "total_edit_after_repair": 127
+    },
+    "validated": {
+      "cells": 336,
+      "balanced_raw": 184,
+      "parses_raw": 29,
+      "balanced_after_repair": 253,
+      "parses_after_repair": 183,
+      "cells_with_reference": 5,
+      "edit_to_reference": [
+        0,
+        3,
+        3,
+        3,
+        6
+      ],
+      "edit_to_reference_after_repair": [
+        0,
+        2,
+        3,
+        3,
+        5
+      ],
+      "total_edit_raw": 15,
+      "total_edit_after_repair": 13
+    },
+    "padded": {
+      "cells": 336,
+      "balanced_raw": 1,
+      "parses_raw": 0,
+      "balanced_after_repair": 1,
+      "parses_after_repair": 0,
+      "cells_with_reference": 5,
+      "edit_to_reference": [
+        15,
+        16,
+        15,
+        20,
+        21
+      ],
+      "edit_to_reference_after_repair": [
+        9,
+        14,
+        9,
+        15,
+        17
+      ],
+      "total_edit_raw": 87,
+      "total_edit_after_repair": 64
+    }
+  },
+  "new": {
+    "production": {
+      "cells": 28,
+      "balanced_raw": 2,
+      "parses_raw": 1,
+      "balanced_after_repair": 6,
+      "parses_after_repair": 3,
+      "cells_with_reference": 6,
+      "edit_to_reference": [
+        3,
+        4,
+        5,
+        4,
+        6,
+        7
+      ],
+      "edit_to_reference_after_repair": [
+        2,
+        2,
+        3,
+        1,
+        2,
+        5
+      ],
+      "total_edit_raw": 29,
+      "total_edit_after_repair": 15
+    },
+    "validated": {
+      "cells": 28,
+      "balanced_raw": 3,
+      "parses_raw": 0,
+      "balanced_after_repair": 3,
+      "parses_after_repair": 1,
+      "cells_with_reference": 6,
+      "edit_to_reference": [
+        4,
+        4,
+        4,
+        4,
+        7,
+        8
+      ],
+      "edit_to_reference_after_repair": [
+        4,
+        4,
+        3,
+        3,
+        5,
+        5
+      ],
+      "total_edit_raw": 31,
+      "total_edit_after_repair": 24
+    },
+    "padded": {
+      "cells": 28,
+      "balanced_raw": 21,
+      "parses_raw": 17,
+      "balanced_after_repair": 21,
+      "parses_after_repair": 19,
+      "cells_with_reference": 6,
+      "edit_to_reference": [
+        0,
+        1,
+        0,
+        0,
+        2,
+        2
+      ],
+      "edit_to_reference_after_repair": [
+        0,
+        1,
+        0,
+        0,
+        2,
+        2
+      ],
+      "total_edit_raw": 5,
+      "total_edit_after_repair": 5
+    }
+  }
+}

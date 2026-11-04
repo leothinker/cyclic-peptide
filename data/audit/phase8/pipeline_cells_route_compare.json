@@ -1,0 +1,35 @@
+{
+  "validated": {
+    "compounds": 335,
+    "bracket_balanced": 210,
+    "rdkit_parses": 169,
+    "cells_with_illegal_characters": 8,
+    "references_exact": 3,
+    "references_total": 3,
+    "reference_edits": 0
+  },
+  "validated_vote": {
+    "compounds": 335,
+    "bracket_balanced": 211,
+    "rdkit_parses": 171,
+    "cells_with_illegal_characters": 8,
+    "references_exact": 3,
+    "references_total": 3,
+    "reference_edits": 0
+  },
+  "vote_effect": {
+    "changed": 4,
+    "broke_a_parsing_reading": 0,
+    "became_parseable": 2,
+    "changed_cells": [
+      "1221",
+      "1229",
+      "2093",
+      "2145"
+    ],
+    "became_parseable_cells": [
+      "2093",
+      "2145"
+    ]
+  }
+}

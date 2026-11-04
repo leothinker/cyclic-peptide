@@ -1,0 +1,47 @@
+{
+  "pages": 20,
+  "jpg_inputs_found_by_current_scanner": 0,
+  "tif_inputs_present": 20,
+  "table1a_data_rows": 28,
+  "current_layout_direct_extraction": {
+    "pages_probed": 2,
+    "compounds": 0,
+    "assays": 0,
+    "pages_with_rows": 0
+  },
+  "production_after_correct_crop": {
+    "balanced": 2,
+    "parses": 1
+  },
+  "validated_after_correct_crop": {
+    "balanced": 4,
+    "parses": 0,
+    "auto_repair_parses": 0
+  },
+  "hand_transcribed_compounds": [
+    1,
+    2,
+    3,
+    4,
+    10,
+    28
+  ],
+  "hand_transcribed_edit_to_reference": {
+    "production": [
+      3,
+      4,
+      5,
+      4,
+      6,
+      7
+    ],
+    "validated": [
+      4,
+      4,
+      4,
+      4,
+      7,
+      8
+    ]
+  }
+}
