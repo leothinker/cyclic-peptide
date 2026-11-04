@@ -231,7 +231,6 @@ MANIFEST: tuple[tuple[str, str], ...] = (
     ("experiments/phase8_patent2_route_diff.py", "experiments/"),
     ("experiments/phase8_pipeline_cells_corpus.py", "experiments/"),
     ("experiments/phase8_vote_evidence.py", "experiments/"),
-    ("experiments/phase8_vote_rule.py", "experiments/"),
     ("experiments/phase9_delivery_check.py", "experiments/"),
     ("experiments/phase9_csv_diff.py", "experiments/"),
     ("experiments/phase9_csv_stats.py", "experiments/"),
@@ -254,7 +253,6 @@ MANIFEST: tuple[tuple[str, str], ...] = (
     ("experiments/phase9_bracket_flip_patent2.py", "experiments/"),
     ("experiments/verify_csv.py", "experiments/"),
     ("experiments/wo2022251372_references.py", "experiments/"),
-    ("tools/run_tests.py", "tools/"),
 )
 
 # Files that are **per repository** and are therefore not copied.
