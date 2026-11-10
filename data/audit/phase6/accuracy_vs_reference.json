@@ -1,12 +1,12 @@
 {
   "n_referenced": 6,
   "n_scored": 6,
-  "total_raw_edit_distance": 6,
-  "total_reference_chars": 1252,
-  "aggregate_raw_cer": 0.00479,
-  "raw_exact_matches": 4,
-  "total_repaired_edit_distance": 6,
-  "repaired_exact_matches": 4,
-  "raw_rdkit_parseable": 5,
-  "repaired_rdkit_parseable": 5
+  "total_raw_edit_distance": 1,
+  "total_reference_chars": 1249,
+  "aggregate_raw_cer": 0.0008,
+  "raw_exact_matches": 5,
+  "total_repaired_edit_distance": 0,
+  "repaired_exact_matches": 6,
+  "raw_rdkit_parseable": 6,
+  "repaired_rdkit_parseable": 6
 }

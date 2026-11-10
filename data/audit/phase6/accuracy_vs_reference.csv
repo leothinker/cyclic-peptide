@@ -1,7 +1,7 @@
-﻿cmpd_id,page,tables,reference_len,raw_len,raw_edit_distance,raw_cer,raw_rdkit_parseable,repaired_edit_distance,repaired_cer,repaired_rdkit_parseable,cross_table_agreement,note
-1,000116,activity8|smiles3,207,207,0,0.0,True,0,0.0,True,True,
-2,000116,activity8|smiles3,214,214,0,0.0,True,0,0.0,True,False,
-3,000117,activity8|smiles3,214,214,0,0.0,True,0,0.0,True,True,
-4,000117,activity8|smiles3,209,209,0,0.0,True,0,0.0,True,True,
-10,000120,activity8|smiles3,202,201,1,0.00495,True,1,0.00495,True,False,
-28,000126,activity8|smiles3,206,202,5,0.02427,False,5,0.02427,False,False,
+﻿cmpd_id,page,tables,reference_len,raw_len,scored_layout,raw_edit_distance,raw_cer,raw_rdkit_parseable,repaired_edit_distance,repaired_cer,repaired_rdkit_parseable,cross_table_agreement,note
+1,000116,activity8|smiles3,207,207,activity8,0,0.0,True,0,0.0,True,True,
+2,000116,activity8|smiles3,214,214,activity8,0,0.0,True,0,0.0,True,True,
+3,000117,activity8|smiles3,214,214,activity8,0,0.0,True,0,0.0,True,True,
+4,000117,activity8|smiles3,209,209,activity8,0,0.0,True,0,0.0,True,True,
+10,000120,activity8|smiles3,201,201,activity8,0,0.0,True,0,0.0,True,True,
+28,000126,activity8|smiles3,204,204,smiles3,1,0.0049,True,0,0.0,True,False,

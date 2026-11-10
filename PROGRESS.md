@@ -9,11 +9,136 @@
 
 **Dataset:** WO2025162428 golden tables (`PCTCN2025075389-ftappb-I100280...382.jpg`)
 **Scope:** 406 compounds, cmpd 1001-2173 and 3001-3003
-**Last updated:** 2026-11-04 (today's addendum at the top)
+**Last updated:** 2026-11-11 (today's addendum at the top)
 
 ![1036 progress](data/audit/demos/figures/demo_cmpd_1036_progress.png)
 ![audit summary](data/audit/demos/figures/report_figure.png)
 ![1036 render-style comparison](data/audit/demos/figures/demo_cmpd_1036_render_styles.png)
+
+---
+
+## 0g. 2026-11-11 — the second patent got a deliverable, and the
+## command line caught up with the profiles
+
+Two things were wrong with the pipeline as it stood, and both are
+now fixed.  Neither of them changed the first patent's output: the
+shipped CSV is still byte-for-byte the same file.
+
+### 1. The command line could not name the routes the profiles use
+
+`main.py --smiles-route` offered three routes: `production`,
+`validated` and `padded`.  But the two profiles declare
+`validated_vote` and `padded_vote` — the routes that actually
+produce the shipped numbers.  So the default path worked, and a
+supervisor who wanted to reproduce a run by hand could not: argparse
+rejected the name of the route that had been used.
+
+The route list now comes from `cpd.ocr.printed_smiles.ROUTES`
+instead of a hand-kept tuple, so it cannot drift from the
+implementation again, and a test asserts that every route is
+selectable and that an unknown one is still a usage error.
+
+### 2. The second patent had no deliverable, because its activity
+### columns were dropped on the floor
+
+`AssayRecord` has always had an `extra` field for patent-specific
+activity values, and WO2022251372's profile has always declared its
+six letter grades (`mdm2`, `mdm4`, `molm13`, `mv4_11`, `waga`,
+`mkl1`).  But `_build_combined_rows` never read it, and the column
+set was one fixed 48-column tuple.  So running the second patent
+through `main.py` produced a CSV that silently dropped **all six** of
+its activity columns.  The patent only existed as an extraction CSV
+inside `data/audit/phase6/`, written by a separate script — which is
+why the two patents did not have the same kind of deliverable.
+
+The column set is now profile-driven:
+
+* `TableProfile.extra_assay_fields` names the fields a patent
+  declares beyond the five canonical ones;
+* `cpd.schema.combined_columns()` appends them **after** the
+  canonical block, in the profile's declaration order;
+* `_build_combined_rows` fills them from `AssayRecord.extra`.
+
+Because the first patent declares no extra field, its column set is
+still exactly the shipped 48 columns.  That was verified rather than
+assumed: the first patent was re-extracted from scratch with the
+`validated_vote` route and rebuilt, and the result is **byte
+identical** to the shipped CSV
+(`SHA256 963A368D31F9004856C66AFEABD2D9BD4FAE2E44D645A77D298B431CEDF718AC`
+before and after).
+
+The second patent now has its own deliverable:
+
+```
+data/processed/WO2022251372/compounds_combined.csv    28 rows x 54 columns
+```
+
+produced by `experiments/phase10_patent2_delivery.py` from the same
+pipeline code, with the same route, the same merge and the same
+repair chain.  `experiments/phase10_patent2_inspect.py` prints it
+readably, since a CSV is not something one wants to read in a
+terminal:
+
+```
+cmpd  parse  bal   mdm2  mdm4  molm1 mv4_1 waga  mkl1
+   1   yes  yes   A     B     C     C     B     A
+   2   yes  yes   A     A     D     B     B     B
+  ...
+  16    no   no    A     B     D     D     D     D
+  ...
+  28   yes  yes   A     D     D     C     D     C
+```
+
+All 168 grade cells are filled and **none** is outside the closed
+set A–D.  27 of 28 printed SMILES parse and are bracket-balanced.
+The one that does not is compound 16, whose opening bracket is
+dropped (`C@@H](C)`) — the known failure, unchanged.
+
+### 3. The phase-6 audit was measuring a string that never shipped
+
+`experiments/phase6_verify_accuracy.py` compared the hand
+transcriptions against the `activity8` table's raw band text.  The
+patent prints each compound twice, and `merge_compound_records`
+keeps the **RDKit-valid** reading — for compound 28 that is the
+other table's text.  The audit was therefore scoring a string the
+pipeline discards.  It now picks the reading the pipeline keeps,
+and records which table it scored in a new `scored_layout` column.
+
+With that fixed and the profile's `padded_vote` route, the six hand
+transcriptions read:
+
+| | raw OCR | after repair |
+|---|---:|---:|
+| exact matches | 5 / 6 | 6 / 6 |
+| total edit distance | 1 | 0 |
+| aggregate CER | 0.08 % | 0.00 % |
+| RDKit-parseable | 6 / 6 | 6 / 6 |
+
+The phase-6 artefacts were regenerated to match
+(`wo2022251372_summary.json` now says `padded_vote` and 27 of 28,
+not `padded` and 23 of 28), and the phase-6 `SUMMARY.md` records the
+correction rather than quietly replacing the old numbers.
+
+### 4. What was verified, and what was not
+
+* The first patent's CSV is byte-identical after the change.
+* 276 tests pass in **both** repositories (`tools/run_tests.py`).
+* The delivery repository is in step with the working one: 392
+  curated files, byte-identical, 0 differences, 0 broken links.
+* The 28 printed-SMILES cells of Table 1a and eight multi-line
+  views now travel to the delivery repository, so a reviewer can
+  check the reading against the pixels without re-running the OCR.
+
+Still not established, and not claimed anywhere:
+
+* **No compound is verified against its drawn structure.**  The four
+  levels — text recognised, RDKit parseable, mass gate passed,
+  structure verified — stay strictly apart, and no column claims
+  the fourth.
+* The mass gate still does not pass on the first patent, and the
+  tolerance was **not** widened.
+* DECIMER stays shelved; the structure columns of the second
+  patent's CSV are empty on purpose.
 
 ---
 

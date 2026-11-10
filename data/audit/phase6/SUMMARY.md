@@ -19,7 +19,7 @@ one extractor, one OCR layer, one repair chain and one merge code.
 | Number cell geometry | `cmpd_id_top_px`, `cmpd_id_inset_px` | None, 0 | 90, 4 |
 | Activity fields and their type | `assay_fields` | 5 numeric/text | 6 letter grades |
 | Closed value set | `AssayFieldSpec.allowed` | — | ("A","B","C","D") |
-| Printed-SMILES route | `smiles_route` | `production` | `padded` |
+| Printed-SMILES route | `smiles_route` | `validated_vote` | `padded_vote` |
 | Cross-table merge rule | `merge_compounds` | `first_valid` | `prefer_structure` |
 
 ### Shared (code, unchanged by the patent)
@@ -60,7 +60,7 @@ regression.
 ```
 n_images           20
 n_compounds        28
-n_rdkit_valid      23
+n_rdkit_valid      27
 n_with_structure   28
 n_assays           28
 ```
@@ -68,6 +68,15 @@ n_assays           28
 All six activity columns are read, and every value is a letter grade
 from the closed set A–D.  A grade that cannot be read is left empty
 rather than written out as a wrong letter (`src/cpd/ocr/constrained.py`).
+
+> **Updated 2026-11-11.**  This phase originally ran the `padded`
+> route and measured 23 of 28 parseable.  The profile now declares
+> `padded_vote` (the `padded` route plus the second recogniser), and
+> the extraction above was re-run with it: 27 of 28 parse, and all
+> six hand transcriptions are character exact.  The route comparison
+> is in `data/audit/phase8/patent2_route_compare.json`; the second
+> patent's own deliverable CSV is
+> `data/processed/WO2022251372/compounds_combined.csv`.
 
 ### 3. Text accuracy against hand transcriptions
 
@@ -78,16 +87,19 @@ the intended one.
 
 ```
                          raw OCR        after repair
-exact matches            4 / 6          4 / 6
-total edit distance      6              6
-aggregate CER            0.48 %         0.48 %
-RDKit-parseable          5 / 6          5 / 6
+exact matches            5 / 6          6 / 6
+total edit distance      1              0
+aggregate CER            0.08 %         0.00 %
+RDKit-parseable          6 / 6          6 / 6
 ```
 
 `experiments/phase6_diff_detail.py` shows where the remaining errors
-are.  Every one of them is the first or last character of a printed
-line.  The two tables of the patent print the same SMILES, and where
-they disagree the more complete reading is the one kept.
+are.  The two tables of the patent print the same SMILES, and where
+they disagree the RDKit-valid reading is the one kept -- the audit
+above scores that reading, so it measures the string that reaches
+the deliverable and not a discarded one.  Compound 28 is the only
+compound where the two tables disagree; the repair chain closes its
+single missing bracket, which is why it is exact after the repair.
 
 ### 4. The remaining errors are *not* a cropping problem
 
@@ -111,16 +123,17 @@ route is configuration rather than a hard-coded constant.
 
 ## What this does not establish
 
-* RDKit-parseable is not structure-correct.  23 of 28 strings parse;
+* RDKit-parseable is not structure-correct.  27 of 28 strings parse;
   none of them has been compared with the drawn structure.
 * The text reference is verified by hand.  It is not a chemical
   ground truth.
-* Six hand-transcribed compounds are a small sample.  The 0.48 % CER
+* Six hand-transcribed compounds are a small sample.  The 0.08 % CER
   describes those six, not the whole patent.
-* The `production` route is still the route of the shipped CSV.  The
-  second patent's `padded` route was measured on this patent and is
-  known to be *worse* on the first patent, so the two must not be
-  merged into one setting.
+* The two patents use different routes.  The second patent's
+  `padded_vote` route was measured on this patent and is known to be
+  *worse* on the first patent, so the two must not be merged into one
+  setting.  The first patent's `validated_vote` route is the one that
+  reaches its shipped CSV.
 
 ## Reproducing
 

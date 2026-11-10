@@ -312,11 +312,28 @@ graph is the right molecule, and that comparison is not automated yet.
      the compound number sits;
    * `assay_fields` -- the activity columns and how each is written;
    * `smiles_route` -- the route that reads the printed SMILES.
+
+   A field in `assay_fields` whose name is not one of the five
+   canonical ones (`kd_nm`, `rt_min`, `ms_mz`, `lcms_method`,
+   `ms_polarity`) becomes an **extra column** of that patent's own
+   combined CSV.  `TableProfile.extra_assay_fields` lists them and
+   `cpd.schema.combined_columns()` appends them after the canonical
+   block, in declaration order.  The values travel on
+   `AssayRecord.extra`, which the extractor fills from the row and
+   `_build_combined_rows` writes out.  A patent that declares no
+   extra field -- the first one -- keeps exactly the shipped 48
+   columns.
+
 3. Run it:
 
    ```
    .venv\Scripts\python.exe main.py --profile <patent>
    ```
+
+   The combined CSV lands in `data/processed/compounds_combined.csv`
+   for the first patent.  Give a second patent its own output
+   directory so the two deliverables cannot overwrite each other:
+   `main.py --profile <patent> --out-dir data/processed/<patent>`.
 
 4. Check the result against a hand transcription of a few rows before
    trusting the numbers.

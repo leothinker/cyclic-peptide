@@ -54,15 +54,19 @@ uv run python main.py
 # 4. Run it for the other patent
 uv run python main.py --profile WO2022251372
 
-# 5. Read the printed SMILES with a specific route
+# 5. Build the second patent's deliverable CSV
+uv run python experiments/phase10_patent2_delivery.py
+
+# 6. Read the printed SMILES with a specific route
+#    (any of: production, validated, padded, validated_vote, padded_vote)
 uv run python main.py --smiles-route validated_vote
 
-# 6. Rebuild only the OCR half of the CSV, keeping the DECIMER columns
+# 7. Rebuild only the OCR half of the CSV, keeping the DECIMER columns
 uv run python experiments/rebuild_csv.py --route validated_vote \
     --base data/processed/compounds_combined.csv \
     --out data/processed/compounds_combined.csv
 
-# 7. Run the test suite
+# 8. Run the test suite
 # On Windows the sandbox denies os.scandir on the directories pytest
 # creates for its tmp_path fixture; tools/run_tests.py works around it.
 uv run python tools/run_tests.py
@@ -89,6 +93,15 @@ install the package and re-run to fill it.
   ocr_repair_largest_ring, ocr_repair_mass_ppm, ocr_bracket_deficit,
   ocr_difficulty.
   Read with `pandas.read_csv("data/processed/compounds_combined.csv")`.
+- `data/processed/WO2022251372/compounds_combined.csv` -- the second
+  patent's own deliverable: 28 rows x 54 columns.  The 48 canonical
+  columns come first, then the six letter-grade activity columns
+  (`mdm2`, `mdm4`, `molm13`, `mv4_11`, `waga`, `mkl1`) that this
+  patent has instead of the five numeric ones.  The column set is
+  profile-driven, so the first patent's CSV keeps exactly its
+  shipped 48 columns and its bytes.
+  Print it readably with
+  `uv run python experiments/phase10_patent2_inspect.py`.
 - `data/processed/cells/{src_stem}_{cmpd_id}_struct.png` -- cropped
   structure image per compound (406 PNGs).
 - `data/processed/rendered/{cmpd_id}.png` -- DECIMER-canonicalised
@@ -162,6 +175,7 @@ cyclic-peptide/
  |   +- test_activity_reading.py
  |   +- test_chem.py
  |   +- test_combined_pipeline.py
+|   +- test_delivery_contract.py
  |   +- test_macrocycle_repair.py
  |   +- test_merge.py
  |   +- test_new_repair_strategies.py
@@ -504,6 +518,13 @@ from inside the allowed set.
 See `data/audit/phase6/SUMMARY.md` for the full measurement and
 `data/audit/phase6/accuracy_vs_reference.csv` for the per-compound
 comparison.
+
+The second patent now has a deliverable of its own:
+`data/processed/WO2022251372/compounds_combined.csv`, produced by
+`experiments/phase10_patent2_delivery.py` from the same pipeline code
+that serves the first patent.  Its six letter-grade columns are
+carried by the same `AssayRecord` mechanism the five numeric fields
+use, so nothing had to be special-cased for the grade values.
 
 ## What is shelved, and why
 

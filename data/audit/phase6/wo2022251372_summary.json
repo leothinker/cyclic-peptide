@@ -1,10 +1,10 @@
 {
   "patent": "WO2022251372",
   "profile": "WO2022251372",
-  "route": "padded",
+  "route": "padded_vote",
   "n_images": 20,
   "n_compounds": 28,
-  "n_rdkit_valid": 23,
+  "n_rdkit_valid": 27,
   "n_with_structure": 28,
   "n_assays": 28
 }
