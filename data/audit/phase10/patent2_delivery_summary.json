@@ -1,0 +1,31 @@
+{
+  "patent": "WO2022251372",
+  "profile": "WO2022251372",
+  "route": "padded_vote",
+  "rows": 28,
+  "columns": 54,
+  "extra_columns": [
+    "mdm2",
+    "mdm4",
+    "molm13",
+    "mv4_11",
+    "waga",
+    "mkl1"
+  ],
+  "printed_smiles": 28,
+  "rdkit_parseable": 27,
+  "bracket_balanced": 27,
+  "hand_references": {
+    "compounds": 6,
+    "exact": 6,
+    "edit_distance": 0,
+    "chars": 1249,
+    "cer_percent": 0.0
+  },
+  "activity_grades": {
+    "columns": 6,
+    "non_empty_cells": 168,
+    "values_outside_A_D": 0
+  },
+  "decimer": "shelved: the structure columns are empty on purpose"
+}

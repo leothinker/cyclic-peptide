@@ -1,0 +1,7 @@
+cmpd_id,reference_chars,read_chars,edit_distance,exact,parses
+1,207,207,0,True,True
+2,214,214,0,True,True
+3,214,214,0,True,True
+4,209,209,0,True,True
+10,201,201,0,True,True
+28,204,204,0,True,True

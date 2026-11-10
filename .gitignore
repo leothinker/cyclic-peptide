@@ -100,6 +100,14 @@ data/raw/WO2022251372/*
 data/processed/*
 !data/processed/compounds_combined.csv
 
+# The second patent's own deliverable.  It is a separate CSV because
+# it has its own activity columns (six letter grades instead of the
+# five numeric ones), and it must never overwrite the first patent's
+# file.
+!data/processed/WO2022251372/
+data/processed/WO2022251372/*
+!data/processed/WO2022251372/compounds_combined.csv
+
 # The route archives: the same CSV under three different OCR routes.
 # They are kept so the route comparison in the report can be re-checked
 # against the data rather than taken on trust.
@@ -128,6 +136,22 @@ data/audit/**
 !data/audit/phase9/patent2_reference_audit/cmpd10_line07.png
 !data/audit/phase9/patent2_zoom/cmpd28_band2_line03.png
 !data/audit/phase9/patent2_zoom/cmpd28_band2_line05.png
+
+# The 28 printed-SMILES cells of Table 1a: one crop per compound.
+# They are the pixels the recogniser actually read, so a reviewer can
+# check the reading without re-running the OCR.
+!data/audit/phase4/wo2022251372/table1a_cells/*.png
+
+# The multi-line views of four compounds, including the two that were
+# transcribed by hand.  They are what the transcription was read from.
+!data/audit/phase4/wo2022251372/visual_checks/cmpd1_lines_1_6.png
+!data/audit/phase4/wo2022251372/visual_checks/cmpd1_lines_7_10.png
+!data/audit/phase4/wo2022251372/visual_checks/cmpd4_lines_1_7.png
+!data/audit/phase4/wo2022251372/visual_checks/cmpd4_lines_8_10.png
+!data/audit/phase4/wo2022251372/visual_checks/cmpd10_lines_1_7.png
+!data/audit/phase4/wo2022251372/visual_checks/cmpd10_lines_8_10.png
+!data/audit/phase4/wo2022251372/visual_checks/cmpd28_lines_1_6.png
+!data/audit/phase4/wo2022251372/visual_checks/cmpd28_lines_7_10.png
 
 # Rendered PDF pages used for the external check: keep the one page that
 # carries a printed-SMILES table, drop the rest of the bulk renders.
