@@ -109,7 +109,21 @@ def main() -> int:
         # The two tables must agree; when they do not, the reference
         # cannot be scored against an ambiguous reading.
         distinct = set(variants.values())
-        raw = variants.get("activity8") or variants.get("smiles3") or ""
+        # Score the reading the pipeline actually ships.  The patent
+        # prints each compound twice -- once in the activity table and
+        # once in the structure table -- and ``merge_compound_records``
+        # keeps the RDKit-valid one.  Scoring the other reading would
+        # measure a string that never reaches the deliverable.
+        raw = ""
+        used_layout = ""
+        for layout, text in variants.items():
+            if not text:
+                continue
+            if not raw:
+                raw, used_layout = text, layout
+                continue
+            if validate_and_enrich(text) and not validate_and_enrich(raw):
+                raw, used_layout = text, layout
         cross_ok = len(distinct) <= 1
         repaired = auto_repair_smiles(raw) if raw else ""
         raw_chem = validate_and_enrich(raw) if raw else None
@@ -118,6 +132,7 @@ def main() -> int:
             "cmpd_id": compound_id,
             "page": page,
             "tables": "|".join(sorted(variants)),
+            "scored_layout": used_layout,
             "reference_len": len(reference),
             "raw_len": len(raw),
             "raw_edit_distance": edit_distance(reference, raw) if raw else "",
@@ -141,6 +156,7 @@ def main() -> int:
         writer = csv.DictWriter(
             handle, fieldnames=[
                 "cmpd_id", "page", "tables", "reference_len", "raw_len",
+                    "scored_layout",
                 "raw_edit_distance", "raw_cer", "raw_rdkit_parseable",
                 "repaired_edit_distance", "repaired_cer",
                 "repaired_rdkit_parseable", "cross_table_agreement", "note",

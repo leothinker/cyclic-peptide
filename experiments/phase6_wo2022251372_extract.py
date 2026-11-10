@@ -52,6 +52,11 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--cells", default=str(OUT / "cells"),
         help="Directory for the cropped structure images.",
     )
+    parser.add_argument(
+        "--route", default=None,
+        help="Printed-SMILES route. Defaults to the profile's own route, "
+             "which is what the committed output was produced with.",
+    )
     return parser.parse_args(argv)
 
 
@@ -68,7 +73,8 @@ def main(argv: list[str] | None = None) -> int:
         if p.suffix.lower() in {".jpg", ".jpeg", ".tif", ".tiff", ".png"}
     )
 
-    extractor = RapidOcrTableExtractor(profile=profile)
+    route = args.route or profile.smiles_route
+    extractor = RapidOcrTableExtractor(profile=profile, smiles_route=route)
     compounds: list = []
     assays: list = []
     prev_columns: list = []
@@ -132,7 +138,7 @@ def main(argv: list[str] | None = None) -> int:
     summary = {
         "patent": args.patent,
         "profile": args.profile,
-        "route": profile.smiles_route,
+        "route": route,
         "n_images": len(images),
         "n_compounds": len(merged),
         "n_rdkit_valid": n_valid,

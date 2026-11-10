@@ -27,7 +27,10 @@ column with the previous one.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
+
 from cpd.postprocess import DERIVED_COLUMNS as _DERIVED_COLUMNS
+from cpd.parsers.profiles import CANONICAL_ASSAY_FIELDS
 
 PIPELINE_COLUMNS: tuple[str, ...] = (
     "cmpd_id",
@@ -94,11 +97,37 @@ COMBINED_COLUMNS: tuple[str, ...] = (
     + ("ocr_bracket_deficit", "ocr_difficulty")
 )
 
+def combined_columns(extra_assay_fields: Iterable[str] = ()) -> tuple[str, ...]:
+    """The combined-CSV columns for one patent.
+
+    The canonical block always comes first and in the shipped order.
+    Patent-specific activity columns (the letter grades of
+    WO2022251372, for example) are appended after it, so the first
+    patent -- which declares only the five canonical fields -- keeps
+    exactly the shipped 48 columns and a byte-identical CSV.
+
+    The order of the extra columns follows the patent's profile, so
+    the header of a re-run is predictable.
+    """
+    seen: set[str] = set()
+    extra: list[str] = []
+    for name in extra_assay_fields:
+        if name in COMBINED_COLUMNS or name in CANONICAL_ASSAY_FIELDS:
+            continue
+        if name in seen:
+            continue
+        seen.add(name)
+        extra.append(name)
+    return COMBINED_COLUMNS + tuple(extra)
+
+
 __all__ = [
+    "CANONICAL_ASSAY_FIELDS",
     "COMBINED_COLUMNS",
     "DERIVED_COLUMNS",
     "PIPELINE_COLUMNS",
     "REPAIR_COLUMNS",
     "SEARCH_COLUMNS",
+    "combined_columns",
 ]
 

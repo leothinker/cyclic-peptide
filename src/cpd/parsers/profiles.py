@@ -19,6 +19,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+#: The five activity fields every patent's characterisation table
+#: carries.  A patent may declare more; those become extra columns
+#: after the canonical block of the combined CSV.
+CANONICAL_ASSAY_FIELDS: tuple[str, ...] = (
+    "kd_nm",
+    "rt_min",
+    "ms_mz",
+    "lcms_method",
+    "ms_polarity",
+)
+
 
 @dataclass(frozen=True)
 class ColumnTemplate:
@@ -122,6 +133,22 @@ class TableProfile:
             if field.name == name:
                 return field
         return None
+
+    @property
+    def extra_assay_fields(self) -> tuple[str, ...]:
+        """The patent-specific activity fields, in declaration order.
+
+        These are the fields the profile declares beyond the five
+        canonical ones (KD, RT, m/z, LCMS method, MS polarity).  The
+        first patent declares none, so its combined CSV keeps exactly
+        the shipped columns; the second patent declares six letter
+        grades, which become extra columns of its own CSV.
+        """
+        return tuple(
+            field.name
+            for field in self.assay_fields
+            if field.name not in CANONICAL_ASSAY_FIELDS
+        )
 
     def layout_for_fields(self, fields: set[str]) -> str | None:
         """Resolve a layout from canonical header fields."""

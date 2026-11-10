@@ -44,9 +44,11 @@ from cpd.parsers.table_extractor import (  # type: ignore[import-not-found]
     RapidOcrTableExtractor,
 )
 from cpd.parsers.profiles import get_profile  # type: ignore[import-not-found]
+from cpd.ocr.printed_smiles import ROUTES  # type: ignore[import-not-found]
 from cpd.schema import (  # type: ignore[import-not-found]
     COMBINED_COLUMNS as FULL_COLUMNS,
     PIPELINE_COLUMNS,
+    combined_columns,
 )
 
 
@@ -197,6 +199,7 @@ def _load_from_csv(
     assays_csv: Path,
     cells_dir: Path,
     img_dir: Path,
+    extra_columns: tuple[str, ...] = (),
 ) -> tuple[list, dict, dict]:
     """Load OCR results from legacy compounds.csv + assays.csv.
 
@@ -254,6 +257,11 @@ def _load_from_csv(
                     lcms_method=(r.get("lcms_method") or "").strip() or None,
                     ms_polarity=(r.get("ms_polarity") or "").strip() or None,
                     source_image=(r.get("source_image") or "").strip() or None,
+                    extra=tuple(
+                        (name, (r.get(name) or "").strip())
+                        for name in extra_columns
+                        if (r.get(name) or "").strip()
+                    ),
                 )
 
     print(f"   loaded {len(compounds)} compounds and {len(assays)} assays from legacy CSVs")
@@ -418,10 +426,28 @@ def _build_combined_rows(
     decimer_min_conf: dict[str, float] | None = None,
     decimer_low_conf: dict[str, int] | None = None,
     decimer_render: dict[str, str] | None = None,
+    extra_columns: tuple[str, ...] = (),
 ) -> list[dict]:
-    """Flatten compounds + assays + DECIMER into COMBINED_COLUMNS-shaped dicts."""
+    """Flatten compounds + assays + DECIMER into COMBINED_COLUMNS-shaped dicts.
+
+    ``extra_columns`` names the patent-specific activity fields (the
+    letter grades of WO2022251372).  Their values travel on
+    :attr:`AssayRecord.extra` and are written into their own columns
+    after the canonical block.  The first patent declares no extra
+    field, so its rows and its CSV stay exactly as shipped.
+    """
     rows: list[dict] = []
     seen_assay_ids: set[str] = set()
+
+    def _extra_values(assay: AssayRecord | None) -> dict[str, str]:
+        """The patent-specific activity values of one assay record."""
+        if assay is None or not extra_columns:
+            return {}
+        stored = dict(assay.extra)
+        return {
+            name: stored.get(name, "") for name in extra_columns
+        }
+
     for c in compounds:
         a = assays.get(c.cmpd_id)
         if a is not None:
@@ -473,7 +499,7 @@ def _build_combined_rows(
             best = ""
             best_src = ""
 
-        rows.append({
+        row = {
             "cmpd_id": c.cmpd_id,
             "smiles": c.smiles or "",
             "canonical_smiles": c.canonical_smiles or "",
@@ -503,11 +529,13 @@ def _build_combined_rows(
             "ocr_low_conf_count": (
                 c.ocr_low_conf_count if c.ocr_low_conf_count is not None else ""
             ),
-        })
+        }
+        row.update(_extra_values(a))
+        rows.append(row)
     for cid, a in assays.items():
         if cid in seen_assay_ids:
             continue
-        rows.append({
+        row = {
             "cmpd_id": cid,
             "smiles": "",
             "canonical_smiles": "",
@@ -531,7 +559,9 @@ def _build_combined_rows(
             "ocr_avg_entropy": "",
             "ocr_min_top1": "",
             "ocr_low_conf_count": "",
-        })
+        }
+        row.update(_extra_values(a))
+        rows.append(row)
     return rows
 
 
@@ -549,6 +579,31 @@ def _write_csv(
             writer.writerow(row)
             n += 1
     return n
+
+
+def _writable_target(canonical_csv: Path) -> Path:
+    """The file the combined CSV should be written to.
+
+    VSCode holds an exclusive write lock on ``compounds_combined.csv``
+    while it is open in the Source Control diff view; writing to the
+    canonical filename then raises PermissionError.  When that
+    happens the pipeline writes a sibling file instead and says so.
+
+    A file that does not exist yet is simply writable -- the check
+    must not fail on a patent's first run into a fresh directory.
+    """
+    swap_csv = canonical_csv.with_name("compounds_combined.new.csv")
+    if not canonical_csv.exists():
+        return canonical_csv
+    try:
+        with open(canonical_csv, "r+b"):
+            return canonical_csv
+    except PermissionError:
+        print(
+            f"   [!] {canonical_csv.name} is locked; "
+            f"writing to {swap_csv.name} instead"
+        )
+        return swap_csv
 
 
 def _l1_breakdown(combined_rows: list[dict], threshold: float = 0.5) -> dict:
@@ -615,6 +670,11 @@ def run_pipeline(
     cells_dir = out_path / "cells"
     cache_path = out_path / DECIMER_CACHE_FILENAME
     profile = get_profile(profile_name)
+    # The column set is profile-driven: the canonical block first,
+    # then the patent-specific activity fields.  The first patent
+    # declares no extra field, so its CSV keeps exactly the shipped
+    # 48 columns.
+    columns = combined_columns(profile.extra_assay_fields)
 
     print(f"[1/4] scanning {img_path} ...")
     jpgs = list(_iter_images(img_path, profile))
@@ -628,6 +688,7 @@ def run_pipeline(
         compounds, assays, failures = _load_from_csv(
             out_path / "compounds.csv", out_path / "assays.csv",
             cells_dir, img_path,
+            extra_columns=profile.extra_assay_fields,
         )
     else:
         # ``None`` means "whatever the patent's profile declares".
@@ -658,6 +719,7 @@ def run_pipeline(
     combined_rows = _build_combined_rows(
         compounds, assays, decimer_raw, decimer_canon,
         decimer_min_conf, decimer_low_conf, decimer_render,
+        extra_columns=profile.extra_assay_fields,
     )
     # The repair layer: the DECIMER-side promotion policy.  It picks
     # what goes into ``smiles_best`` and records the mass verdict.
@@ -669,23 +731,13 @@ def run_pipeline(
     from cpd.postprocess import apply_derived_columns as _apply_derived
 
     combined_rows = _apply_derived(combined_rows)
-    # VSCode holds an exclusive write lock on compounds_combined.csv while
-    # it is open in the Source Control diff view; writing to the canonical
-    # filename raises PermissionError on Windows. Auto-detect and fall back
-    # to a sibling name; the user can swap once the editor releases the file.
     canonical_csv = out_path / "compounds_combined.csv"
-    swap_csv = out_path / "compounds_combined.new.csv"
-    try:
-        with open(canonical_csv, "r+b"):
-            target_csv = canonical_csv
-    except PermissionError:
-        target_csv = swap_csv
-        print(f"   [!] {canonical_csv.name} is locked; writing to {swap_csv.name} instead")
+    target_csv = _writable_target(canonical_csv)
 
     n_combined = _write_csv(
         combined_rows,
         target_csv,
-        FULL_COLUMNS,
+        columns,
     )
 
     n_decimer = len(decimer_raw)
@@ -753,7 +805,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="Per-character top-k returned by the SMILES-cell recogniser (default: 5). "
                         "Set to 0 to disable the RDKit-validated top-k repair.")
     p.add_argument("--smiles-route",
-                   choices=("production", "validated", "padded"),
+                   choices=ROUTES,
                    default=None,
                    help="How the printed SMILES cell is read. 'production' is the "
                         "historical behaviour (English PP-OCRv4; drops the left "
@@ -762,6 +814,10 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         "'padded' is the same ink-band geometry with the English "
                         "PP-OCRv4 recogniser and a 6 px margin around each printed "
                         "line, measured on patent WO2022251372. "
+                        "'validated_vote' and 'padded_vote' add a second "
+                        "recogniser that settles the characters the first one "
+                        "lost; they are the routes the two patent profiles "
+                        "declare by default. "
                         "Default: the route the patent's profile declares.")
     p.add_argument("--report-l1", action="store_true",
                    help="Skip the pipeline; print the L1 breakdown from the existing combined CSV instead.")

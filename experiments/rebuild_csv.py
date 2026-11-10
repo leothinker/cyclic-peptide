@@ -41,7 +41,7 @@ import main as pipeline  # noqa: E402
 from cpd.parsers.profiles import get_profile  # noqa: E402
 from cpd.postprocess import apply_derived_columns  # noqa: E402
 from cpd.repair_policy import process_rows  # noqa: E402
-from cpd.schema import COMBINED_COLUMNS  # noqa: E402
+from cpd.schema import combined_columns  # noqa: E402
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -165,6 +165,7 @@ def main(argv: list[str] | None = None) -> int:
         print("[2/3] building the combined rows ...")
         rows = pipeline._build_combined_rows(
             compounds, assays, dec_raw, dec_canon, dec_min, dec_low, dec_render,
+            extra_columns=profile.extra_assay_fields,
         )
     print("   applying the repair policy ...")
     rows = process_rows(rows)
@@ -187,7 +188,9 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"[3/3] writing {out_path} ...")
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    n = pipeline._write_csv(rows, out_path, COMBINED_COLUMNS)
+    n = pipeline._write_csv(
+        rows, out_path, combined_columns(profile.extra_assay_fields),
+    )
 
     n_valid = sum(1 for r in rows if r["is_valid"] == "True")
     n_canon = sum(1 for r in rows if r["canonical_smiles"])
