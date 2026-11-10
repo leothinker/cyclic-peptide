@@ -17,6 +17,83 @@
 
 ---
 
+## 0h. 2026-11-11 (day two) — one command for both patents, and a
+## bracket count that was too generous
+
+### 1. The reviewer's summary command only knew about one patent
+
+`analysis/verify_deliverable.py` is the script a reviewer runs to see
+what the deliverable contains.  It read one hard-coded path --
+`data/processed/compounds_combined.csv` -- so the second patent's CSV
+was invisible to it even after that CSV existed.  A reviewer running
+it would have seen the first patent and nothing else, and had no
+reason to know a second deliverable was there.
+
+It now finds the patents through the profile registry, reads each
+one's own CSV and prints its rows, columns, route, activity-field
+coverage, printed-SMILES quality and the distribution of the audit
+columns.  A third patent is covered as soon as its profile exists
+and its CSV has been built.
+
+### 2. The same script over-reported the bracket balance
+
+While extending it, the printed-SMILES section turned out to be
+counting the wrong thing.  It used
+`cpd.postprocess.bracket_deficit(smiles) == 0` as its "is this
+string balanced?" test.  But `bracket_deficit` counts the surplus of
+**opening** brackets and clamps the result at zero, because the
+failure it was written for is a bracket the recogniser *lost*.  Two
+things follow:
+
+* a string with one closing bracket too many scores zero, because its
+  surplus is negative and the clamp lifts it back to zero;
+* a string with one opening bracket too many *and* one closing
+  bracket too many also scores zero, because the two surpluses
+  cancel.
+
+So the verifier reported **294 of 335** printed SMILES of the first
+patent as bracket-balanced when only **211** are.  The other 83 are
+not balanced.  This was the reviewer's own tool, so the number it
+printed was the one a supervisor was most likely to quote.
+
+The check now looks at both directions, which is what "balanced"
+means:
+
+```
+  bracket-balanced    : 211 / 335
+```
+
+That is the same figure the rest of the repository already uses --
+`experiments/phase8_pipeline_cells_corpus.py` counts the two
+directions separately, and the README quotes 211 -- so this brings
+the summary script into line with the corpus measurement rather than
+introducing a new number.  The shipped CSV's `ocr_bracket_deficit`
+column is **not** changed: its meaning is "how many brackets did the
+recogniser lose", it is documented as such in `cpd/postprocess.py`,
+and changing it would change the deliverable for no good reason.
+
+The second patent's own file shows the same distinction:
+`bracket_deficit == 0` for all 28 strings, but only 27 of them are
+balanced -- compound 16 has one closing bracket too many.
+
+### 3. Where both repositories stand
+
+| | working `cyclic-peptide` | delivery `drug_ocr` |
+|---|---|---|
+| commits this round | 3 | 1 |
+| tests | 278 pass | 278 pass |
+| working tree | clean | clean |
+| curated files in step | 392 identical, 0 different, 0 broken links | |
+
+The delivery repository's own self-check
+(`experiments/phase9_delivery_check.py`, run inside `drug_ocr` with
+its own interpreter) confirms that it resolves its own `cpd`
+package, selects `validated_vote` for the first patent and
+`padded_vote` for the second, and reads all three hand-checked
+compounds of the first patent character-exactly.
+
+---
+
 ## 0g. 2026-11-11 — the second patent got a deliverable, and the
 ## command line caught up with the profiles
 

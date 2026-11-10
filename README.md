@@ -575,6 +575,12 @@ numbers (`experiments/rebuild_csv.py`, the phase-6 and phase-7 audit
 scripts, and `analysis/verify_deliverable.py`), so a reviewer can
 re-run the audit rather than take it on trust.
 
+`analysis/verify_deliverable.py` now summarises **every** configured
+patent, not just the first: it finds the patents through the profile
+registry, reads each one's own CSV and prints its rows, columns,
+route, activity-field coverage, printed-SMILES quality and the
+distribution of the audit columns.
+
 ## Open Research: the repair strategies do not survive auditing
 
 Once the chemistry and mass gates are applied, **0 of the 119 candidate
