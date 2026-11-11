@@ -102,6 +102,11 @@ install the package and re-run to fill it.
   shipped 48 columns and its bytes.
   Print it readably with
   `uv run python experiments/phase10_patent2_inspect.py`.
+- `data/audit/phase10/figure_patent2_delivery.png` -- the second
+  patent at a glance: the printed cell of four compounds next to the
+  SMILES the pipeline delivered, with the activity grades and the
+  one failing row (compound 16) shown rather than hidden.  Rebuild it
+  with `uv run python experiments/phase10_patent2_figure.py`.
 - `data/processed/cells/{src_stem}_{cmpd_id}_struct.png` -- cropped
   structure image per compound (406 PNGs).
 - `data/processed/rendered/{cmpd_id}.png` -- DECIMER-canonicalised

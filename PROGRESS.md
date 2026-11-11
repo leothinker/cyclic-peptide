@@ -74,7 +74,10 @@ and changing it would change the deliverable for no good reason.
 
 The second patent's own file shows the same distinction:
 `bracket_deficit == 0` for all 28 strings, but only 27 of them are
-balanced -- compound 16 has one closing bracket too many.
+balanced.  Compound 16 is the odd one out: the recogniser lost two
+**opening** brackets, the `[` before `C@@H]` and the `(` before
+`CCOC`, so the delivered string carries one surplus `]` and one
+surplus `)`.
 
 ### 3. Where both repositories stand
 
@@ -91,6 +94,21 @@ its own interpreter) confirms that it resolves its own `cpd`
 package, selects `validated_vote` for the first patent and
 `padded_vote` for the second, and reads all three hand-checked
 compounds of the first patent character-exactly.
+
+### 4. A picture of the second patent's delivery
+
+`experiments/phase10_patent2_figure.py` draws
+`data/audit/phase10/figure_patent2_delivery.png`: four compounds
+side by side, the printed patent cell on the left and the string the
+pipeline delivered on the right, with the activity grades underneath.
+Three of the four panels are compounds that were transcribed by hand
+and match character for character; the fourth is compound 16, the
+failing row, with the two lost brackets underlined.
+
+It is the same evidence a reviewer can get from
+`experiments/phase10_patent2_inspect.py`, only readable from across
+a table.  The script needs only Pillow and the standard library, so
+it runs wherever the pipeline runs.
 
 ---
 
