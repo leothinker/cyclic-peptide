@@ -61,6 +61,7 @@ import hashlib
 import re
 import shutil
 import sys
+import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
@@ -273,6 +274,7 @@ MANIFEST: tuple[tuple[str, str], ...] = (
     ("experiments/phase10_patent2_delivery.py", "experiments/"),
     ("experiments/phase10_patent2_inspect.py", "experiments/"),
     ("experiments/phase10_patent2_figure.py", "experiments/"),
+    ("experiments/demo_csv_vs_golden.py", "experiments/"),
     ("experiments/verify_csv.py", "experiments/"),
     ("experiments/wo2022251372_references.py", "experiments/"),
 )
@@ -477,6 +479,38 @@ def check_links(source: Path, target: Path) -> list[str]:
     return broken
 
 
+def _copy_file(src: Path, dst: Path) -> None:
+    """Copy a file, falling back to a plain read and write.
+
+    ``shutil.copy2`` goes through ``CopyFile2``, which fails with a
+    sharing violation when anything else on the machine happens to
+    hold the file open -- an image preview or a virus scanner is
+    enough.  The comparison downstream only looks at the bytes, so a
+    plain read and write is an acceptable substitute.  A failed
+    ``CopyFile2`` can leave the destination locked for a moment, so
+    the fallback retries briefly before giving up.
+    """
+    try:
+        shutil.copy2(src, dst)
+        return
+    except OSError:
+        pass
+
+    payload = src.read_bytes()
+    for attempt in range(5):
+        try:
+            dst.write_bytes(payload)
+            break
+        except PermissionError:
+            if attempt == 4:
+                raise
+            time.sleep(0.2 * (attempt + 1))
+    try:
+        shutil.copystat(src, dst)
+    except OSError:
+        pass
+
+
 def apply(source: Path, target: Path, prune: bool) -> None:
     pairs = collect(source)
     for src, dst_rel in pairs:
@@ -490,7 +524,7 @@ def apply(source: Path, target: Path, prune: bool) -> None:
             dst.write_bytes(rendered.encode("utf-8"))
             shutil.copystat(src, dst)
         else:
-            shutil.copy2(src, dst)
+            _copy_file(src, dst)
     print(f"copied {len(pairs)} files into {target}")
 
     if not prune:
